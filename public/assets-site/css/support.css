@@ -1,0 +1,60 @@
+/* Custom Arabic font support */
+@import url("https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700&display=swap");
+body {
+  font-family: "Cairo", sans-serif;
+}
+
+/* Loading animation */
+.loading-spinner {
+  border: 2px solid #1f232b;
+  border-top: 2px solid #0ea5e9;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  animation: spin 1s linear infinite;
+  display: inline-block;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* Custom scrollbar for dark theme */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #1f232b;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #0ea5e9;
+  border-radius: 4px;
+}
+
+/* Smooth accordion animation */
+.accordion-content {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease-out;
+}
+
+.accordion-content.active {
+  max-height: 200px;
+}
+
+/* LTR support */
+[dir="ltr"] {
+  text-align: left;
+}
+
+[dir="rtl"] {
+  text-align: right;
+}

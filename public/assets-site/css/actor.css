@@ -1,0 +1,56 @@
+* {
+  scroll-behavior: smooth;
+}
+
+.bio-gradient {
+  background: linear-gradient(180deg, transparent 0%, #0e1117 100%);
+}
+
+.star-rating {
+  display: inline-flex;
+  direction: ltr;
+}
+
+.star {
+  color: #374151;
+  transition: color 0.2s;
+}
+
+.star.active {
+  color: #fbbf24;
+}
+
+.work-card {
+  transition: all 0.3s ease;
+}
+
+.work-card:hover {
+  transform: translateY(-8px);
+}
+
+.swiper-button-next,
+.swiper-button-prev {
+  color: #0ea5e9 !important;
+}
+
+.swiper-pagination-bullet-active {
+  background-color: #0ea5e9 !important;
+}
+
+.genre-tag {
+  transition: all 0.2s ease;
+}
+
+.genre-tag:hover {
+  transform: scale(1.05);
+}
+
+[dir="rtl"] .swiper-button-next {
+  left: 10px;
+  right: auto;
+}
+
+[dir="rtl"] .swiper-button-prev {
+  right: 10px;
+  left: auto;
+}

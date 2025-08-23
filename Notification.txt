@@ -1,0 +1,9 @@
+        // // Send Notification
+        // $userId = User::find(1)->id;
+        // $employee = Employee::first();
+        // $message = 'New Employee';
+        // broadcast(new NewEmployeeNotificationEvent($userId, $employee, $message));
+        // return response()->json([
+        //     'status' => 'success',
+        //     'message' => 'Notification sent successfully',
+        // ]);
