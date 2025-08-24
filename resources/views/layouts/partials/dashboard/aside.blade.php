@@ -57,6 +57,27 @@
                 </a>
             </li>
         @endcan
+
+        @can('view', 'App\\Models\Country')
+            <li
+                class="menu-item {{ request()->is('dashboard/countries') || request()->is('dashboard/countries/*') ? 'active' : '' }}">
+                <a href="{{ route('dashboard.countries.index') }}" class="menu-link">
+                    <i class="fa-solid fa-users me-2"></i>
+                    <div data-i18n="users">الدول</div>
+                </a>
+            </li>
+        @endcan
+
+        @can('view', 'App\\Models\SystemSetting')
+            <li
+                class="menu-item {{ request()->is('dashboard/settings') || request()->is('dashboard/settings/*') ? 'active' : '' }}">
+                <a href="{{ route('dashboard.settings.edit') }}" class="menu-link">
+                    <i class="fa-solid fa-users me-2"></i>
+                    <div data-i18n="users">الاعدادات</div>
+                </a>
+            </li>
+        @endcan
+
         {{-- <li class="menu-item">
             <a href="page-2.html" class="menu-link">
                 <i class="menu-icon tf-icons ti ti-app-window"></i>
