@@ -15,13 +15,6 @@ return new class extends Migration
             $table->id(); // المعرف الفريد
             $table->string('key', 100)->unique(); // مفتاح الإعداد
             $table->longText('value')->nullable(); // قيمة الإعداد
-            $table->enum('type', ['string', 'number', 'boolean', 'json', 'text'])->default('string'); // نوع البيانات
-            $table->string('group_name', 50)->default('general'); // مجموعة الإعدادات
-            $table->string('label_ar', 200)->nullable(); // تسمية الإعداد بالعربية
-            $table->string('label_en', 200)->nullable(); // تسمية الإعداد بالإنجليزية
-            $table->text('description_ar')->nullable(); // وصف الإعداد بالعربية
-            $table->text('description_en')->nullable(); // وصف الإعداد بالإنجليزية
-            $table->boolean('is_public')->default(false); // متاح للجمهور عبر API
             $table->timestamps(); // تواريخ الإنشاء والتحديث
         });
     }

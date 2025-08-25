@@ -19,29 +19,29 @@ class DatabaseSeeder extends Seeder
         // User::factory(10)->create();
 
         // Create Admin User
-        // Admin::create([
-        //     'name'            => 'Administrator',
-        //     'username'              => 'admin',
-        //     'email'                 => 'admin@admin.com',
-        //     'password'              => Hash::make('12345678'),
-        //     'last_activity'  => now(),
-        //     'avatar'  => null,
-        //     'super_admin'  => 1,
-        //     'is_active' => 1,
-        // ]);
+        Admin::create([
+            'name'=> 'Administrator',
+            'username'=> 'admin',
+            'email'=> 'admin@admin.com',
+            'password'=> Hash::make('12345678'),
+            'last_activity'  => now(),
+            'avatar'  => null,
+            'super_admin'  => 1,
+            'is_active' => 1,
+        ]);
 
-        //
-        // User::create([
-        //     'first_name' => 'User',
-        //     'last_name' => null,
-        //     'email' => 'user@gmail.com',
-        //     'phone' => null,
-        //     'password' => Hash::make('12345678'),
-        //     'date_of_birth' => null,
-        //     'gender' => 'male',
-        //     'country_code' => null,
-        //     'avatar' => null,
-        //     'last_activity' => now()
-        // ]);
+        
+        User::create([
+            'first_name' => 'User',
+            'last_name' => null,
+            'email' => 'user@gmail.com',
+            'phone' => null,
+            'password' => Hash::make('12345678'),
+            'date_of_birth' => null,
+            'gender' => 'male',
+            'country_code' => null,
+            'avatar' => null,
+            'last_activity' => now()
+        ]);
     }
 }
