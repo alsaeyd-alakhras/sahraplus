@@ -7,3 +7,10 @@
         //     'status' => 'success',
         //     'message' => 'Notification sent successfully',
         // ]);
+
+$notificationService = new NotificationService();
+$notificationService->sendFromTemplate(
+    $user,
+    'subscription_activated',
+    ['name' => $user->first_name, 'plan' => 'Premium']
+);

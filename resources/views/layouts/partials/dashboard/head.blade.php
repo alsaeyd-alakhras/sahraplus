@@ -72,7 +72,7 @@
     </style>
     {{-- <link rel="stylesheet" href="{{ asset('assets/vendor/css/rtl/theme-semi-dark.css') }}" /> --}}
     <link rel="stylesheet" href="{{ asset('css/custom/style.css') }}" />
-    <meta name="user_id" content="{{ $auth_user?->id ?? 0 }}">
+    <meta name="admin_id" content="{{ $auth_admin?->id ?? 0 }}">
     @vite('resources/js/app.js');
     @stack('styles')
 </head>

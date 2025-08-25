@@ -15,18 +15,21 @@ class ActivityLogService
         $internalIp = session('internal_ip', 'IP not found');
 
 
+        $admin = Auth::guard('admin')->user();
         // حفظ التفاصيل في قاعدة البيانات
-        ActivityLog::create([
-            'admin_id' => $admin_id ?? Auth::guard('admin')->user()->id,
-            'admin_name' => $admin_name ?? Auth::guard('admin')->user()->name ?? 'Guest',
-            'ip_request' => Request::ip(),
-            'ip_address' => $internalIp,
-            'event_type' => $eventType,
-            'model_name' => $modelName,
-            'message' => $message,
-            'old_data' => json_encode($oldData),
-            'new_data' => json_encode($newData),
-            'created_at' => now(),
-        ]);
+        if($admin){
+            ActivityLog::create([
+                'admin_id' => $admin_id ?? $admin->id,
+                'admin_name' => $admin_name ?? $admin->name ?? 'Guest',
+                'ip_request' => Request::ip(),
+                'ip_address' => $internalIp,
+                'event_type' => $eventType,
+                'model_name' => $modelName,
+                'message' => $message,
+                'old_data' => json_encode($oldData),
+                'new_data' => json_encode($newData),
+                'created_at' => now(),
+            ]);
+        }
     }
 }

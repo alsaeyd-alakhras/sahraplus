@@ -24,7 +24,7 @@ class User extends Authenticatable
         'gender',
         'country_code',
         'language',
-        'avatar',
+        'avatar_url',
         'is_active',
         'is_banned',
         'email_notifications',
@@ -47,6 +47,7 @@ class User extends Authenticatable
         'push_notifications' => 'boolean',
         'parental_controls' => 'boolean',
     ];
+    protected $appends = ['avatar_full_url', 'full_name'];
 
     // العلاقات
     public function profiles()
@@ -74,10 +75,10 @@ class User extends Authenticatable
     {
         return $this->first_name . ' ' . $this->last_name;
     }
-    public function getAvatarUrlAttribute() // $user->avatar_url
+    public function getAvatarFullUrlAttribute() // $user->avatar_full_url
     {
-        if ($this->avatar) {
-            return asset('storage/' . $this->avatar);
+        if ($this->avatar_url) {
+            return asset('storage/' . $this->avatar_url);
         }
         return asset('assets/img/avatars/1.png');
     }

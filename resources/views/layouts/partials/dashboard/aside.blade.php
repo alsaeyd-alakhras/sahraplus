@@ -33,6 +33,15 @@
                 </a>
             </li>
         @endcan
+        @can('view', 'App\\Models\Notification')
+            <li
+                class="menu-item {{ request()->is('dashboard/notifications') || request()->is('dashboard/notifications/*') ? 'active' : '' }}">
+                <a href="{{ route('dashboard.notifications.index') }}" class="menu-link">
+                    <i class="fa-solid fa-bell me-2"></i>
+                    <div data-i18n="notifications">الإشعارات</div>
+                </a>
+            </li>
+        @endcan
         {{-- <li class="menu-header small">
             <span class="menu-header-text" data-i18n="Apps &amp; Pages">الوسائط</span>
         </li> --}}
@@ -54,6 +63,15 @@
                 <a href="{{ route('dashboard.users.index') }}" class="menu-link">
                     <i class="fa-solid fa-users me-2"></i>
                     <div data-i18n="users">المستخدمين</div>
+                </a>
+            </li>
+        @endcan
+        @can('view', 'App\\Models\UserAvatar')
+            <li
+                class="menu-item {{ request()->is('dashboard/user_avatars') || request()->is('dashboard/user_avatars/*') ? 'active' : '' }}">
+                <a href="{{ route('dashboard.user_avatars.index') }}" class="menu-link">
+                    <i class="fa-solid fa-images me-2"></i>
+                    <div data-i18n="user-avatar">مكتبة الأفاتار</div>
                 </a>
             </li>
         @endcan
@@ -106,7 +124,7 @@
     <div class="my-3 text-center text-white text-body">
         ©
         2025
-        , تم الإنشاء ❤️ بواسطة <a href="https://saeyd-jamal.github.io/Portfolio/" target="_blank" class="footer-link">م
+        , تم الإنشاء ❤️ بواسطة <a href="https://saeyd-jamal.github.io/portfolio/" target="_blank" class="footer-link">م
             . السيد الاخرسي</a>
     </div>
 </aside>

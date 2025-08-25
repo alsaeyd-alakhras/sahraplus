@@ -6,6 +6,12 @@
     'label'=>'',
     'required' => false,
 ])
+@php
+    $inputId = $id ?? $name;
+    $hasError = $errors->has($name);
+    $errorMessage = $errors->first($name);
+@endphp
+
 @if ($label)
     <label class="mb-1 form-label fw-semibold text-dark d-flex align-items-center justify-content-between" for="{{ $name }}">
         {{ $label }}
@@ -25,13 +31,13 @@
     autocomplete="off"
     {{$attributes->class([
         'form-control',
-        'is-invalid' => $errors->has($name)
+        'is-invalid' => $hasError
     ])}}
 />
 
 {{-- Validation --}}
-@error($name)
+@if ($hasError)
     <div class="invalid-feedback">
-        {{$message}}
+        {{ $errorMessage }}
     </div>
-@enderror
+@endif

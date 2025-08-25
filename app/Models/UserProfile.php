@@ -15,7 +15,6 @@ class UserProfile extends Model
         'avatar_url',
         'is_default',
         'is_child_profile',
-        'age_restriction',
         'pin_code',
         'language',
         'is_active'
@@ -25,8 +24,8 @@ class UserProfile extends Model
         'is_default' => 'boolean',
         'is_child_profile' => 'boolean',
         'is_active' => 'boolean',
-        'age_restriction' => 'integer',
     ];
+    protected $appends = ['avatar_full_url'];
 
     // العلاقات
     public function user()
@@ -59,5 +58,13 @@ class UserProfile extends Model
     public function scopeForChildren($query)
     {
         return $query->where('is_child_profile', true);
+    }
+
+    public function getAvatarFullUrlAttribute() // $user->avatar_full_url
+    {
+        if ($this->avatar_url) {
+            return asset('storage/' . $this->avatar_url);
+        }
+        return asset('assets/img/avatars/1.png');
     }
 }

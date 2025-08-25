@@ -20,7 +20,7 @@ class UserResource extends JsonResource
             'gender' => $this->gender,
             'country_code' => $this->country_code,
             'language' => $this->language,
-            'avatar_url' => $this->avatar_url,
+            'avatar_url' => $this->avatar_full_url,
             'is_active' => $this->is_active,
             'is_banned' => $this->is_banned,
             'email_notifications' => $this->email_notifications,

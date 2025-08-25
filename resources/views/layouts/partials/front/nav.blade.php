@@ -12,7 +12,7 @@ class="fixed top-0 right-0 left-0 z-[9999] navbar-initial navbar-inset-shadow tr
 
         <!-- Navigation Links -->
         <div class="hidden items-center space-x-8 md:flex rtl:space-x-reverse">
-            <a href="./index.html"
+            <a href="{{route('site.home')}}"
                 class="font-medium text-white transition-colors duration-300 hover:text-fire-red">الرئيسية</a>
             <a href="./series.html"
                 class="font-medium text-white transition-colors duration-300 hover:text-fire-red">مسلسلات</a>
@@ -29,15 +29,17 @@ class="fixed top-0 right-0 left-0 z-[9999] navbar-initial navbar-inset-shadow tr
             <button id="open-search" class="text-white transition-colors duration-300 hover:text-neon-green">
                 <i class="fas fa-search"></i>
             </button>
-            <a href="./login.html"
+            @guest('web')
+            <a href="{{route('login')}}"
                 class="font-medium text-white transition-colors duration-300 hover:text-neon-green">
                 تسجيل الدخول
             </a>
-            <a href="./sup.html"
+            <a href="{{route('login')}}"
                 class="px-6 py-2 font-medium text-white rounded-lg transition-all duration-300 bg-fire-red hover:bg-red-700 btn-glow">
                 اشترك الآن
             </a>
-
+            @endguest
+            @auth('web')
             <!-- قسم بيانات اليوزر -->
             <div class="relative group">
                 <button class="flex items-center space-x-2 rtl:space-x-reverse focus:outline-none">
@@ -51,13 +53,13 @@ class="fixed top-0 right-0 left-0 z-[9999] navbar-initial navbar-inset-shadow tr
                     <!-- العناصر -->
                     <div class="px-4 py-2 text-[15px] divide-y divide-gray-700">
                         <div class="py-2 space-y-2">
-                            <a href="./settings.html"
+                            <a href="{{route('site.settings')}}"
                                 class="flex justify-start items-center transition-all duration-200 cursor-pointer hover:text-sky-400 hover:pr-2">
                                 <i class="pl-2 fas fa-user"></i>
                                 <span>إعدادات الحساب</span>
                             </a>
 
-                            <a href="#"
+                            <a href="{{route('site.settings',['tab'=>'devices'])}}"
                                 class="flex justify-start items-center transition-all duration-200 cursor-pointer hover:text-sky-400 hover:pr-2">
                                 <i class="pl-2 fas fa-desktop"></i>
                                 <span>إدارة الأجهزة</span>
@@ -65,8 +67,13 @@ class="fixed top-0 right-0 left-0 z-[9999] navbar-initial navbar-inset-shadow tr
 
                             <div
                                 class="flex justify-start items-center transition-all duration-200 cursor-pointer hover:text-red-400 hover:pr-2">
-                                <i class="pl-2 fas fa-sign-out-alt"></i>
-                                <span>خروج</span>
+                                <form action="{{route('logout')}}" method="POST">
+                                    @csrf
+                                    <button type="submit">
+                                        <i class="pl-2 fas fa-sign-out-alt"></i>
+                                        <span>خروج</span>
+                                    </button>
+                                </form>
                             </div>
                         </div>
                     </div>
@@ -76,7 +83,7 @@ class="fixed top-0 right-0 left-0 z-[9999] navbar-initial navbar-inset-shadow tr
             <div class="relative group" id="user-avatar-menu">
                 <!-- زر الصورة -->
                 <button class="flex items-center space-x-2 rtl:space-x-reverse focus:outline-none">
-                    <img src="./assets/images/avatar.jpg" alt="Avatar"
+                    <img src="" alt="Avatar"
                         class="w-9 h-9 rounded-full border-2 border-white shadow profile-img" />
                 </button>
 
@@ -88,9 +95,9 @@ class="fixed top-0 right-0 left-0 z-[9999] navbar-initial navbar-inset-shadow tr
                     <div class="flex justify-between items-center px-4 py-3 border-b border-gray-700">
                         <div id="openProfileModal"
                             class="flex items-center space-x-2 text-gray-300 transition-all duration-200 rtl:space-x-reverse hover:pr-2 hover:text-sky-400 group">
-                            <img src="./assets/images/avatar.jpg" class="w-10 h-10 rounded-full profile-img" />
+                            <img src="{{$auth_user->avatar_full_url}}" class="w-10 h-10 rounded-full profile-img" />
                             <div>
-                                <p class="text-sm font-bold" id="profile-name">❤️ mero</p>
+                                <p class="text-sm font-bold" id="profile-name">{{$auth_user->full_name}}</p>
                                 <p class="text-sm font-bold">تغيير الملف الشخصي</p>
                             </div>
                             <i
@@ -114,7 +121,7 @@ class="fixed top-0 right-0 left-0 z-[9999] navbar-initial navbar-inset-shadow tr
                                 <i class="fas fa-globe"></i>
                                 <span>اللغة</span>
                             </div>
-                            <span class="text-xs">(Ar) العربيّة</span>
+                            <span class="text-xs">({{app()->getLocale()}}) {{app()->getLocale() == 'ar' ? 'العربية' : 'الإنجليزية'}}</span>
                         </div>
                     </div>
                 </div>
@@ -134,23 +141,23 @@ class="fixed top-0 right-0 left-0 z-[9999] navbar-initial navbar-inset-shadow tr
                         <div
                             class="flex justify-between items-center transition-all duration-200 cursor-pointer hover:text-sky-400">
                             <i class="text-green-500 fas fa-check"></i>
-                            <span class="w-full text-right">العربية (Ar)</span>
+                            <span class="w-full text-right">{{app()->getLocale() == 'ar' ? 'العربية' : 'الإنجليزية'}}</span>
                         </div>
+                        @if(app()->getLocale() == 'ar')
                         <div
                             class="flex justify-end transition-all duration-200 cursor-pointer hover:text-sky-400">
                             English (En)
                         </div>
+                        @else
                         <div
                             class="flex justify-end transition-all duration-200 cursor-pointer hover:text-sky-400">
-                            Français (Fr)
+                            Arabic (Ar)
                         </div>
+                        @endif
                     </div>
                 </div>
             </div>
-
-
-
-
+            @endauth
         </div>
     </div>
 </div>

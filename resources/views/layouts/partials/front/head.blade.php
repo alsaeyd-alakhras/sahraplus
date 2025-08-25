@@ -30,6 +30,8 @@
     <!-- Custom CSS -->
     <link href="{{asset('assets-site/css/style.css')}}" rel="stylesheet" />
 
+    <meta name="user_id" content="{{ $auth_user?->id ?? 0 }}">
+    @vite('resources/js/app.js')
     @stack('styles')
 </head>
 

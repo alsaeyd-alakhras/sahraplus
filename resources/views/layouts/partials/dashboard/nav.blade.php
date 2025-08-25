@@ -261,7 +261,7 @@
                 <a class="p-0 nav-link dropdown-toggle hide-arrow" href="javascript:void(0);"
                     data-bs-toggle="dropdown">
                     <div class="avatar avatar-online">
-                        <img src="{{ $auth_user->avatar_url }}" alt class="rounded-circle" />
+                        <img src="{{ $auth_admin->avatar_url }}" alt class="rounded-circle" />
                     </div>
                 </a>
                 <ul class="dropdown-menu dropdown-menu-end">
@@ -270,12 +270,12 @@
                             <div class="d-flex align-items-center">
                                 <div class="flex-shrink-0 me-2">
                                     <div class="avatar avatar-online">
-                                        <img src="{{ $auth_user->avatar_url }}" alt class="rounded-circle" />
+                                        <img src="{{ $auth_admin->avatar_url }}" alt class="rounded-circle" />
                                     </div>
                                 </div>
                                 <div class="flex-grow-1">
-                                    <h6 class="mb-0">{{ $auth_user->name }}</h6>
-                                    <small class="text-muted">{{ $auth_user->email }}</small>
+                                    <h6 class="mb-0">{{ $auth_admin->name }}</h6>
+                                    <small class="text-muted">{{ $auth_admin->email }}</small>
                                 </div>
                             </div>
                         </a>
@@ -284,7 +284,7 @@
                         <div class="my-1 dropdown-divider mx-n2"></div>
                     </li>
                     <li>
-                        <a class="dropdown-item" href="{{ route('dashboard.admins.show', $auth_user->id) }}">
+                        <a class="dropdown-item" href="{{ route('dashboard.admins.show', $auth_admin->id) }}">
                             <i class="ti ti-user me-3 ti-md"></i><span class="align-middle">
                                 الملف الشخصي</span>
                         </a>

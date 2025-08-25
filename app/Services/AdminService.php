@@ -181,10 +181,10 @@ class AdminService
             }
 
             // Update Admin Password
-            if(isset($data['password'])){
+            if (!empty($data['password'])) {
                 $data['password'] = Hash::make($data['password']);
-            }else{
-                $data['password'] = $admin->password;
+            } else {
+                unset($data['password']); // لا تحدثه
             }
 
             // Update Admin Data

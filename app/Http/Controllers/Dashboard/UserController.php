@@ -60,25 +60,8 @@ class UserController extends Controller
      */
     public function show(User $user)
     {
-        if(Auth::user()->id != $user->id && !Auth::user()->can('view', User::class)){
-            abort(403);
-        }
-        $profile = Auth::user()->id == $user->id && !Auth::user()->can('view', User::class) ? true : false;
-        return view('dashboard.users.show', compact('user','profile'));
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function settings(Request $request)
-    {
-        $user = Auth::user();
-        if(Auth::user()->id != $user->id){
-            abort(403);
-        }
-        $btn_label = "تعديل";
-        $settings_profile = true;
-        return view('dashboard.users.settings', compact('user', 'btn_label', 'settings_profile'));
+        $this->authorize('show', User::class);
+        return view('dashboard.users.show', compact('user'));
     }
     /**
      * Show the form for editing the specified resource.
@@ -109,6 +92,6 @@ class UserController extends Controller
         $this->userService->deleteById($user->id);
         return request()->ajax()
             ? response()->json([ 'status' => true, 'message' => 'تم حذف المستخدم' ])
-            : redirect()->route('dashboard.admins.index')->with('success', 'تم حذف المستخدم');
+            : redirect()->route('dashboard.users.index')->with('success', 'تم حذف المستخدم');
     }
 }

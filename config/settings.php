@@ -32,6 +32,9 @@ return [
     'whatsapp_support' => 'https://wa.me/+972594318545',
 
     // كاش افتراضي
-    'cache_duration' => 60 * 60, // بالثواني (1 ساعة)
+    'cache_duration' => 60 * 60, // بالثواني (1 ساعة)/
+
+    // إعدادات الأطفال
+    'require_pin_for_children' => false,
 
 ];

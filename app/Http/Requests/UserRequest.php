@@ -18,6 +18,14 @@ class UserRequest extends FormRequest
         if ($this->isUpdate() && empty($this->password)) {
             $this->getInputSource()->remove('password');
         }
+
+        $this->merge([
+            'is_active' => filter_var($this->is_active, FILTER_VALIDATE_BOOLEAN),
+            'is_banned' => filter_var($this->is_banned, FILTER_VALIDATE_BOOLEAN),
+            'email_notifications' => filter_var($this->email_notifications, FILTER_VALIDATE_BOOLEAN),
+            'push_notifications' => filter_var($this->push_notifications, FILTER_VALIDATE_BOOLEAN),
+            'parental_controls' => filter_var($this->parental_controls, FILTER_VALIDATE_BOOLEAN),
+        ]);
     }
 
     public function rules(): array

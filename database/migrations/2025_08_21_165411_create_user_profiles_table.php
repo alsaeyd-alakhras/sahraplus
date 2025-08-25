@@ -18,7 +18,6 @@ return new class extends Migration
             $table->text('avatar_url')->nullable(); // صورة الملف الشخصي
             $table->boolean('is_default')->default(false); // الملف الافتراضي
             $table->boolean('is_child_profile')->default(false); // ملف الأطفال
-            $table->integer('age_restriction')->default(18); // قيود العمر
             $table->string('pin_code', 6)->nullable(); // رمز الحماية
             $table->string('language', 5)->default('ar'); // اللغة المفضلة
             $table->boolean('is_active')->default(true); // حالة النشاط

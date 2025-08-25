@@ -142,10 +142,15 @@ class UserService
         DB::beginTransaction();
         try {
             $user = $this->userRepository->getById($id);
-            if(isset($data['password'])){
+            if (!empty($data['password'])) {
                 $data['password'] = Hash::make($data['password']);
-            }else{
-                $data['password'] = $user->password;
+            } else {
+                unset($data['password']); // لا تحدثه
+            }
+            if (!empty($data['avatar_url'])) {
+                $data['avatar_url'] = $data['avatar_url'];
+            } else {
+                unset($data['avatar_url']); // لا تحدثه
             }
             $userRepository = $this->userRepository->update($data, $id);
             DB::commit();
@@ -153,6 +158,7 @@ class UserService
         } catch (Exception $e) {
             DB::rollBack();
             report($e);
+            dd($e);
             throw new InvalidArgumentException('Unable to update post data');
         }
     }

@@ -17,10 +17,9 @@ class UserProfileResource extends JsonResource
         return [
             'id' => $this->id,
             'name' => $this->name,
-            'avatar_url' => $this->avatar_url,
+            'avatar_url' => $this->avatar_full_url,
             'is_default' => $this->is_default,
             'is_child_profile' => $this->is_child_profile,
-            'age_restriction' => $this->age_restriction,
             'pin_code' => $this->pin_code,
             'language' => $this->language,
             'is_active' => $this->is_active,

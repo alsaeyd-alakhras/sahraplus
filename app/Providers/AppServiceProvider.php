@@ -76,7 +76,8 @@ class AppServiceProvider extends ServiceProvider
 
         View::composer('*', function ($view) {
             $view->with([
-                'auth_user' => Auth::check() ? Auth::guard('admin')->user() : null,
+                'auth_admin' => Auth::guard('admin')->check() ? Auth::guard('admin')->user() : null,
+                'auth_user' => Auth::guard('web')->check() ? User::find(Auth::guard('web')->user()?->id)->with('profiles','sessions')->first() : null,
                 'settings' => config('app.settings'),
             ]);
         });

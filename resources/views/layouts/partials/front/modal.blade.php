@@ -37,8 +37,8 @@
     <div class="bg-[#1e222a] rounded-lg w-full max-w-md p-6 text-white">
         <div class="text-center">
             <div class="flex justify-between items-center mb-4">
-                <h2 class="mb-4 text-2xl font-bold">إدارة الملف</h2>
-                <button onclick="closeModal('editModal')" class="text-2xl">&times;</button>
+                <h2 class="mb-4 text-2xl font-bold" id="editModalTitle">إدارة الملف</h2>
+                <button onclick="closeModal('editModal')" id="editCloseBtn" class="text-2xl">&times;</button>
             </div>
             <div class="flex justify-center mb-4">
                 <div id="editAvatar" class="overflow-hidden relative w-28 h-28 rounded-full cursor-pointer"
@@ -59,6 +59,12 @@
                 <option value="en">English</option>
             </select>
 
+            <div class="mb-3">
+                <label class="block text-sm font-medium text-gray-700">كود PIN</label>
+                <input type="password" id="editPin" maxlength="6" class="form-control" placeholder="••••" />
+                <small class="text-gray-500">اختياري — إلا إذا الملف طفل وكان التحقق مفعل</small>
+            </div>
+
             <label class="block mb-2 text-sm text-gray-300">حساب أطفال</label>
             <label class="inline-flex items-center mb-4 cursor-pointer">
                 <input id="editKids" type="checkbox" class="sr-only peer">
@@ -69,21 +75,12 @@
                 </div>
             </label>
 
-            <div id="ageSelector" class="hidden">
-                <label class="block mb-1 text-sm text-gray-300">تاريخ الميلاد</label>
-                <input id="editBirth" type="month" class="py-2 mb-2 w-full text-center text-black rounded-full">
-                <label class="inline-flex items-center text-sm">
-                    <input type="checkbox" checked class="ml-2 form-checkbox accent-emerald-500">
-                    تحديد المحتوى المناسب لعمر الطفل
-                </label>
-            </div>
-
-            <button onclick="saveProfile()"
+            <button onclick="saveProfile()" id="editSaveBtn"
                 class="py-2 mt-6 w-full font-bold text-white bg-gradient-to-r from-green-600 to-green-800 rounded-full transition-all duration-300 hover:from-green-700 hover:to-green-900">
                 حفظ
             </button>
 
-            <button onclick="deleteProfile()"
+            <button onclick="deleteProfile()" id="editDeleteBtn"
                 class="py-2 mt-6 w-full font-bold text-white bg-gradient-to-r from-red-700 to-gray-900 rounded-full transition-all duration-300 hover:from-red-800 hover:to-black">حذف</button>
         </div>
     </div>
@@ -94,38 +91,15 @@
     class="fixed inset-0 z-[99999] bg-black bg-opacity-80 flex justify-center items-center hidden">
     <div class="bg-[#1e222a] text-white p-6 rounded-lg w-full max-w-xl text-center">
         <h2 class="mb-4 text-xl font-bold">اختر صورة الملف</h2>
+        @php
+            $avatars = App\Models\UserAvatar::get();
+        @endphp
         <div class="grid grid-cols-4 gap-4 mb-6">
-            <!-- صور جاهزة -->
-            <img src="./assets/images/avatars/1.jpg"
-                class="w-20 h-20 rounded-full transition cursor-pointer hover:scale-105"
-                onclick="selectAvatar(this.src)">
-            <img src="./assets/images/avatars/2.png"
-                class="w-20 h-20 rounded-full transition cursor-pointer hover:scale-105"
-                onclick="selectAvatar(this.src)">
-            <img src="./assets/images/avatars/3.png"
-                class="w-20 h-20 rounded-full transition cursor-pointer hover:scale-105"
-                onclick="selectAvatar(this.src)">
-            <img src="./assets/images/avatars/4.png"
-                class="w-20 h-20 rounded-full transition cursor-pointer hover:scale-105"
-                onclick="selectAvatar(this.src)">
-            <img src="./assets/images/avatars/5.png"
-                class="w-20 h-20 rounded-full transition cursor-pointer hover:scale-105"
-                onclick="selectAvatar(this.src)">
-            <img src="./assets/images/avatars/6.png"
-                class="w-20 h-20 rounded-full transition cursor-pointer hover:scale-105"
-                onclick="selectAvatar(this.src)">
-            <img src="./assets/images/avatars/7.jpg"
-                class="w-20 h-20 rounded-full transition cursor-pointer hover:scale-105"
-                onclick="selectAvatar(this.src)">
-            <img src="./assets/images/avatars/8.jpg"
-                class="w-20 h-20 rounded-full transition cursor-pointer hover:scale-105"
-                onclick="selectAvatar(this.src)">
-            <img src="./assets/images/avatars/9.png"
-                class="w-20 h-20 rounded-full transition cursor-pointer hover:scale-105"
-                onclick="selectAvatar(this.src)">
-            <img src="./assets/images/avatars/10.jpg"
-                class="w-20 h-20 rounded-full transition cursor-pointer hover:scale-105"
-                onclick="selectAvatar(this.src)">
+            @foreach ($avatars as $avatar)
+                <img src="{{ asset('storage/' . $avatar->image_url) }}"
+                    class="w-20 h-20 rounded-full transition cursor-pointer hover:scale-105"
+                    onclick="selectAvatar('{{ asset('storage/' . $avatar->image_url) }}')">
+            @endforeach
         </div>
         <button onclick="$('#avatarPickerModal').addClass('hidden')"
             class="px-6 py-2 bg-gray-700 rounded hover:bg-gray-600">إغلاق</button>

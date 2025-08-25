@@ -210,7 +210,7 @@
                 { data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, class: 'text-center'}, // عمود الترقيم التلقائي
                 { data: 'first_name', name: 'first_name' , orderable: false, render: function(data, type, row) {
                     let name = (row.first_name || '-') + ' ' + (row.last_name || '-');
-                    let img = row.avatar_url;
+                    let img = row.avatar_full_url;
                     let email = row.email || '-';
                     return `
                         <div style="display:flex; align-items:center; gap:8px;">

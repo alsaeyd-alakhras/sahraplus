@@ -8,6 +8,8 @@ use App\Http\Controllers\Dashboard\AdminController;
 use App\Http\Controllers\Dashboard\HomeController;
 use App\Http\Controllers\Dashboard\UserController;
 use App\Http\Controllers\Dashboard\MediaController;
+use App\Http\Controllers\Dashboard\NotificationController;
+use App\Http\Controllers\Dashboard\UserAvatarController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('dashboard',function(){
@@ -27,8 +29,15 @@ Route::group([
     Route::get('logs', [ActivityLogController::class, 'index'])->name('logs.index');
     Route::get('getLogs', [ActivityLogController::class, 'getLogs'])->name('logs.getLogs');
 
-    // users ************************
+    // admin ************************
     Route::get('profile/settings', [AdminController::class, 'settings'])->name('profile.settings');
+
+    // notifications ************************
+    Route::get('notifications', [NotificationController::class, 'index'])->name('notifications.index');
+    Route::get('notifications/{id}', [NotificationController::class, 'show'])->name('notifications.show');
+    Route::get('notifications-filters/{column}', [NotificationController::class, 'getFilterOptions'])->name('notifications.filters');
+    Route::delete('notifications/{id}', [NotificationController::class, 'destroy'])->name('notifications.destroy');
+    Route::post('notifications/{id}/read', [NotificationController::class, 'markAsRead'])->name('notifications.read');
 
     /* ********************************************************** */
 
@@ -47,6 +56,7 @@ Route::group([
         'users' => UserController::class,
         'admins' => AdminController::class,
         'media' => MediaController::class,
+        'user_avatars' => UserAvatarController::class,
     ]);
     /* ********************************************************** */
 });
