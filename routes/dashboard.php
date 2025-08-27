@@ -10,6 +10,8 @@ use App\Http\Controllers\Dashboard\AdminController;
 use App\Http\Controllers\Dashboard\MediaController;
 use App\Http\Controllers\Dashboard\NotificationController;
 use App\Http\Controllers\Dashboard\UserAvatarController;
+use App\Http\Controllers\Dashboard\MoviesController;
+use App\Http\Controllers\Dashboard\PeopleController;
 use App\Http\Controllers\Dashboard\CountryController;
 use App\Http\Controllers\Dashboard\ActivityLogController;
 use App\Http\Controllers\Dashboard\SystemSettingsController;
