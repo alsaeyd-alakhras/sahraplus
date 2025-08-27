@@ -78,6 +78,26 @@
             </li>
         @endcan
 
+        @can('view', 'App\\Models\Movie')
+            <li
+                class="menu-item {{ request()->is('dashboard/movies') || request()->is('dashboard/movies/*') ? 'active' : '' }}">
+                <a href="{{ route('dashboard.movies.index') }}" class="menu-link">
+                    <i class="fa-solid fa-users me-2"></i>
+                    <div data-i18n="users">الافلام</div>
+                </a>
+            </li>
+        @endcan
+
+         @can('view', 'App\\Models\Person')
+            <li
+                class="menu-item {{ request()->is('dashboard/people') || request()->is('dashboard/people/*') ? 'active' : '' }}">
+                <a href="{{ route('dashboard.people.index') }}" class="menu-link">
+                    <i class="fa-solid fa-users me-2"></i>
+                    <div data-i18n="users">الممثلين</div>
+                </a>
+            </li>
+        @endcan
+
         {{-- <li class="menu-item">
             <a href="page-2.html" class="menu-link">
                 <i class="menu-icon tf-icons ti ti-app-window"></i>
