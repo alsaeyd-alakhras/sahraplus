@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Repositories\SystemSettingRepository;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 
 class SystemSettingService
@@ -86,7 +87,9 @@ class SystemSettingService
             DB::commit();
         } catch (\Throwable $e) {
             DB::rollBack();
-            throw $e;
+            // throw $e;
+            Log::channel('system')->error($e);
+            abort(500, 'حدث خطأ أثناء تحديث الإعدادات.');
         }
     }
 }

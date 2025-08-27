@@ -9,7 +9,7 @@
         "php": "^8.2",
         "alkoumi/laravel-arabic-numbers": "^1.1",
         "carlos-meneses/laravel-mpdf": "^2.1",
-        "laravel/fortify": "^1.25",
+        "laravel/fortify": "^1.29",
         "laravel/framework": "^11.31",
         "laravel/reverb": "^1.0",
         "laravel/sanctum": "^4.2",

@@ -30,6 +30,40 @@ class="fixed top-0 right-0 left-0 z-[9999] navbar-initial navbar-inset-shadow tr
                 <i class="fas fa-search"></i>
             </button>
             @guest('web')
+            <div class="relative group">
+                <button class="flex items-center space-x-2 rtl:space-x-reverse focus:outline-none">
+                    <i class="text-white fas fa-language"></i>
+                    <i class="text-xs text-white fas fa-chevron-down"></i>
+                </button>
+
+                <div class="overflow-hidden absolute left-0 right-auto invisible z-50 mt-3 w-52 text-white bg-gray-800 rounded-lg border-t-4 border-sky-500 shadow-lg opacity-0 transition-all duration-300 transform scale-95 group-hover:opacity-100 group-hover:visible group-hover:scale-100">
+                    <div class="px-4 py-2 text-[15px] divide-y divide-gray-700">
+                        <div class="py-2 space-y-2">
+                            @php
+                                $currentPath = preg_replace('/^\/[a-z]{2}/', '', request()->getPathInfo());
+                            @endphp
+
+                            <a href="/ar{{ $currentPath }}"
+                               class="flex justify-start items-center transition-all duration-200 cursor-pointer hover:text-sky-400 hover:pr-2 {{ app()->getLocale() == 'ar' ? 'text-sky-400' : '' }}">
+                                <span class="flag flag-ar"></span>
+                                <span>العربية</span>
+                                @if(app()->getLocale() == 'ar')
+                                    <i class="mr-auto fas fa-check"></i>
+                                @endif
+                            </a>
+
+                            <a href="/en{{ $currentPath }}"
+                               class="flex justify-start items-center transition-all duration-200 cursor-pointer hover:text-sky-400 hover:pr-2 {{ app()->getLocale() == 'en' ? 'text-sky-400' : '' }}">
+                                <span class="flag flag-en"></span>
+                                <span>English</span>
+                                @if(app()->getLocale() == 'en')
+                                    <i class="mr-auto fas fa-check"></i>
+                                @endif
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
             <a href="{{route('login')}}"
                 class="font-medium text-white transition-colors duration-300 hover:text-neon-green">
                 تسجيل الدخول

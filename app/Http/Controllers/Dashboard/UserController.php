@@ -52,7 +52,7 @@ class UserController extends Controller
     {
         $this->authorize('create', User::class);
         $this->userService->save($request->validated());
-        return redirect()->route('dashboard.users.index')->with('success', 'تم اضافة مستخدم جديد');
+        return redirect()->route('dashboard.users.index')->with('success', __('controller.Created_item_successfully'));
     }
 
     /**
@@ -80,7 +80,7 @@ class UserController extends Controller
     {
         $this->authorize('update', User::class);
         $this->userService->update($request->validated(),$user->id);
-        return redirect()->route('dashboard.users.index')->with('success', 'تم تعديل المستخدم');
+        return redirect()->route('dashboard.users.index')->with('success', __('controller.Updated_item_successfully'));
     }
 
     /**
@@ -91,7 +91,7 @@ class UserController extends Controller
         $this->authorize('delete', User::class);
         $this->userService->deleteById($user->id);
         return request()->ajax()
-            ? response()->json([ 'status' => true, 'message' => 'تم حذف المستخدم' ])
-            : redirect()->route('dashboard.users.index')->with('success', 'تم حذف المستخدم');
+            ? response()->json([ 'status' => true, 'message' => __('controller.Deleted_item_successfully') ])
+            : redirect()->route('dashboard.users.index')->with('success', __('controller.Deleted_item_successfully'));
     }
 }

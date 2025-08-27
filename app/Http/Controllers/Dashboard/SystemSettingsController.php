@@ -23,8 +23,6 @@ class SystemSettingsController extends Controller
         $this->authorize('update', \App\Models\SystemSetting::class);
         $settings = $this->service->getFormData();   // ← اسم المتغير settings
         $btn_label = 'تحديث';
-        //  dd($settings);
-
         return view('dashboard.pages.settings', compact('settings', 'btn_label'));
     }
 
@@ -32,6 +30,6 @@ class SystemSettingsController extends Controller
     {
         $this->authorize('update', SystemSetting::class);
         $this->service->update($request->validated() + $request->only(['logoUpload','faviconUpload']));
-        return redirect()->route('dashboard.settings.edit')->with('success', 'تم تحديث الإعدادات بنجاح');
+        return redirect()->route('dashboard.settings.edit')->with('success', __('controller.Updated_item_successfully'));
     }
 }

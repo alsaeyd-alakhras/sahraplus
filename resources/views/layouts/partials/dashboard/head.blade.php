@@ -1,7 +1,9 @@
 <!doctype html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}"
-    class="light-style layout-navbar-fixed layout-menu-fixed layout-compact" dir="rtl" data-theme="theme-default"
-    data-assets-path="{{ asset('assets') }}/" data-template="vertical-menu-template-starter" data-style="light">
+    class="light-style layout-navbar-fixed layout-menu-fixed layout-compact"
+    dir="{{ str_replace('_', '-', app()->getLocale()) == 'ar' ? 'rtl' : 'ltr' }}" data-theme="theme-default"
+    data-assets-path="{{ asset('assets') }}/"
+    data-template="vertical-menu-template-starter" data-style="light">
 
 <head>
     <meta charset="utf-8" />
@@ -53,6 +55,9 @@
     <!--? Template customizer: To hide customizer set displayCustomizer value false in config.js.  -->
     <script src="{{ asset('assets/vendor/js/template-customizer.js') }}"></script>
 
+    <script>
+        const lang = "{{ str_replace('_', '-', app()->getLocale()) }}";
+    </script>
     <!--? Config:  Mandatory theme config file contain global vars & default theme options, Set your preferred theme option in this file.  -->
     <script src="{{ asset('assets/js/config.js') }}"></script>
 

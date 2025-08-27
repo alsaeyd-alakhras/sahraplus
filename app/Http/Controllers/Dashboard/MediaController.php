@@ -110,7 +110,7 @@ class MediaController extends Controller
 
         $media->update($request->all());
 
-        return response()->json(['message' => 'تم التحديث بنجاح']);
+        return response()->json(['message' => __('controller.Updated_item_successfully')]);
     }
 
 
@@ -120,6 +120,6 @@ class MediaController extends Controller
         Storage::disk('public')->delete($media->file_path);
         $media->delete();
 
-        return response()->json(['message' => 'تم الحذف']);
+        return response()->json(['message' => __('controller.Deleted_item_successfully')]);
     }
 }

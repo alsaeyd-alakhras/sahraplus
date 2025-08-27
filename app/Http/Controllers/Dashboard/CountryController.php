@@ -60,7 +60,7 @@ class CountryController extends Controller
 
         return redirect()
             ->route('dashboard.countries.index')
-            ->with('success', 'تم إضافة دولة جديدة');
+            ->with('success', __('controller.Created_item_successfully'));
     }
 
     /**
@@ -94,7 +94,7 @@ class CountryController extends Controller
 
         return redirect()
             ->route('dashboard.countries.index')
-            ->with('success', 'تم تعديل بيانات الدولة');
+            ->with('success', __('controller.Updated_item_successfully'));
     }
 
     /**
@@ -107,7 +107,7 @@ class CountryController extends Controller
         $this->countryService->deleteById($country->id);
 
         return request()->ajax()
-            ? response()->json(['status' => true, 'message' => 'تم حذف الدولة'])
-            : redirect()->route('dashboard.countries.index')->with('success', 'تم حذف الدولة');
+            ? response()->json(['status' => true, 'message' => __('controller.Deleted_item_successfully')])
+            : redirect()->route('dashboard.countries.index')->with('success', __('controller.Deleted_item_successfully'));
     }
 }

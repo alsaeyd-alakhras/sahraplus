@@ -39,7 +39,7 @@ class UserController extends Controller
             return new UserResource($user);
         } catch (\Exception $exception) {
             report($exception);
-            return response()->json(['error' => 'Something went wrong.'], Response::HTTP_INTERNAL_SERVER_ERROR);
+            return response()->json(['error' => __('controller.Something_went_wrong')], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -55,7 +55,7 @@ class UserController extends Controller
 
         try {
             $this->userService->changePassword(Auth::guard('sanctum')->user(), $request->current_password, $request->new_password);
-            return response()->json(['message' => 'Password updated successfully.'], Response::HTTP_OK);
+            return response()->json(['message' => __('controller.Password_updated_successfully')], Response::HTTP_OK);
         } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()], Response::HTTP_UNPROCESSABLE_ENTITY);
         }
@@ -94,6 +94,6 @@ class UserController extends Controller
         $user = User::find(Auth::guard('sanctum')->user()->id);
         $notification = $user->notifications()->findOrFail($id);
         $notification->update(['read_at' => now()]);
-        return response()->json(['message' => 'Notification marked as read.']);
+        return response()->json(['message' => __('controller.Notification_marked_as_read')]);
     }
 }

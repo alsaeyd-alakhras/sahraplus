@@ -20,6 +20,166 @@
     <div class="navbar-nav-right d-flex align-items-center justify-content-end" id="navbar-collapse">
         <ul class="flex-row navbar-nav align-items-center ms-auto">
             {{ $extra_nav ?? '' }}
+            <style>
+                .lang-dropdown .dropdown-item.active::after {
+                    content: " ✓";
+                    float: right;
+                }
+                .flag {
+                    width: 20px;
+                    height: 15px;
+                    display: inline-block;
+                    margin-right: 8px;
+                    border-radius: 2px;
+                }
+                .flag-ar {
+                    background: linear-gradient(to bottom, #ce1126 33%, #fff 33%, #fff 66%, #007a3d 66%);
+                }
+                .flag-en {
+                    background: #012169;
+                }
+            </style>
+            <!-- Language -->
+            <li class="nav-item dropdown-language dropdown">
+                <a class="nav-link btn btn-text-secondary btn-icon rounded-pill dropdown-toggle hide-arrow"
+                    href="javascript:void(0);" data-bs-toggle="dropdown">
+                    <i class="ti ti-language rounded-circle ti-md"></i>
+                </a>
+                <ul class="dropdown-menu dropdown-menu-end lang-dropdown">
+                    @php
+                        $currentPath = preg_replace('/^\/[a-z]{2}/', '', request()->getPathInfo());
+                    @endphp
+                    <li>
+                        <a class="dropdown-item {{ app()->getLocale() == 'ar' ? 'active' : '' }}"
+                           href="/ar{{ $currentPath }}">
+                            <span class="flag flag-ar"></span>
+                            العربية
+                        </a>
+                    </li>
+                    <li>
+                        <a class="dropdown-item {{ app()->getLocale() == 'en' ? 'active' : '' }}"
+                           href="/en{{ $currentPath }}">
+                            <span class="flag flag-en"></span>
+                            English
+                        </a>
+                    </li>
+                </ul>
+            </li>
+            <!--/ Language -->
+
+            <!-- Style Switcher -->
+            <li class="nav-item dropdown-style-switcher dropdown">
+                <a class="nav-link btn btn-text-secondary btn-icon rounded-pill dropdown-toggle hide-arrow"
+                    href="javascript:void(0);" data-bs-toggle="dropdown">
+                    <i class="ti ti-md"></i>
+                </a>
+                <ul class="dropdown-menu dropdown-menu-end dropdown-styles">
+                    <li>
+                        <a class="dropdown-item" href="javascript:void(0);" data-theme="light">
+                            <span class="align-middle"><i class="ti ti-sun ti-md me-3"></i>Light</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a class="dropdown-item" href="javascript:void(0);" data-theme="dark">
+                            <span class="align-middle"><i class="ti ti-moon-stars ti-md me-3"></i>Dark</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a class="dropdown-item" href="javascript:void(0);" data-theme="system">
+                            <span class="align-middle"><i
+                                    class="ti ti-device-desktop-analytics ti-md me-3"></i>System</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+            <!-- / Style Switcher-->
+
+            <!-- Quick links  -->
+            {{-- <li class="nav-item dropdown-shortcuts navbar-dropdown dropdown">
+                <a class="nav-link btn btn-text-secondary btn-icon rounded-pill dropdown-toggle hide-arrow"
+                    href="javascript:void(0);" data-bs-toggle="dropdown" data-bs-auto-close="outside"
+                    aria-expanded="false">
+                    <i class="ti ti-layout-grid-add ti-md"></i>
+                </a>
+                <div class="p-0 dropdown-menu dropdown-menu-end">
+                    <div class="dropdown-menu-header border-bottom">
+                        <div class="py-3 dropdown-header d-flex align-items-center">
+                            <h6 class="mb-0 me-auto">Shortcuts</h6>
+                            <a href="javascript:void(0)"
+                                class="btn btn-text-secondary rounded-pill btn-icon dropdown-shortcuts-add"
+                                data-bs-toggle="tooltip" data-bs-placement="top" title="Add shortcuts"><i
+                                    class="ti ti-plus text-heading"></i></a>
+                        </div>
+                    </div>
+                    <div class="dropdown-shortcuts-list scrollable-container">
+                        <div class="overflow-visible row row-bordered g-0">
+                            <div class="dropdown-shortcuts-item col">
+                                <span class="mb-3 dropdown-shortcuts-icon rounded-circle">
+                                    <i class="ti ti-calendar ti-26px text-heading"></i>
+                                </span>
+                                <a href="app-calendar.html" class="stretched-link">Calendar</a>
+                                <small>Appointments</small>
+                            </div>
+                            <div class="dropdown-shortcuts-item col">
+                                <span class="mb-3 dropdown-shortcuts-icon rounded-circle">
+                                    <i class="ti ti-file-dollar ti-26px text-heading"></i>
+                                </span>
+                                <a href="app-invoice-list.html" class="stretched-link">Invoice App</a>
+                                <small>Manage Accounts</small>
+                            </div>
+                        </div>
+                        <div class="overflow-visible row row-bordered g-0">
+                            <div class="dropdown-shortcuts-item col">
+                                <span class="mb-3 dropdown-shortcuts-icon rounded-circle">
+                                    <i class="ti ti-user ti-26px text-heading"></i>
+                                </span>
+                                <a href="app-user-list.html" class="stretched-link">User App</a>
+                                <small>Manage Users</small>
+                            </div>
+                            <div class="dropdown-shortcuts-item col">
+                                <span class="mb-3 dropdown-shortcuts-icon rounded-circle">
+                                    <i class="ti ti-users ti-26px text-heading"></i>
+                                </span>
+                                <a href="app-access-roles.html" class="stretched-link">Role Management</a>
+                                <small>Permission</small>
+                            </div>
+                        </div>
+                        <div class="overflow-visible row row-bordered g-0">
+                            <div class="dropdown-shortcuts-item col">
+                                <span class="mb-3 dropdown-shortcuts-icon rounded-circle">
+                                    <i class="ti ti-device-desktop-analytics ti-26px text-heading"></i>
+                                </span>
+                                <a href="index.html" class="stretched-link">Dashboard</a>
+                                <small>User Dashboard</small>
+                            </div>
+                            <div class="dropdown-shortcuts-item col">
+                                <span class="mb-3 dropdown-shortcuts-icon rounded-circle">
+                                    <i class="ti ti-settings ti-26px text-heading"></i>
+                                </span>
+                                <a href="pages-account-settings-account.html" class="stretched-link">Setting</a>
+                                <small>Account Settings</small>
+                            </div>
+                        </div>
+                        <div class="overflow-visible row row-bordered g-0">
+                            <div class="dropdown-shortcuts-item col">
+                                <span class="mb-3 dropdown-shortcuts-icon rounded-circle">
+                                    <i class="ti ti-help ti-26px text-heading"></i>
+                                </span>
+                                <a href="pages-faq.html" class="stretched-link">FAQs</a>
+                                <small>FAQs & Articles</small>
+                            </div>
+                            <div class="dropdown-shortcuts-item col">
+                                <span class="mb-3 dropdown-shortcuts-icon rounded-circle">
+                                    <i class="ti ti-square ti-26px text-heading"></i>
+                                </span>
+                                <a href="modal-examples.html" class="stretched-link">Modals</a>
+                                <small>Useful Popups</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </li> --}}
+            <!-- Quick links -->
             <!-- Notification -->
             <li class="nav-item dropdown-notifications navbar-dropdown dropdown me-3 me-xl-2">
                 <a class="nav-link btn btn-text-secondary btn-icon rounded-pill dropdown-toggle hide-arrow"
@@ -311,8 +471,7 @@
                         <div class="px-2 pt-2 pb-1 d-grid">
                             <form action="{{ route('logout') }}" method="post">
                                 @csrf
-                                <button type="submit" class="btn btn-sm btn-danger d-flex"
-                                    href="javascript:void(0);">
+                                <button type="submit" class="btn btn-sm btn-danger d-flex">
                                     <small class="align-middle">تسجيل الخروج</small>
                                     <i class="ti ti-logout ms-2 ti-14px"></i>
                                 </button>

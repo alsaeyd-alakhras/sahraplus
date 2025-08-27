@@ -24,7 +24,7 @@ class AuthController extends Controller
         ]);
 
         if (!Auth::guard('web')->attempt($credentials)) {
-            return response()->json(['error' => 'Invalid credentials'], Response::HTTP_UNAUTHORIZED);
+            return response()->json(['error' => __('controller.Invalid_credentials')], Response::HTTP_UNAUTHORIZED);
         }
 
         $user = Auth::guard('web')->user();
@@ -71,6 +71,6 @@ class AuthController extends Controller
     {
         $request->user()->currentAccessToken()->delete();
 
-        return response()->json(['message' => 'Logged out successfully.'], Response::HTTP_OK);
+        return response()->json(['message' => __('controller.Logged_out_successfully')], Response::HTTP_OK);
     }
 }

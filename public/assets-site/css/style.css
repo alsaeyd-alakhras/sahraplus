@@ -405,3 +405,17 @@ html {
   top: 72px !important; /* أو أي قيمة بدك إياها */
   left: 12px;
 }
+
+.flag {
+    width: 20px;
+    height: 15px;
+    display: inline-block;
+    margin-left: 8px;
+    border-radius: 2px;
+}
+.flag-ar {
+    background: linear-gradient(to bottom, #ce1126 33%, #fff 33%, #fff 66%, #007a3d 66%);
+}
+.flag-en {
+    background: #012169;
+}

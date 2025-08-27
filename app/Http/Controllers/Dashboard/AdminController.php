@@ -53,7 +53,7 @@ class AdminController extends Controller
     {
         $this->authorize('create', Admin::class);
         $this->adminService->save($request->validated());
-        return redirect()->route('dashboard.admins.index')->with('success', 'تم اضافة مستخدم جديد');
+        return redirect()->route('dashboard.admins.index')->with('success', __('controller.Created_item_successfully'));
     }
 
     /**
@@ -110,8 +110,8 @@ class AdminController extends Controller
         $this->adminService->update($request->validated(),$admin->id);
 
         return $request->settings_profile
-            ? redirect()->route('dashboard.home')->with('success', 'تم تعديل بياناتك الشخصية')
-            : redirect()->route('dashboard.admins.index')->with('success', 'تم تعديل المستخدم');
+            ? redirect()->route('dashboard.home')->with('success', __('controller.Profile_updated_successfully'))
+            : redirect()->route('dashboard.admins.index')->with('success', __('controller.Updated_item_successfully'));
     }
 
     /**
@@ -124,7 +124,7 @@ class AdminController extends Controller
         $this->adminService->deleteById($admin->id);
 
         return request()->ajax()
-            ? response()->json([ 'status' => true, 'message' => 'تم حذف المستخدم' ])
-            : redirect()->route('dashboard.admins.index')->with('success', 'تم حذف المستخدم');
+            ? response()->json([ 'status' => true, 'message' => __('controller.Deleted_item_successfully') ])
+            : redirect()->route('dashboard.admins.index')->with('success', __('controller.Deleted_item_successfully'));
     }
 }

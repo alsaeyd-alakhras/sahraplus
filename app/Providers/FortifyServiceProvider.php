@@ -7,19 +7,19 @@ use App\Actions\Fortify\ResetUserPassword;
 use App\Actions\Fortify\UpdateUserPassword;
 use App\Actions\Fortify\UpdateUserProfileInformation;
 use App\Models\Admin;
-use App\Models\Employee;
 use App\Models\User;
 use App\Services\ActivityLogService;
-use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
 use Laravel\Fortify\Contracts\LoginResponse;
 use Laravel\Fortify\Contracts\LogoutResponse;
 use Laravel\Fortify\Fortify;
+
 
 class FortifyServiceProvider extends ServiceProvider
 {
@@ -28,40 +28,41 @@ class FortifyServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        // if want to change guard
         $request = request();
+        $locale = app()->getLocale();
 
-        if ($request->is('dashboard/*')) {
+        if ($request->is('*/dashboard/*') || $request->is('dashboard/*')) {
             Config::set('fortify.guard', 'admin');
-            Config::set('fortify.password', 'admins');
-            Config::set('fortify.prefix', 'dashboard');
-            Config::set('fortify.home', '/dashboard/home');
-        }
-
-        if ($request->is('/*')) {
+            Config::set('fortify.passwords', 'admins');
+            Config::set('fortify.prefix', $locale . '/dashboard');
+            Config::set('fortify.home', '/' . $locale . '/dashboard/home');
+        } else {
             Config::set('fortify.guard', 'web');
-            Config::set('fortify.password', 'users');
-            Config::set('fortify.prefix', '');
-            Config::set('fortify.home', '/home');
+            Config::set('fortify.passwords', 'users');
+            Config::set('fortify.prefix', $locale);
+            Config::set('fortify.home', '/' . $locale . '/home');
         }
 
-        // if want to coustom login page
         $this->app->instance(LoginResponse::class, new class implements LoginResponse {
             public function toResponse($request)
             {
                 if (Config::get('fortify.guard') == 'admin') {
-                    return redirect()->intended('/dashboard/home');
+                    return redirect()->intended('/' . app()->getLocale() . '/dashboard/home');
                 }
-                return redirect()->intended('/');
+                return redirect()->intended('/' . app()->getLocale() . '/home');
             }
         });
+
         $this->app->instance(LogoutResponse::class, new class implements LogoutResponse {
             public function toResponse($request)
             {
-                if(Config::get('fortify.guard') == 'admin'){
-                    return redirect('/dashboard/login');
+                $locale = app()->getLocale();
+                // تحقق من المسار الحالي قبل تسجيل الخروج
+                $isDashboard = $request->is('*/dashboard/*') || str_contains($request->url(), '/dashboard/');
+                if ($isDashboard) {
+                    return redirect("/{$locale}/dashboard/login");
                 }
-                return redirect('/login');
+                return redirect("/{$locale}/login");
             }
         });
     }
@@ -78,12 +79,11 @@ class FortifyServiceProvider extends ServiceProvider
             return view('auth.user.login');
         });
 
-
         Fortify::authenticateUsing(function (Request $request) {
             if (Config::get('fortify.guard') == 'admin') {
                 $user = Admin::where('username', $request->username)
-                            ->orWhere('email', $request->username)
-                            ->first();
+                    ->orWhere('email', $request->username)
+                    ->first();
                 if ($user && Hash::check($request->password, $user->password)) {
                     ActivityLogService::log(
                         'Login',
@@ -98,18 +98,9 @@ class FortifyServiceProvider extends ServiceProvider
                 }
             }
             $user = User::where('email', $request->username)
-                        ->first();
+                ->first();
 
             if ($user && Hash::check($request->password, $user->password)) {
-                ActivityLogService::log(
-                    'Login',
-                    'User',
-                    "تم تسجيل دخول",
-                    null,
-                    null,
-                    $user->id,
-                    $user->name
-                );
                 return $user;
             }
         });
@@ -121,7 +112,7 @@ class FortifyServiceProvider extends ServiceProvider
         Fortify::resetUserPasswordsUsing(ResetUserPassword::class);
 
         RateLimiter::for('login', function (Request $request) {
-            $throttleKey = Str::transliterate(Str::lower($request->input(Fortify::username())).'|'.$request->ip());
+            $throttleKey = Str::transliterate(Str::lower($request->input(Fortify::username())) . '|' . $request->ip());
             return Limit::perMinute(5)->by($throttleKey);
         });
 

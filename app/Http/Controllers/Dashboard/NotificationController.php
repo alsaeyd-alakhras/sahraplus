@@ -56,7 +56,7 @@ class NotificationController extends Controller
         $notification = Notification::findOrFail($id);
         $notification->update(['read_at' => now()]);
 
-        return back()->with('success', 'تم التعليم كمقروء');
+        return back()->with('success', __('controller.Notification_marked_as_read'));
     }
 
     /**
@@ -69,6 +69,6 @@ class NotificationController extends Controller
         $notification = Notification::findOrFail($id);
         $notification->delete();
 
-        return back()->with('success', 'تم الحذف بنجاح');
+        return back()->with('success', __('controller.Deleted_item_successfully'));
     }
 }

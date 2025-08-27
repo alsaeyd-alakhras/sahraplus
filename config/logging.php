@@ -127,9 +127,9 @@ return [
             'path' => storage_path('logs/laravel.log'),
         ],
 
-        'salary' => [
+        'system' => [
             'driver' => 'single',
-            'path' => storage_path('logs/salary_errors.log'),
+            'path' => storage_path('logs/system_errors.log'),
             'level' => 'error',
         ],
 

@@ -113,7 +113,7 @@ class UserAvatarController extends Controller
 
         $user_avatar->update($request->all());
 
-        return response()->json(['message' => 'تم التحديث بنجاح']);
+        return response()->json(['message' => __('controller.Updated_item_successfully')]);
     }
 
 
@@ -123,6 +123,6 @@ class UserAvatarController extends Controller
         Storage::disk('public')->delete($user_avatar->image_url);
         $user_avatar->delete();
 
-        return response()->json(['message' => 'تم الحذف']);
+        return response()->json(['message' => __('controller.Deleted_item_successfully')]);
     }
 }
