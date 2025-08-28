@@ -1,20 +1,21 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use Mcamara\LaravelLocalization\Facades\LaravelLocalization;
-
 use App\Http\Controllers\Dashboard\HomeController;
 
 use App\Http\Controllers\Dashboard\UserController;
+
 use App\Http\Controllers\Dashboard\AdminController;
 use App\Http\Controllers\Dashboard\MediaController;
-use App\Http\Controllers\Dashboard\NotificationController;
-use App\Http\Controllers\Dashboard\UserAvatarController;
+use App\Http\Controllers\Dashboard\ShortController;
 use App\Http\Controllers\Dashboard\MoviesController;
 use App\Http\Controllers\Dashboard\PeopleController;
 use App\Http\Controllers\Dashboard\CountryController;
+use App\Http\Controllers\Dashboard\UserAvatarController;
 use App\Http\Controllers\Dashboard\ActivityLogController;
+use App\Http\Controllers\Dashboard\NotificationController;
 use App\Http\Controllers\Dashboard\SystemSettingsController;
+use Mcamara\LaravelLocalization\Facades\LaravelLocalization;
 
 Route::group([
     'prefix' => LaravelLocalization::setLocale(),
@@ -65,6 +66,7 @@ Route::group([
         Route::get('countries-filters/{column}', [CountryController::class, 'getFilterOptions'])->name('countries.filters');
         Route::get('movies-filters/{column}', [ MoviesController::class, 'getFilterOptions'])->name('movies.filters');
         Route::get('people-filters/{column}', [ PeopleController::class, 'getFilterOptions'])->name('people.filters');
+        Route::get('short-filters/{column}', [ ShortController::class, 'getFilterOptions'])->name('short.filters');
 
 
         // resources
@@ -76,6 +78,7 @@ Route::group([
             'countries' => CountryController::class,
             'movies'    => MoviesController::class,
             'people'    => PeopleController::class,
+            'shorts'    => ShortController::class,
         ]);
     });
 });
