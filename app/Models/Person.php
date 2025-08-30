@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Support\Str;
 
 class Person extends Model
 {
@@ -59,6 +60,17 @@ class Person extends Model
     {
         return $this->birth_date ? $this->birth_date->age : null;
     }
+    public function getPhotoFullUrlAttribute() // $this->photo_full_url
+    {
+        if(Str::startsWith($this->photo_url, ['http', 'https'])) {
+            return $this->photo_url;
+        }
+        if (empty($this->photo_url)) {
+            return null;
+        }
+        return asset('storage/' . $this->photo_url);
+    }
+
 
     // Scopes
     public function scopeActive($query)

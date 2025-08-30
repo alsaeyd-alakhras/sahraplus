@@ -22,8 +22,10 @@
     <x-slot:extra_nav>
         <div class="nav-item">
             <select class="form-control" id="advanced-pagination">
-                <option value="10">10</option><option value="25">25</option>
-                <option value="100">100</option><option value="500">500</option>
+                <option value="10">10</option>
+                <option value="25">25</option>
+                <option value="100">100</option>
+                <option value="500">500</option>
                 <option value="-1">all</option>
             </select>
         </div>
@@ -34,6 +36,17 @@
             </a>
         </div>
         @endcan
+        <div class="mx-2 nav-item">
+            <button class="p-2 border-0 btn btn-outline-danger rounded-pill me-n1 waves-effect waves-light d-none"
+                    type="button" id="filterBtnClear" title="إزالة التصفية">
+                <i class="fa-solid fa-eraser fe-16"></i>
+            </button>
+        </div>
+        <div class="mx-2 nav-item d-flex align-items-center justify-content-center">
+            <button type="button" class="btn" id="refreshData">
+                <i class="fa-solid fa-arrows-rotate"></i>
+            </button>
+        </div>
     </x-slot:extra_nav>
 
     @php
@@ -49,7 +62,7 @@
         <div class="enhanced-card-body">
             <div class="col-12" style="padding:0;">
                 <div class="table-container">
-                    <table id="people-table" class="table enhanced-sticky table-striped table-hover" style="width:100%;">
+                    <table id="people-table" class="table enhanced-sticky table-striped table-hover" style="display: table; width:100%; height: auto;">
                         <thead>
                             <tr>
                                 <th class="text-center">#</th>
@@ -81,7 +94,7 @@
                                         </div>
                                     </th>
                                 @endforeach
-                                <th class="enhanced-sticky">العمليات</th>
+                                <th>العمليات</th>
                             </tr>
                         </thead>
                     </table>
@@ -105,7 +118,6 @@
             const urlIndex   = `{{ route('dashboard.people.index') }}`;
             const urlFilters = `{{ route('dashboard.people.filters', ':column') }}`; // ✅ اسم الراوت الصحيح
             const urlCreate  = '{{ route("dashboard.people.create") }}';
-            const urlShow    = '{{ route("dashboard.people.show", ":id") }}';
             const urlEdit    = '{{ route("dashboard.people.edit", ":id") }}';
             const urlDelete  = '{{ route("dashboard.people.destroy", ":id") }}';
 
@@ -125,23 +137,12 @@
                     return `<span class="badge ${active ? 'bg-success' : 'bg-secondary'}">${active ? 'نشط' : 'غير نشط'}</span>`;
                 }},
                 { data: 'edit', name: 'edit', orderable:false, searchable:false, render: function (id) {
-                    let linkshow = '', linkedit = '', linkdelete = '';
-                    if (abilityShow)  linkshow  = `<a href="${urlShow.replace(':id', id)}" class="action-btn btn-show" title="عرض"><i class="fas fa-eye"></i></a>`;
+                    let linkedit = '', linkdelete = '';
                     if (abilityEdit)  linkedit  = `<a href="${urlEdit.replace(':id', id)}" class="action-btn btn-edit" title="تعديل"><i class="fas fa-edit"></i></a>`;
                     if (abilityDelete)linkdelete= `<button class="action-btn btn-delete delete_row" data-id="${id}" title="حذف"><i class="fas fa-trash"></i></button>`;
-                    return `<div class="d-flex align-items-center justify-content-evenly">${linkshow}${linkedit}${linkdelete}</div>`;
+                    return `<div class="d-flex align-items-center justify-content-evenly">${linkedit}${linkdelete}</div>`;
                 }},
             ];
-        </script>
-
-        {{-- ✅ ضبط عرض الأعمدة بعد تهيئة الداتا تيبل (يحل مشاكل العرض النصفي) --}}
-        <script>
-            $(document).on('init.dt', function (e, settings) {
-                if (settings.nTable && settings.nTable.id === tableId) {
-                    const api = new $.fn.dataTable.Api(settings);
-                    api.columns.adjust().draw(false);
-                }
-            });
         </script>
 
         <script type="text/javascript" src="{{asset('js/custom/datatable.js')}}"></script>

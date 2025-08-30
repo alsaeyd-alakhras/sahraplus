@@ -27,7 +27,7 @@ class MovieCast extends Model
 
     public function person()
     {
-        return $this->belongsTo(People::class);
+        return $this->belongsTo(Person::class);
     }
 
     // Scopes

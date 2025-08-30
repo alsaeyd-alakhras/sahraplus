@@ -6,7 +6,6 @@
             </span>
             {{-- <span class="app-brand-text demo menu-text fw-bold">{{ $title }}</span> --}}
         </a>
-
         <a href="javascript:void(0);" class="layout-menu-toggle menu-link text-large ms-auto">
             <i class="align-middle ti menu-toggle-icon d-none d-xl-block"></i>
             <i class="align-middle ti ti-x d-block d-xl-none ti-md"></i>
@@ -18,9 +17,9 @@
             <span class="menu-header-text" data-i18n="Apps &amp; Pages">العامة</span>
         </li>
         <!-- Page -->
-        <li class="menu-item {{ request()->is('/') ? 'active' : '' }}">
+        <li class="menu-item {{ request()->is('dashboard/home') || request()->is('dashboard/home/*') ? 'active' : '' }}">
             <a href="{{ route('dashboard.home') }}" class="menu-link">
-                <i class="fa-solid fa-house me-2"></i>
+                <i class="ph ph-house me-2"></i>
                 <div data-i18n="home">الرئيسية</div>
             </a>
         </li>
@@ -28,7 +27,7 @@
             <li
                 class="menu-item {{ request()->is('dashboard/media') || request()->is('dashboard/media/*') ? 'active' : '' }}">
                 <a href="{{ route('dashboard.media.index') }}" class="menu-link">
-                    <i class="fa-solid fa-images me-2"></i>
+                    <i class="ph ph-images me-2"></i>
                     <div data-i18n="media">مكتبة الوسائط</div>
                 </a>
             </li>
@@ -37,14 +36,32 @@
             <li
                 class="menu-item {{ request()->is('dashboard/notifications') || request()->is('dashboard/notifications/*') ? 'active' : '' }}">
                 <a href="{{ route('dashboard.notifications.index') }}" class="menu-link">
-                    <i class="fa-solid fa-bell me-2"></i>
+                    <i class="ph ph-bell me-2"></i>
                     <div data-i18n="notifications">الإشعارات</div>
                 </a>
             </li>
         @endcan
-        {{-- <li class="menu-header small">
+        <li class="menu-header small">
             <span class="menu-header-text" data-i18n="Apps &amp; Pages">الوسائط</span>
-        </li> --}}
+        </li>
+        @can('view', 'App\\Models\Movie')
+            <li
+                class="menu-item {{ request()->is('dashboard/movies') || request()->is('dashboard/movies/*') ? 'active' : '' }}">
+                <a href="{{ route('dashboard.movies.index') }}" class="menu-link">
+                    <i class="ph ph-film-strip me-2"></i>
+                    <div data-i18n="movies">الافلام</div>
+                </a>
+            </li>
+        @endcan
+        @can('view', 'App\\Models\Person')
+            <li
+                class="menu-item {{ request()->is('dashboard/people') || request()->is('dashboard/people/*') ? 'active' : '' }}">
+                <a href="{{ route('dashboard.people.index') }}" class="menu-link">
+                    <i class="ph ph-user me-2"></i>
+                    <div data-i18n="people">الممثلين</div>
+                </a>
+            </li>
+        @endcan
         <li class="menu-header small">
             <span class="menu-header-text" data-i18n="Apps &amp; Pages">الإعدادات</span>
         </li>
@@ -52,7 +69,7 @@
             <li
                 class="menu-item {{ request()->is('dashboard/admins') || request()->is('dashboard/admins/*') ? 'active' : '' }}">
                 <a href="{{ route('dashboard.admins.index') }}" class="menu-link">
-                    <i class="fa-solid fa-user-group me-2"></i>
+                    <i class="ph ph-users-three me-2"></i>
                     <div data-i18n="admins">الأدمن/ الموظفين</div>
                 </a>
             </li>
@@ -61,7 +78,7 @@
             <li
                 class="menu-item {{ request()->is('dashboard/users') || request()->is('dashboard/users/*') ? 'active' : '' }}">
                 <a href="{{ route('dashboard.users.index') }}" class="menu-link">
-                    <i class="fa-solid fa-users me-2"></i>
+                    <i class="ph ph-users me-2"></i>
                     <div data-i18n="users">المستخدمين</div>
                 </a>
             </li>
@@ -70,7 +87,7 @@
             <li
                 class="menu-item {{ request()->is('dashboard/user_avatars') || request()->is('dashboard/user_avatars/*') ? 'active' : '' }}">
                 <a href="{{ route('dashboard.user_avatars.index') }}" class="menu-link">
-                    <i class="fa-solid fa-images me-2"></i>
+                    <i class="ph ph-user-circle me-2"></i>
                     <div data-i18n="user-avatar">مكتبة الأفاتار</div>
                 </a>
             </li>
@@ -79,7 +96,7 @@
             <li
                 class="menu-item {{ request()->is('dashboard/countries') || request()->is('dashboard/countries/*') ? 'active' : '' }}">
                 <a href="{{ route('dashboard.countries.index') }}" class="menu-link">
-                    <i class="fa-solid fa-users me-2"></i>
+                    <i class="ph ph-globe me-2"></i>
                     <div data-i18n="users">الدول</div>
                 </a>
             </li>
@@ -89,27 +106,8 @@
             <li
                 class="menu-item {{ request()->is('dashboard/settings') || request()->is('dashboard/settings/*') ? 'active' : '' }}">
                 <a href="{{ route('dashboard.settings.edit') }}" class="menu-link">
-                    <i class="fa-solid fa-users me-2"></i>
+                    <i class="ph ph-gear me-2"></i>
                     <div data-i18n="users">الاعدادات</div>
-                </a>
-            </li>
-        @endcan
-        @can('view', 'App\\Models\Movie')
-            <li
-                class="menu-item {{ request()->is('dashboard/movies') || request()->is('dashboard/movies/*') ? 'active' : '' }}">
-                <a href="{{ route('dashboard.movies.index') }}" class="menu-link">
-                    <i class="fa-solid fa-users me-2"></i>
-                    <div data-i18n="users">الافلام</div>
-                </a>
-            </li>
-        @endcan
-
-         @can('view', 'App\\Models\Person')
-            <li
-                class="menu-item {{ request()->is('dashboard/people') || request()->is('dashboard/people/*') ? 'active' : '' }}">
-                <a href="{{ route('dashboard.people.index') }}" class="menu-link">
-                    <i class="fa-solid fa-users me-2"></i>
-                    <div data-i18n="users">الممثلين</div>
                 </a>
             </li>
         @endcan
@@ -160,10 +158,10 @@
             </ul>
         </li> --}}
     </ul>
-    <div class="my-3 text-center text-white text-body">
+    {{-- <div class="my-3 text-center text-white text-body">
         ©
         2025
-        , تم الإنشاء ❤️ بواسطة <a href="https://saeyd-jamal.github.io/portfolio/" target="_blank" class="footer-link">م
+        , تم الإنشاء ❤️ بواسطة <a href="https://saeyd-jamal.github.io/" target="_blank" class="footer-link">م
             . السيد الاخرسي</a>
-    </div>
+    </div> --}}
 </aside>

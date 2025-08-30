@@ -7,8 +7,6 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class SeriesCast extends Model
 {
-    use HasFactory;
-
     protected $table = 'series_cast';
 
     protected $fillable = [

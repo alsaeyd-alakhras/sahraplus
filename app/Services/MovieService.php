@@ -8,6 +8,7 @@ use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use Yajra\DataTables\Facades\DataTables;
 
 class MovieService
@@ -76,10 +77,22 @@ class MovieService
     {
         DB::beginTransaction();
         try {
-            // رفع ملفات اختيارية
-            $data = $this->handleUploads($data);
             // من أنشأ؟
             $data['created_by'] = $data['created_by'] ?? optional(Auth::guard('admin')->user())->id;
+
+            // رفع الصور
+            if($data['poster_url_out'] || $data['poster_url_out'] === "" || $data['poster_url_out'] === null){
+                $data['poster_url'] = $data['poster_url_out'];
+            }else{
+                $data['poster_url'] = $data['poster_url'] ?? null;
+            }
+            if($data['backdrop_url_out'] || $data['backdrop_url_out'] === "" || $data['backdrop_url_out'] === null){
+                $data['backdrop_url'] = $data['backdrop_url_out'];
+            }else{
+                $data['backdrop_url'] = $data['backdrop_url'] ?? null;
+            }
+
+            $data['slug'] = Str::slug($data['title_en'] ?? $data['title_ar']);
 
             $movie = $this->repo->save($data);
             DB::commit();
@@ -95,10 +108,20 @@ class MovieService
         DB::beginTransaction();
         try {
             $movie = $this->repo->getById($id);
-            $oldPoster   = $movie->poster_url;
-            $oldBackdrop = $movie->backdrop_url;
 
-            $data = $this->handleUploads($data, $oldPoster, $oldBackdrop);
+            // رفع الصور
+            if($data['poster_url_out'] || $data['poster_url_out'] === "" || $data['poster_url_out'] === null){
+                $data['poster_url'] = $data['poster_url_out'];
+            }else{
+                $data['poster_url'] = $data['poster_url'] ?? $movie->poster_url;
+            }
+            if($data['backdrop_url_out'] || $data['backdrop_url_out'] === "" || $data['backdrop_url_out'] === null){
+                $data['backdrop_url'] = $data['backdrop_url_out'];
+            }else{
+                $data['backdrop_url'] = $data['backdrop_url'] ?? $movie->backdrop_url;
+            }
+
+            $data['slug'] = Str::slug($data['title_en'] ?? $data['title_ar']);
 
             $movie = $this->repo->update($data,$id);
 
@@ -114,9 +137,6 @@ class MovieService
     {
         DB::beginTransaction();
         try {
-            $m = $this->repo->getById($id);
-            if ($m?->poster_url)   Storage::disk('public')->delete($m->poster_url);
-            if ($m?->backdrop_url) Storage::disk('public')->delete($m->backdrop_url);
             $deleted = $this->repo->delete($id);
             DB::commit();
             return $deleted;
@@ -124,18 +144,5 @@ class MovieService
             DB::rollBack();
             throw $e;
         }
-    }
-
-    private function handleUploads(array $data, ?string $oldPoster=null, ?string $oldBackdrop=null): array
-    {
-        if (($data['posterUpload'] ?? null) instanceof UploadedFile) {
-            if ($oldPoster) Storage::disk('public')->delete($oldPoster);
-            $data['poster_url'] = $data['posterUpload']->store('movies/posters','public');
-        }
-        if (($data['backdropUpload'] ?? null) instanceof UploadedFile) {
-            if ($oldBackdrop) Storage::disk('public')->delete($oldBackdrop);
-            $data['backdrop_url'] = $data['backdropUpload']->store('movies/backdrops','public');
-        }
-        return $data;
     }
 }

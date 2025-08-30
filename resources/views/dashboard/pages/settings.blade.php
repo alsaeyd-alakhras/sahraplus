@@ -6,7 +6,6 @@
     <form method="POST" action="{{ route('dashboard.settings.update') }}" enctype="multipart/form-data">
         @csrf
         @method('PUT')
-
         <div class="row">
             <div class="col-md-12">
                 <div class="mb-3 border shadow card border-1">
@@ -42,7 +41,7 @@
                                     name="logo_url"
                                     :value="$settings['logo_url'] ?? ''"
                                     placeholder="أو ارفع ملفًا بالأسفل" />
-                                <input type="file" name="logoUpload" class="form-control mt-2" />
+                                <input type="file" name="logoUpload" class="mt-2 form-control" />
                                 @if(!empty($settings['logo_url'] ?? null))
                                 <div class="mt-2">
                                     <img src="{{ \Illuminate\Support\Facades\Storage::url($settings['logo_url']) }}"
@@ -57,7 +56,7 @@
                                     name="favicon_url"
                                     :value="$settings['favicon_url'] ?? ''"
                                     placeholder="أو ارفع ملفًا بالأسفل" />
-                                <input type="file" name="faviconUpload" class="form-control mt-2" />
+                                <input type="file" name="faviconUpload" class="mt-2 form-control" />
                                 @if(!empty($settings['favicon_url'] ?? null))
                                 <div class="mt-2">
                                     <img src="{{ \Illuminate\Support\Facades\Storage::url($settings['favicon_url']) }}"
@@ -148,8 +147,4 @@
             </div>
         </div>
     </form>
-
-    @push('scripts')
-    {{-- أي سكربتات إضافية إن لزم --}}
-    @endpush
 </x-dashboard-layout>

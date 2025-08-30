@@ -4,16 +4,32 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Support\Str;
 
 class Movie extends Model
 {
     use HasFactory;
 
     protected $fillable = [
-        'title_ar', 'title_en', 'slug', 'description_ar', 'description_en',
-        'poster_url', 'backdrop_url', 'trailer_url', 'release_date',
-        'duration_minutes', 'imdb_rating', 'content_rating', 'language',
-        'country', 'status', 'is_featured', 'view_count', 'tmdb_id', 'created_by'
+        'title_ar',
+        'title_en',
+        'slug',
+        'description_ar',
+        'description_en',
+        'poster_url',
+        'backdrop_url',
+        'trailer_url',
+        'release_date',
+        'duration_minutes',
+        'imdb_rating',
+        'content_rating',
+        'language',
+        'country',
+        'status',
+        'is_featured',
+        'view_count',
+        'tmdb_id',
+        'created_by'
     ];
 
     protected $casts = [
@@ -23,6 +39,8 @@ class Movie extends Model
         'is_featured' => 'boolean',
         'view_count' => 'integer',
     ];
+
+    protected $appends = ['poster_full_url', 'backdrop_full_url'];
 
     // العلاقات
     public function categories()
@@ -71,6 +89,26 @@ class Movie extends Model
         $hours = floor($this->duration_minutes / 60);
         $minutes = $this->duration_minutes % 60;
         return $hours > 0 ? "{$hours}h {$minutes}m" : "{$minutes}m";
+    }
+    public function getPosterFullUrlAttribute() // $this->poster_full_url
+    {
+        if(Str::startsWith($this->poster_url, ['http', 'https'])) {
+            return $this->poster_url;
+        }
+        if (empty($this->poster_url)) {
+            return null;
+        }
+        return asset('storage/' . $this->poster_url);
+    }
+    public function getBackdropFullUrlAttribute() // $this->backdrop_full_url
+    {
+        if(Str::startsWith($this->backdrop_url, ['http', 'https'])) {
+            return $this->backdrop_url;
+        }
+        if (empty($this->backdrop_url)) {
+            return null;
+        }
+        return asset('storage/' . $this->backdrop_url);
     }
 
     // Scopes
