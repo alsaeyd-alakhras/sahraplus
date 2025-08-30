@@ -1,5 +1,13 @@
 $(document).ready(function () {
-    $(document).on("click", "#openMediaModalBtn", function () {
+    let mode = "single";
+    let input = "";
+    let img = "";
+    let clearBtn = "";
+    $(document).on("click", ".openMediaModal", function () {
+        mode = $(this).data("mode");
+        input = $(this).data("input");
+        clearBtn = $(this).data("clear-btn");
+        img = $(this).data("img");
         loadMedia();
     });
 
@@ -45,7 +53,7 @@ $(document).ready(function () {
             data.forEach((item) => {
                 html += `
                 <div class="overflow-hidden masonry-item position-relative" data-path="${item.file_path}">
-                        <img src="${urlAssetPath}/storage/${item.file_path}" class="img-fluid media-image">
+                        <img src="${urlAssetPath}storage/${item.file_path}" class="img-fluid media-image">
                         <div class="top-0 p-2 media-actions position-absolute" style="display: none;">
                             <button class="border btn btn-sm btn-light rounded-circle edit-btn" data-id="${item.id}" data-name="${item.name}" title="تعديل">
                                 <i class="fas fa-pen text-secondary"></i>
@@ -73,7 +81,7 @@ $(document).ready(function () {
         $("#openDeleteModalBtn").click();
     });
 
-    $("#confirmDeleteBtn").click(function () {
+    $(document).on("click", "#confirmDeleteBtn", function () {
         if (deleteId) {
             $.ajax({
                 url: urlDelete.replace(":id", deleteId),
@@ -88,11 +96,24 @@ $(document).ready(function () {
             });
         }
     });
+
+    $(document).on("click", ".clear-btn", function () {
+        let input = $(this).data("input");
+        let img = $(this).data("img");
+        $(input).val("");
+        $(img).attr("src","");
+        $(img).addClass("d-none");
+        $(this).addClass("d-none");
+        toast.error("تم حذف الصورة");
+    });
     // اختيار الصورة
     $(document).on("click", ".masonry-item", function () {
         let path = $(this).data("path");
         $("#closeMediaModal").click();
-        $('#imageInputPath').val(path);
-        $("#uploadedAvatar").attr("src",urlAssetPath + "/storage/" + path);
+        $(input).val(path);
+        $(img).attr("src",urlAssetPath + "storage/" + path);
+        $(img).removeClass("d-none");
+        $(clearBtn).removeClass("d-none");
+        toast.success("تم اختيار الصورة");
     });
 });

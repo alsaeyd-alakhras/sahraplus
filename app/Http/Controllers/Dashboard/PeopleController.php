@@ -50,7 +50,7 @@ class PeopleController extends Controller
 
         return redirect()
             ->route('dashboard.people.index')
-            ->with('success', 'تم إضافة شخص جديد');
+            ->with('success', __('controller.Created_item_successfully'));
     }
 
     public function show(Person $person)
@@ -78,7 +78,7 @@ class PeopleController extends Controller
 
         return redirect()
             ->route('dashboard.people.index')
-            ->with('success', 'تم تعديل بيانات الشخص');
+            ->with('success', __('controller.Updated_item_successfully'));
     }
 
     public function destroy(Request $request, Person $person)
@@ -88,7 +88,7 @@ class PeopleController extends Controller
         $this->personService->deleteById($person->id);
 
         return request()->ajax()
-            ? response()->json(['status' => true, 'message' => 'تم حذف الشخص'])
-            : redirect()->route('dashboard.people.index')->with('success', 'تم حذف الشخص');
+            ? response()->json(['status' => true, 'message' => __('controller.Deleted_item_successfully')])
+            : redirect()->route('dashboard.people.index')->with('success', __('controller.Deleted_item_successfully'));
     }
 }

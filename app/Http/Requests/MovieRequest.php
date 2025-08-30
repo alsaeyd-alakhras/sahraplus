@@ -25,9 +25,8 @@ class MovieRequest extends FormRequest
         $id = $this->route('movie')?->id;
 
         return [
-            'title_ar'         => ['required','string','max:200'],
-            'title_en'         => ['nullable','string','max:200'],
-            'slug'             => ['required','string','max:200', Rule::unique('movies','slug')->ignore($id)],
+            'title_ar'         => ['required','string'],
+            'title_en'         => ['nullable','string'],
             'description_ar'   => ['nullable','string'],
             'description_en'   => ['nullable','string'],
             'poster_url'       => ['nullable','string','max:1000'],
@@ -43,10 +42,6 @@ class MovieRequest extends FormRequest
             'is_featured'      => ['sometimes','boolean'],
             'view_count'       => ['sometimes','integer','min:0'],
             'tmdb_id'          => ['nullable','string','max:20'],
-
-            // رفع ملفات اختياريًا
-            'posterUpload'     => ['nullable','file','mimes:jpg,jpeg,png,webp','max:8192'],
-            'backdropUpload'   => ['nullable','file','mimes:jpg,jpeg,png,webp','max:12288'],
         ];
     }
 }

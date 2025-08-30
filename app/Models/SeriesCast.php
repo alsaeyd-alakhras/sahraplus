@@ -6,8 +6,6 @@ use Illuminate\Database\Eloquent\Model;
 
 class SeriesCast extends Model
 {
-    use HasFactory;
-
     protected $table = 'series_cast';
 
     protected $fillable = [
@@ -26,7 +24,7 @@ class SeriesCast extends Model
 
     public function person()
     {
-        return $this->belongsTo(People::class);
+        return $this->belongsTo(Person::class);
     }
 
     // Scopes
