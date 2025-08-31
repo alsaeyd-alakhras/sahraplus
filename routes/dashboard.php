@@ -14,6 +14,7 @@ use App\Http\Controllers\Dashboard\CountryController;
 use App\Http\Controllers\Dashboard\UserAvatarController;
 use App\Http\Controllers\Dashboard\ActivityLogController;
 use App\Http\Controllers\Dashboard\NotificationController;
+use App\Http\Controllers\Dashboard\MovieCategoryController;
 use App\Http\Controllers\Dashboard\SystemSettingsController;
 use Mcamara\LaravelLocalization\Facades\LaravelLocalization;
 
@@ -67,6 +68,7 @@ Route::group([
         Route::get('movies-filters/{column}', [ MoviesController::class, 'getFilterOptions'])->name('movies.filters');
         Route::get('people-filters/{column}', [ PeopleController::class, 'getFilterOptions'])->name('people.filters');
         Route::get('short-filters/{column}', [ ShortController::class, 'getFilterOptions'])->name('short.filters');
+        Route::get('movie-categories-filters/{column}', [ MovieCategoryController::class, 'getFilterOptions'])->name('movie-categories.filters');
 
 
         // resources
@@ -79,6 +81,7 @@ Route::group([
             'movies'    => MoviesController::class,
             'people'    => PeopleController::class,
             'shorts'    => ShortController::class,
+            'movie-categories'    => MovieCategoryController::class,
         ]);
     });
 });

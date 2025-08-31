@@ -3,11 +3,13 @@
 namespace App\Http\Controllers\Dashboard;
 
 use App\Models\Movie;
+use App\Models\Person;
+use App\Models\Country;
 use Illuminate\Http\Request;
+use App\Models\MovieCategory;
 use App\Services\MovieService;
 use App\Http\Requests\MovieRequest;
 use App\Http\Controllers\Controller;
-use App\Models\Country;
 
 class MoviesController extends Controller
 {
@@ -68,6 +70,12 @@ class MoviesController extends Controller
     {
         $this->authorize('create', Movie::class);
         $movie = new Movie();
+        $categories = MovieCategory::query()
+        ->orderBy('sort_order')
+        ->get(['id','name_ar','name_en']);
+        $people = Person::query()
+        ->orderBy('name_ar')
+        ->get(['id','name_ar','name_en']);
         $contentRatingOptions = $this->contentRatingOptions;
         $languageOptions = $this->languageOptions;
         $countries = Country::select('code', 'name_ar', 'name_en')->get()->map(function ($country) {
@@ -77,7 +85,7 @@ class MoviesController extends Controller
         });
         $statusOptions = $this->statusOptions;
 
-        return view('dashboard.movies.create', compact('movie', 'contentRatingOptions', 'languageOptions', 'countries', 'statusOptions'));
+        return view('dashboard.movies.create', compact('movie', 'contentRatingOptions', 'languageOptions', 'countries', 'statusOptions', 'categories', 'people'));
     }
 
     /**
@@ -112,14 +120,25 @@ class MoviesController extends Controller
 
         $btn_label = "تعديل";
         $contentRatingOptions = $this->contentRatingOptions;
+
         $languageOptions = $this->languageOptions;
         $countries = Country::select('code', 'name_ar', 'name_en')->get()->map(function ($country) {
             return [
                 $country->code => app()->getLocale() == 'ar' ? $country->name_ar : $country->name_en,
             ];
         });
+
+         $categories = MovieCategory::query()
+        ->orderBy('sort_order')
+        ->get(['id','name_ar','name_en']);
+
+         $people = Person::query()
+        ->orderBy('name_ar')
+        ->get(['id','name_ar','name_en']);
+
+
         $statusOptions = $this->statusOptions;
-        return view('dashboard.movies.edit', compact('movie', 'btn_label', 'contentRatingOptions', 'languageOptions', 'countries', 'statusOptions'));
+        return view('dashboard.movies.edit', compact('movie', 'btn_label', 'contentRatingOptions', 'languageOptions', 'countries', 'statusOptions','categories','people'));
     }
 
     /**

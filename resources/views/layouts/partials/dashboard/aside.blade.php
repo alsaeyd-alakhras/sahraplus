@@ -53,6 +53,15 @@
                 </a>
             </li>
         @endcan
+         @can('view', 'App\\Models\MovieCategory')
+            <li
+                class="menu-item {{ request()->is('dashboard/movie-categories') || request()->is('dashboard/movie-categories/*') ? 'active' : '' }}">
+                <a href="{{ route('dashboard.movie-categories.index') }}" class="menu-link">
+                    <i class="ph ph-film-strip me-2"></i>
+                    <div data-i18n="movie-categories">تصنيفات الافلام </div>
+                </a>
+            </li>
+        @endcan
         @can('view', 'App\\Models\Person')
             <li
                 class="menu-item {{ request()->is('dashboard/people') || request()->is('dashboard/people/*') ? 'active' : '' }}">

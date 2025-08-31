@@ -44,9 +44,20 @@ class Movie extends Model
 
     // العلاقات
     public function categories()
-    {
-        return $this->belongsToMany(MovieCategory::class, 'movie_category_mapping', 'movie_id', 'category_id');
-    }
+{
+    return $this->belongsToMany(MovieCategory::class, 'category_movie_pivot', 'movie_id', 'category_id');
+}
+
+public function people()
+{
+    return $this->belongsToMany(
+        Person::class,
+        'movie_person_pivot',  // اسم الجدول الوسيط
+        'movie_id',            // FK الخاص بـ Movie
+        'person_id'            // FK الخاص بـ Person
+    )->withTimestamps();    
+     
+}
 
     public function cast()
     {
