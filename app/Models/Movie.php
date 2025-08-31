@@ -64,6 +64,52 @@ public function people()
         return $this->hasMany(MovieCat::class);
     }
 
+    public function watchlists()
+{
+    return $this->morphMany(Watchlist::class, 'content');
+}
+
+public function watchProgress()
+{
+    return $this->morphMany(WatchProgres::class, 'content');
+}
+
+public function viewingHistory()
+{
+    return $this->morphMany(ViewingHistory::class, 'content');
+}
+
+public function userRatings()
+{
+    return $this->morphMany(UserRating::class, 'content');
+}
+
+public function favorites()
+{
+    return $this->morphMany(Favorite::class, 'content');
+}
+
+public function downloads()
+{
+    return $this->morphMany(Download::class, 'content');
+}
+
+// Methods
+public function getAverageRating()
+{
+    return $this->userRatings()->approved()->avg('rating');
+}
+
+public function getRatingCount()
+{
+    return $this->userRatings()->approved()->count();
+}
+
+public function incrementViewCount()
+{
+    $this->increment('view_count');
+}
+
     public function videoFiles()
     {
         return $this->morphMany(VideoFiles::class, 'content');

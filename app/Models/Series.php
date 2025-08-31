@@ -53,6 +53,37 @@ class Series extends Model
         return $this->belongsTo(Admin::class, 'created_by');
     }
 
+
+    public function watchlists()
+{
+    return $this->morphMany(Watchlist::class, 'content');
+}
+
+public function userRatings()
+{
+    return $this->morphMany(UserRating::class, 'content');
+}
+
+public function favorites()
+{
+    return $this->morphMany(Favorite::class, 'content');
+}
+
+// Methods
+public function getAverageRating()
+{
+    return $this->userRatings()->approved()->avg('rating');
+}
+
+public function getRatingCount()
+{
+    return $this->userRatings()->approved()->count();
+}
+
+public function incrementViewCount()
+{
+    $this->increment('view_count');
+}
     // Accessors
     public function getTitleAttribute()
     {
