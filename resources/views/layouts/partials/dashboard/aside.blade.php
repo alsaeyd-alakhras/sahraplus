@@ -62,6 +62,17 @@
                 </a>
             </li>
         @endcan
+
+         @can('view', 'App\\Models\Short')
+            <li
+                class="menu-item {{ request()->is('dashboard/shorts') || request()->is('dashboard/shorts/*') ? 'active' : '' }}">
+                <a href="{{ route('dashboard.shorts.index') }}" class="menu-link">
+                    <i class="ph ph-user me-2"></i>
+                    <div data-i18n="shorts">فيديوهات قصيرة</div>
+                </a>
+            </li>
+        @endcan
+
         @can('view', 'App\\Models\Person')
             <li
                 class="menu-item {{ request()->is('dashboard/people') || request()->is('dashboard/people/*') ? 'active' : '' }}">
@@ -71,6 +82,8 @@
                 </a>
             </li>
         @endcan
+
+
         <li class="menu-header small">
             <span class="menu-header-text" data-i18n="Apps &amp; Pages">الإعدادات</span>
         </li>
