@@ -6,7 +6,7 @@ use App\Models\User;
 use App\Models\SystemSetting;
 use App\Models\Admin;
 use App\Models\Short;
-use App\Models\Episod;
+use App\Models\Episode;
 use App\Models\Person;
 use App\Models\Season;
 use App\Models\TmdbSyncLog;
@@ -89,7 +89,7 @@ class AppServiceProvider extends ServiceProvider
         Admin::observe(AdminObserver::class);
         // Constant::observe(ConstantObserver::class);
         // Currency::observe(CurrencyObserver::class);
-        Episod::observe(EpisodeObserver::class);
+        Episode::observe(EpisodeObserver::class);
         Notification::observe(NotificationObserver::class);
         Person::observe(PersonObserver::class);
         Season::observe(SeasonObserver::class);
