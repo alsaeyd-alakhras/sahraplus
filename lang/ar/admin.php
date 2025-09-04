@@ -2,15 +2,15 @@
 
 return [
 
-'Home' => 'الرئيسية',
+    'Home' => 'الرئيسية',
 'Dashboard' => 'لوحة التحكم',
-'Media' => 'الوسائط المتعددة',
+'Media' => 'الوسائط',
 'Notification' => 'الإشعارات',
 'Admin' => 'المشرفون',
 'User' => 'المستخدمون',
-'User Avatars' => 'صور المستخدمين',
+'UserAvatar' => 'صور المستخدمين',
 'Settings' => 'الإعدادات',
-'Countries' => 'الدول',
+'Country' => 'الدول',
 'Shorts' => 'المقاطع القصيرة',
 'People' => 'الأشخاص',
 'All' => 'الكل',
@@ -27,7 +27,13 @@ return [
 'Last Activity' => 'آخر نشاط',
 'Last Activity At' => 'وقت آخر نشاط',
 'Last Activity By' => 'بواسطة آخر نشاط',
-'Movies' => 'الأفلام',
-'Movie Categories' => 'تصنيفات الأفلام',
+'Movie' => 'فيلم',
+'Movie Category' => 'تصنيف الفيلم',
+'SystemSetting' => 'إعدادات النظام',
+'Action' => 'إجراء',
+'Delete Confirmation' => 'تأكيد الحذف',
+'Are you sure?' => 'هل أنت متأكد؟',
+'You will not be able to revert this!' => 'لن تتمكن من التراجع عن هذا!',
+
 
 ];
