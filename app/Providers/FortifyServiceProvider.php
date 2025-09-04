@@ -49,7 +49,7 @@ class FortifyServiceProvider extends ServiceProvider
                 if (Config::get('fortify.guard') == 'admin') {
                     return redirect()->intended('/' . app()->getLocale() . '/dashboard/home');
                 }
-                return redirect()->intended('/' . app()->getLocale() . '/home');
+                return redirect()->intended('/' . app()->getLocale());
             }
         });
 

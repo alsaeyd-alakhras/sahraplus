@@ -81,12 +81,12 @@ class MovieService
             $data['created_by'] = $data['created_by'] ?? optional(Auth::guard('admin')->user())->id;
 
             // رفع الصور
-            if($data['poster_url_out'] || $data['poster_url_out'] === "" || $data['poster_url_out'] === null){
+            if($data['poster_url_out'] && $data['poster_url_out'] == "" && $data['poster_url_out'] == null){
                 $data['poster_url'] = $data['poster_url_out'];
             }else{
                 $data['poster_url'] = $data['poster_url'] ?? null;
             }
-            if($data['backdrop_url_out'] || $data['backdrop_url_out'] === "" || $data['backdrop_url_out'] === null){
+            if($data['backdrop_url_out'] && $data['backdrop_url_out'] == "" && $data['backdrop_url_out'] == null){
                 $data['backdrop_url'] = $data['backdrop_url_out'];
             }else{
                 $data['backdrop_url'] = $data['backdrop_url'] ?? null;
@@ -110,12 +110,12 @@ class MovieService
             $movie = $this->repo->getById($id);
 
             // رفع الصور
-            if($data['poster_url_out'] || $data['poster_url_out'] === "" || $data['poster_url_out'] === null){
+            if($data['poster_url_out'] && $data['poster_url_out'] == "" && $data['poster_url_out'] == null){
                 $data['poster_url'] = $data['poster_url_out'];
             }else{
                 $data['poster_url'] = $data['poster_url'] ?? $movie->poster_url;
             }
-            if($data['backdrop_url_out'] || $data['backdrop_url_out'] === "" || $data['backdrop_url_out'] === null){
+            if($data['backdrop_url_out'] && $data['backdrop_url_out'] == "" && $data['backdrop_url_out'] == null){
                 $data['backdrop_url'] = $data['backdrop_url_out'];
             }else{
                 $data['backdrop_url'] = $data['backdrop_url'] ?? $movie->backdrop_url;

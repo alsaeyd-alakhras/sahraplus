@@ -4,15 +4,24 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Support\Str;
 
 class Season extends Model
 {
     use HasFactory;
 
     protected $fillable = [
-        'series_id', 'season_number', 'title_ar', 'title_en',
-        'description_ar', 'description_en', 'poster_url', 'air_date',
-        'episode_count', 'status', 'tmdb_id'
+        'series_id',
+        'season_number',
+        'title_ar',
+        'title_en',
+        'description_ar',
+        'description_en',
+        'poster_url',
+        'air_date',
+        'episode_count',
+        'status',
+        'tmdb_id'
     ];
 
     protected $casts = [
@@ -20,6 +29,8 @@ class Season extends Model
         'episode_count' => 'integer',
         'air_date' => 'date',
     ];
+
+    protected $appends = ['poster_full_url'];
 
     // العلاقات
     public function series()
@@ -29,7 +40,7 @@ class Season extends Model
 
     public function episodes()
     {
-        return $this->hasMany(Episod::class);
+        return $this->hasMany(Episode::class);
     }
 
     // Accessors
@@ -41,6 +52,17 @@ class Season extends Model
     public function getDescriptionAttribute()
     {
         return app()->getLocale() === 'ar' ? $this->description_ar : $this->description_en;
+    }
+
+    public function getPosterFullUrlAttribute()
+    {
+        if(Str::startsWith($this->poster_url, ['http', 'https'])) {
+            return $this->poster_url;
+        }
+        if (empty($this->poster_url)) {
+            return null;
+        }
+        return asset('storage/' . $this->poster_url);
     }
 
     // Methods

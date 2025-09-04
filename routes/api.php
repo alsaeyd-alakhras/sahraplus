@@ -2,8 +2,15 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\API\AuthController;
-use App\Http\Controllers\API\UserController;
+use App\Http\Controllers\API\V1\AuthController;
+use App\Http\Controllers\API\V1\UserController;
+use App\Http\Controllers\API\V1\UserAvatarController;
+use App\Http\Controllers\API\V1\CountryController;
+use App\Http\Controllers\API\V1\MoviesController;
+use App\Http\Controllers\API\V1\PeopleController;
+use App\Http\Controllers\API\V1\ShortController;
+use App\Http\Controllers\API\V1\SeriesController;
+use App\Http\Controllers\API\V1\SystemSettingsController;
 
 /*
 |--------------------------------------------------------------------------
@@ -25,6 +32,26 @@ Route::prefix('v1')->name('api.v1.')->group(function () {
 
     // 📄 Optional: استرجاع إعدادات عامة بدون تسجيل دخول مثل قائمة الدول
     // Route::get('countries', [CountryController::class, 'index']);
+    // 📌 User Avatars
+    Route::apiResource('user_avatars', UserAvatarController::class)->only(['index', 'show']);
+
+    // 📌 Countries
+    Route::apiResource('countries', CountryController::class)->only(['index', 'show']);
+
+    // 🎬 Movies
+    Route::apiResource('movies', MoviesController::class)->only(['index', 'show']);
+
+    // 👥 People
+    Route::apiResource('people', PeopleController::class)->only(['index', 'show']);
+
+    // 🎞 Shorts
+    Route::apiResource('shorts', ShortController::class)->only(['index', 'show']);
+
+    // 📺 Series
+    Route::apiResource('series', SeriesController::class)->only(['index', 'show']);
+
+    // ⚙️ System Settings (عرض الإعدادات العامة)
+    Route::get('settings', [SystemSettingsController::class, 'edit'])->name('settings.edit');
 });
 
 //

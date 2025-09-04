@@ -5,23 +5,30 @@ class="fixed top-0 right-0 left-0 z-[9999] navbar-initial navbar-inset-shadow tr
     <div class="flex justify-between items-center">
         <!-- Logo -->
         <div class="flex items-center space-x-4 rtl:space-x-reverse">
-            <h1 class="text-3xl font-black text-fire-red font-arabic">
-                سهرة بلس
-            </h1>
+            @php
+            $logo = $settings['logo_url'] ?? null;
+            @endphp
+            @if($logo)
+                <img src="{{asset('storage/'.$logo)}}" alt="Logo" class="w-32" />
+            @else
+                <h1 class="text-3xl font-black text-fire-red font-arabic">
+                    سهرة بلس
+                </h1>
+            @endif
         </div>
 
         <!-- Navigation Links -->
         <div class="hidden items-center space-x-8 md:flex rtl:space-x-reverse">
             <a href="{{route('site.home')}}"
-                class="font-medium text-white transition-colors duration-300 hover:text-fire-red">الرئيسية</a>
-            <a href="./series.html"
-                class="font-medium text-white transition-colors duration-300 hover:text-fire-red">مسلسلات</a>
-            <a href="./movies.html"
-                class="font-medium text-white transition-colors duration-300 hover:text-fire-red">أفلام</a>
-            <a href="./live.html"
-                class="font-medium text-white transition-colors duration-300 hover:text-fire-red">مباشر</a>
-            <a href="./categories.html"
-                class="font-medium text-white transition-colors duration-300 hover:text-fire-red">تصنيفات</a>
+                class="font-medium text-white transition-colors duration-300 hover:text-fire-red">{{__('site.Home')}}</a>
+            <a href="{{route('site.series')}}"
+                class="font-medium text-white transition-colors duration-300 hover:text-fire-red">{{__('site.Series')}}</a>
+            <a href="{{route('site.movies')}}"
+                class="font-medium text-white transition-colors duration-300 hover:text-fire-red">{{__('site.Movies')}}</a>
+            <a href="{{route('site.live')}}"
+                class="font-medium text-white transition-colors duration-300 hover:text-fire-red">{{__('site.Live')}}</a>
+            <a href="{{route('site.categories')}}"
+                class="font-medium text-white transition-colors duration-300 hover:text-fire-red">{{__('site.Categories')}}</a>
         </div>
 
         <!-- User Actions -->
@@ -40,7 +47,15 @@ class="fixed top-0 right-0 left-0 z-[9999] navbar-initial navbar-inset-shadow tr
                     <div class="px-4 py-2 text-[15px] divide-y divide-gray-700">
                         <div class="py-2 space-y-2">
                             @php
-                                $currentPath = preg_replace('/^\/[a-z]{2}/', '', request()->getPathInfo());
+                                $defaultLocale = 'ar';
+                                $currentLocale = app()->getLocale();
+
+                                // لو اللغة مش الافتراضية، نشيل prefix
+                                if ($currentLocale !== $defaultLocale) {
+                                    $currentPath = preg_replace('/^\/[a-z]{2}/', '', request()->getPathInfo());
+                                } else {
+                                    $currentPath = request()->getPathInfo();
+                                }
                             @endphp
 
                             <a href="/ar{{ $currentPath }}"
@@ -48,7 +63,7 @@ class="fixed top-0 right-0 left-0 z-[9999] navbar-initial navbar-inset-shadow tr
                                 <span class="flag flag-ar"></span>
                                 <span>العربية</span>
                                 @if(app()->getLocale() == 'ar')
-                                    <i class="mr-auto fas fa-check"></i>
+                                    <i class="mr-auto fas fa-check rtl:ml-auto"></i>
                                 @endif
                             </a>
 
@@ -57,7 +72,7 @@ class="fixed top-0 right-0 left-0 z-[9999] navbar-initial navbar-inset-shadow tr
                                 <span class="flag flag-en"></span>
                                 <span>English</span>
                                 @if(app()->getLocale() == 'en')
-                                    <i class="mr-auto fas fa-check"></i>
+                                    <i class="mr-auto rtl:ml-auto fas fa-check"></i>
                                 @endif
                             </a>
                         </div>
@@ -177,16 +192,27 @@ class="fixed top-0 right-0 left-0 z-[9999] navbar-initial navbar-inset-shadow tr
                             <i class="text-green-500 fas fa-check"></i>
                             <span class="w-full text-right">{{app()->getLocale() == 'ar' ? 'العربية' : 'الإنجليزية'}}</span>
                         </div>
+                        @php
+                            $defaultLocale = 'ar';
+                            $currentLocale = app()->getLocale();
+
+                            // لو اللغة مش الافتراضية، نشيل prefix
+                            if ($currentLocale !== $defaultLocale) {
+                                $currentPath = preg_replace('/^\/[a-z]{2}/', '', request()->getPathInfo());
+                            } else {
+                                $currentPath = request()->getPathInfo();
+                            }
+                        @endphp
                         @if(app()->getLocale() == 'ar')
-                        <div
+                        <a href="/en{{ $currentPath }}"
                             class="flex justify-end transition-all duration-200 cursor-pointer hover:text-sky-400">
                             English (En)
-                        </div>
+                        </a>
                         @else
-                        <div
+                        <a href="/ar{{ $currentPath }}"
                             class="flex justify-end transition-all duration-200 cursor-pointer hover:text-sky-400">
                             Arabic (Ar)
-                        </div>
+                        </a>
                         @endif
                     </div>
                 </div>

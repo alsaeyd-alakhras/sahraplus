@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use App\Models\Admin;
+use App\Models\SystemSetting;
 use App\Models\User;
 use App\Observers\AdminObserver;
 use App\Observers\UserObserver;
@@ -78,7 +79,7 @@ class AppServiceProvider extends ServiceProvider
             $view->with([
                 'auth_admin' => Auth::guard('admin')->check() ? Auth::guard('admin')->user() : null,
                 'auth_user' => Auth::guard('web')->check() ? User::find(Auth::guard('web')->user()?->id)->with('profiles','sessions')->first() : null,
-                'settings' => config('app.settings'),
+                'settings' => SystemSetting::get()->pluck('value', 'key')->toArray(),
             ]);
         });
 

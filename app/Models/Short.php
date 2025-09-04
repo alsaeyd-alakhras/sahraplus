@@ -10,9 +10,18 @@ class Short extends Model
      use HasFactory;
 
     protected $fillable = [
-        'title', 'description', 'video_path', 'poster_path',
-        'aspect_ratio', 'likes_count', 'comments_count', 'shares_count',
-        'share_url', 'is_featured', 'status', 'created_by'
+        'title',
+        'description',
+        'video_path',
+        'poster_path',
+        'aspect_ratio',
+        'likes_count',
+        'comments_count',
+        'shares_count',
+        'share_url',
+        'is_featured',
+        'status',
+        'created_by'
     ];
 
     protected $casts = [

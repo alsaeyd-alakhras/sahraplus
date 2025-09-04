@@ -22,4 +22,8 @@ return [
     'Created_item_successfully' => 'Item created successfully.',
     'Updated_item_successfully' => 'Item updated successfully.',
     'Deleted_item_successfully' => 'Item deleted successfully.',
+
+
+    'Episod_number_exists' => 'Episode number already exists.',
+    'Episod_number_available' => 'Episode number is available.',
 ];

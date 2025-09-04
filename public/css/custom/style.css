@@ -119,3 +119,7 @@
     text-overflow: ellipsis;
     direction: rtl;
 }
+
+.text-left{
+    text-align: left;
+}

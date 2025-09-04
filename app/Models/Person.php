@@ -13,9 +13,18 @@ class Person extends Model
     protected $table = 'people';
 
     protected $fillable = [
-        'name_ar', 'name_en', 'bio_ar', 'bio_en', 'photo_url',
-        'birth_date', 'birth_place', 'nationality', 'gender',
-        'known_for', 'tmdb_id', 'is_active'
+        'name_ar',
+        'name_en',
+        'bio_ar',
+        'bio_en',
+        'photo_url',
+        'birth_date',
+        'birth_place',
+        'nationality',
+        'gender',
+        'known_for',
+        'tmdb_id',
+        'is_active'
     ];
 
     protected $casts = [
@@ -24,7 +33,9 @@ class Person extends Model
         'is_active' => 'boolean',
     ];
 
-    // العلاقات
+    protected $appends = ['photo_full_url', 'age'];
+
+    //relationships
     public function movieRoles()
     {
         return $this->hasMany(MovieCat::class);

@@ -21,6 +21,10 @@ Route::group([
         // 'middleware' => ['auth'],
     ], function () {
         Route::get('/',[FrontController::class,'index'])->name('home');
+        Route::get('/series',[FrontController::class,'series'])->name('series');
+        Route::get('/movies',[FrontController::class,'movies'])->name('movies');
+        Route::get('/live',[FrontController::class,'live'])->name('live');
+        Route::get('/categories',[FrontController::class,'categories'])->name('categories');
     });
 
     Route::group([
@@ -38,6 +42,8 @@ Route::group([
 
         // settings ************************
         Route::get('settings', [FrontController::class, 'settings'])->name('settings');
+        Route::post('settings/change-password', [FrontController::class, 'changePassword'])->name('change-password');
+        Route::post('settings/update-personal-info', [FrontController::class, 'updatePersonalInfo'])->name('update-personal-info');
     });
 
 });

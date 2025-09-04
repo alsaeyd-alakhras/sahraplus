@@ -22,4 +22,7 @@ return [
     'Created_item_successfully' => 'تم إنشاء العنصر بنجاح.',
     'Updated_item_successfully' => 'تم تحديث العنصر بنجاح.',
     'Deleted_item_successfully' => 'تم حذف العنصر بنجاح.',
+
+    'Episod_number_exists' => 'رقم الحلقة موجود بالفعل.',
+    'Episod_number_available' => 'رقم الحلقة متاح.',
 ];
