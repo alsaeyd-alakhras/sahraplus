@@ -2,11 +2,40 @@
 
 return [
 
-    /*
-    |--------------------------------------------------------------------------
-    | Admin Language Lines
-    |--------------------------------------------------------------------------
-    */
+    'Home' => 'Home',
+    'Dashboard' => 'Dashboard',
+    'Media' => 'Media',
+    'Notification' => 'Notifications',
+    'Admin' => 'Admins',
+    'User' => 'Users',
+    'UserAvatar' => 'User Avatars',
+    'Settings' => 'Settings',
+    'Country' => 'Countries',
+    'Shorts' => 'Shorts',
+    'People' => 'People',
+    'All' => 'All',
+    'Active' => 'Active',
+    'Inactive' => 'Inactive',
+    'Create' => 'Create',
+    'Edit' => 'Edit',
+    'Delete' => 'Delete',
+    'Show' => 'Show',
+    'Cancel' => 'Cancel',
+    'Save' => 'Save',
+    'Name' => 'Name',
+    'Status' => 'Status',
+    'Last Activity' => 'Last Activity',
+    'Last Activity At' => 'Last Activity At',
+    'Last Activity By' => 'Last Activity By',
+    'Movie' => 'Movies',
+    'Movie Category' => 'Movie Category',
+    'SystemSetting' => 'System Settings',
+    'All' => 'All',
+    'Action' => 'Action',
+    'Delete Confirmation' => 'Delete Confirmation',
+    'Are you sure?' => 'Are you sure?',
+    'You will not be able to revert this!' => 'You will not be able to revert this!',
+
 
     'admin_page' => 'Dashboard',
     'login' => 'Login',

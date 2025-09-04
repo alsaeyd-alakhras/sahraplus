@@ -28,7 +28,7 @@
                 class="menu-item {{ request()->is('dashboard/media') || request()->is('dashboard/media/*') ? 'active' : '' }}">
                 <a href="{{ route('dashboard.media.index') }}" class="menu-link">
                     <i class="ph ph-images me-2"></i>
-                    <div data-i18n="media">مكتبة الوسائط</div>
+                    <div data-i18n="media">{{ __('admin.Media') }}</div>
                 </a>
             </li>
         @endcan
@@ -37,12 +37,12 @@
                 class="menu-item {{ request()->is('dashboard/notifications') || request()->is('dashboard/notifications/*') ? 'active' : '' }}">
                 <a href="{{ route('dashboard.notifications.index') }}" class="menu-link">
                     <i class="ph ph-bell me-2"></i>
-                    <div data-i18n="notifications">الإشعارات</div>
+                    <div data-i18n="notifications">{{ __('admin.Notification') }}</div>
                 </a>
             </li>
         @endcan
         <li class="menu-header small">
-            <span class="menu-header-text" data-i18n="Apps &amp; Pages">الوسائط</span>
+            <span class="menu-header-text" data-i18n="Apps &amp; Pages">{{ __('admin.Media') }}</span>
         </li>
         @can('view', 'App\\Models\Series')
             <li
@@ -58,19 +58,41 @@
                 class="menu-item {{ request()->is('dashboard/movies') || request()->is('dashboard/movies/*') ? 'active' : '' }}">
                 <a href="{{ route('dashboard.movies.index') }}" class="menu-link">
                     <i class="ph ph-film-strip me-2"></i>
-                    <div data-i18n="movies">الافلام</div>
+                    <div data-i18n="movies">{{ __('admin.Movie') }}</div>
                 </a>
             </li>
         @endcan
+         @can('view', 'App\\Models\MovieCategory')
+            <li
+                class="menu-item {{ request()->is('dashboard/movie-categories') || request()->is('dashboard/movie-categories/*') ? 'active' : '' }}">
+                <a href="{{ route('dashboard.movie-categories.index') }}" class="menu-link">
+                    <i class="ph ph-film-strip me-2"></i>
+                    <div data-i18n="movie-categories"> {{ __('admin.Movie Category') }} </div>
+                </a>
+            </li>
+        @endcan
+
+         @can('view', 'App\\Models\Short')
+            <li
+                class="menu-item {{ request()->is('dashboard/shorts') || request()->is('dashboard/shorts/*') ? 'active' : '' }}">
+                <a href="{{ route('dashboard.shorts.index') }}" class="menu-link">
+                    <i class="ph ph-user me-2"></i>
+                    <div data-i18n="shorts"> {{ __('admin.Short') }}</div>
+                </a>
+            </li>
+        @endcan
+
         @can('view', 'App\\Models\Person')
             <li
                 class="menu-item {{ request()->is('dashboard/people') || request()->is('dashboard/people/*') ? 'active' : '' }}">
                 <a href="{{ route('dashboard.people.index') }}" class="menu-link">
                     <i class="ph ph-user me-2"></i>
-                    <div data-i18n="people">الممثلين</div>
+                    <div data-i18n="people"> {{ __('admin.Person') }}</div>
                 </a>
             </li>
         @endcan
+
+
         <li class="menu-header small">
             <span class="menu-header-text" data-i18n="Apps &amp; Pages">الإعدادات</span>
         </li>
@@ -79,7 +101,7 @@
                 class="menu-item {{ request()->is('dashboard/admins') || request()->is('dashboard/admins/*') ? 'active' : '' }}">
                 <a href="{{ route('dashboard.admins.index') }}" class="menu-link">
                     <i class="ph ph-users-three me-2"></i>
-                    <div data-i18n="admins">الأدمن/ الموظفين</div>
+                    <div data-i18n="admins">{{ __('admin.Admin') }}</ </div>
                 </a>
             </li>
         @endcan
@@ -88,7 +110,7 @@
                 class="menu-item {{ request()->is('dashboard/users') || request()->is('dashboard/users/*') ? 'active' : '' }}">
                 <a href="{{ route('dashboard.users.index') }}" class="menu-link">
                     <i class="ph ph-users me-2"></i>
-                    <div data-i18n="users">المستخدمين</div>
+                    <div data-i18n="users">{{ __('admin.User') }}</div>
                 </a>
             </li>
         @endcan
@@ -97,7 +119,7 @@
                 class="menu-item {{ request()->is('dashboard/user_avatars') || request()->is('dashboard/user_avatars/*') ? 'active' : '' }}">
                 <a href="{{ route('dashboard.user_avatars.index') }}" class="menu-link">
                     <i class="ph ph-user-circle me-2"></i>
-                    <div data-i18n="user-avatar">مكتبة الأفاتار</div>
+                    <div data-i18n="user-avatar">{{ __('admin.UserAvatar') }} </div>
                 </a>
             </li>
         @endcan
@@ -106,7 +128,7 @@
                 class="menu-item {{ request()->is('dashboard/countries') || request()->is('dashboard/countries/*') ? 'active' : '' }}">
                 <a href="{{ route('dashboard.countries.index') }}" class="menu-link">
                     <i class="ph ph-globe me-2"></i>
-                    <div data-i18n="users">الدول</div>
+                    <div data-i18n="users">{{ __('admin.Country') }}</div>
                 </a>
             </li>
         @endcan
@@ -116,7 +138,7 @@
                 class="menu-item {{ request()->is('dashboard/settings') || request()->is('dashboard/settings/*') ? 'active' : '' }}">
                 <a href="{{ route('dashboard.settings.edit') }}" class="menu-link">
                     <i class="ph ph-gear me-2"></i>
-                    <div data-i18n="users">الاعدادات</div>
+                    <div data-i18n="users">{{ __('admin.SystemSetting') }}</div>
                 </a>
             </li>
         @endcan
@@ -125,19 +147,19 @@
             <a href="page-2.html" class="menu-link">
                 <i class="menu-icon tf-icons ti ti-app-window"></i>
                 <i class="fa-solid fa-house me-2"></i>
-                <div data-i18n="Page 2">Page 2</div>
+                <div data-i18n="Page 2"> {{ __('admin.Page') }}</div>
             </a>
         </li>
         <li class="menu-item">
             <a href="javascript:void(0)" class="menu-link menu-toggle">
                 <i class="menu-icon tf-icons ti ti-smart-home"></i>
-                <div data-i18n="Dashboards">Dashboards</div>
+                <div data-i18n="Dashboards">{{ __('admin.Dashboards') }}</div>
             </a>
             <ul class="menu-sub">
                 <li class="menu-item">
                     <a href="index.html" class="menu-link">
                         <i class="menu-icon tf-icons ti ti-chart-pie-2"></i>
-                        <div data-i18n="Analytics">Analytics</div>
+                        <div data-i18n="Analytics">{{ __('admin.Analytics') }}</div>
                     </a>
                 </li>
                 <li class="menu-item">

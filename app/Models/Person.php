@@ -41,15 +41,22 @@ class Person extends Model
         return $this->hasMany(MovieCat::class);
     }
 
+    public function movies()
+    {
+        return $this->belongsToMany(
+            Movie::class,
+            'movie_person_pivot',
+            'person_id',
+            'movie_id'
+        )->withTimestamps();
+    }
+
     public function seriesRoles()
     {
         return $this->hasMany(SeriesCast::class);
     }
 
-    public function movies()
-    {
-        return $this->belongsToMany(Movie::class, 'movie_cast')->withPivot('role_type', 'character_name', 'sort_order');
-    }
+
 
     public function series()
     {
@@ -73,7 +80,7 @@ class Person extends Model
     }
     public function getPhotoFullUrlAttribute() // $this->photo_full_url
     {
-        if(Str::startsWith($this->photo_url, ['http', 'https'])) {
+        if (Str::startsWith($this->photo_url, ['http', 'https'])) {
             return $this->photo_url;
         }
         if (empty($this->photo_url)) {
@@ -91,18 +98,18 @@ class Person extends Model
 
     public function scopeActors($query)
     {
-        return $query->whereHas('movieRoles', function($q) {
+        return $query->whereHas('movieRoles', function ($q) {
             $q->where('role_type', 'actor');
-        })->orWhereHas('seriesRoles', function($q) {
+        })->orWhereHas('seriesRoles', function ($q) {
             $q->where('role_type', 'actor');
         });
     }
 
     public function scopeDirectors($query)
     {
-        return $query->whereHas('movieRoles', function($q) {
+        return $query->whereHas('movieRoles', function ($q) {
             $q->where('role_type', 'director');
-        })->orWhereHas('seriesRoles', function($q) {
+        })->orWhereHas('seriesRoles', function ($q) {
             $q->where('role_type', 'director');
         });
     }

@@ -74,65 +74,107 @@ class MovieService
     }
 
     public function save(array $data)
-    {
-        DB::beginTransaction();
-        try {
-            // من أنشأ؟
-            $data['created_by'] = $data['created_by'] ?? optional(Auth::guard('admin')->user())->id;
+{
+    DB::beginTransaction();
+    try {
+        // من أنشأ؟
+        $data['created_by'] = $data['created_by'] ?? optional(Auth::guard('admin')->user())->id;
 
-            // رفع الصور
-            if($data['poster_url_out'] && $data['poster_url_out'] == "" && $data['poster_url_out'] == null){
-                $data['poster_url'] = $data['poster_url_out'];
-            }else{
-                $data['poster_url'] = $data['poster_url'] ?? null;
-            }
-            if($data['backdrop_url_out'] && $data['backdrop_url_out'] == "" && $data['backdrop_url_out'] == null){
-                $data['backdrop_url'] = $data['backdrop_url_out'];
-            }else{
-                $data['backdrop_url'] = $data['backdrop_url'] ?? null;
-            }
+        // التقط العلاقات (ولا ترسلها للـ repo)
+        $categoryIds = $data['category_ids'] ?? [];
+        $personIds   = $data['person_ids']   ?? [];
+        unset($data['category_ids'], $data['person_ids']);
 
-            $data['slug'] = Str::slug($data['title_en'] ?? $data['title_ar']);
-
-            $movie = $this->repo->save($data);
-            DB::commit();
-            return $movie;
-        } catch (\Throwable $e) {
-            DB::rollBack();
-            return back()->with('error',$e->getMessage());
+        // الصور (نفضل *_out إن وُجدت وقيمتها غير فارغة)
+        if (array_key_exists('poster_url_out', $data) && $data['poster_url_out'] !== null && $data['poster_url_out'] !== '') {
+            $data['poster_url'] = $data['poster_url_out'];
+        } else {
+            $data['poster_url'] = $data['poster_url'] ?? null;
         }
-    }
 
-    public function update(array $data, int $id)
-    {
-        DB::beginTransaction();
-        try {
-            $movie = $this->repo->getById($id);
-
-            // رفع الصور
-            if($data['poster_url_out'] && $data['poster_url_out'] == "" && $data['poster_url_out'] == null){
-                $data['poster_url'] = $data['poster_url_out'];
-            }else{
-                $data['poster_url'] = $data['poster_url'] ?? $movie->poster_url;
-            }
-            if($data['backdrop_url_out'] && $data['backdrop_url_out'] == "" && $data['backdrop_url_out'] == null){
-                $data['backdrop_url'] = $data['backdrop_url_out'];
-            }else{
-                $data['backdrop_url'] = $data['backdrop_url'] ?? $movie->backdrop_url;
-            }
-
-            $data['slug'] = Str::slug($data['title_en'] ?? $data['title_ar']);
-
-            $movie = $this->repo->update($data,$id);
-
-            DB::commit();
-            return $movie;
-        } catch (\Throwable $e) {
-            DB::rollBack();
-            return back()->with('error',$e->getMessage());
+        if (array_key_exists('backdrop_url_out', $data) && $data['backdrop_url_out'] !== null && $data['backdrop_url_out'] !== '') {
+            $data['backdrop_url'] = $data['backdrop_url_out'];
+        } else {
+            $data['backdrop_url'] = $data['backdrop_url'] ?? null;
         }
-    }
 
+        unset($data['poster_url_out'], $data['backdrop_url_out']);
+
+        // slug
+        $data['slug'] = Str::slug($data['title_en'] ?? $data['title_ar']);
+
+        // إنشاء الفيلم
+        $movie = $this->repo->save($data);
+
+        // مزامنة العلاقات (لو فيه اختيارات)
+        if (!empty($categoryIds)) {
+            $movie->categories()->sync($categoryIds);
+        }
+        if (!empty($personIds)) {
+            $movie->people()->sync($personIds);
+        }
+
+        DB::commit();
+        return $movie;
+    } catch (\Throwable $e) {
+        DB::rollBack();
+        return back()->with('error', $e->getMessage());
+    }
+}
+
+public function update(array $data, int $id)
+{
+    DB::beginTransaction();
+    try {
+        $movie = $this->repo->getById($id);
+
+        // التقط العلاقات (واحذفها من $data قبل التحديث)
+        $hasCategoryIds = array_key_exists('category_ids', $data);
+        $hasPersonIds   = array_key_exists('person_ids', $data);
+
+        $categoryIds = $hasCategoryIds ? (array)($data['category_ids'] ?? []) : null;
+        $personIds   = $hasPersonIds   ? (array)($data['person_ids']   ?? []) : null;
+
+        unset($data['category_ids'], $data['person_ids']);
+
+        // الصور: نفضل *_out إذا وُجدت وغير فارغة، وإلا نحافظ على القيمة السابقة
+        if (array_key_exists('poster_url_out', $data) && $data['poster_url_out'] !== null && $data['poster_url_out'] !== '') {
+            $data['poster_url'] = $data['poster_url_out'];
+        } else {
+            $data['poster_url'] = $data['poster_url'] ?? $movie->poster_url;
+        }
+
+        if (array_key_exists('backdrop_url_out', $data) && $data['backdrop_url_out'] !== null && $data['backdrop_url_out'] !== '') {
+            $data['backdrop_url'] = $data['backdrop_url_out'];
+        } else {
+            $data['backdrop_url'] = $data['backdrop_url'] ?? $movie->backdrop_url;
+        }
+
+        unset($data['poster_url_out'], $data['backdrop_url_out']);
+
+        // slug
+        $data['slug'] = Str::slug($data['title_en'] ?? $data['title_ar']);
+
+        // تحديث بيانات الفيلم
+        $movie = $this->repo->update($data, $id);
+
+        // مزامنة العلاقات:
+        // - لو المفتاح موجود في الريكوست حتى لو مصفوفة فاضية => sync([]) = تفريغ العلاقات
+        // - لو المفتاح غير موجود => لا نلمس العلاقات
+        if ($hasCategoryIds) {
+            $movie->categories()->sync($categoryIds ?? []);
+        }
+        if ($hasPersonIds) {
+            $movie->people()->sync($personIds ?? []);
+        }
+
+        DB::commit();
+        return $movie;
+    } catch (\Throwable $e) {
+        DB::rollBack();
+        return back()->with('error', $e->getMessage());
+    }
+}
     public function deleteById(int $id)
     {
         DB::beginTransaction();

@@ -70,6 +70,36 @@ class User extends Authenticatable
         return $this->belongsTo(Country::class, 'country_code', 'code');
     }
 
+    public function watchlist()
+{
+    return $this->hasMany(Watchlist::class);
+}
+
+public function watchProgress()
+{
+    return $this->hasMany(WatchProgres::class);
+}
+
+public function viewingHistory()
+{
+    return $this->hasMany(ViewingHistory::class);
+}
+
+public function ratings()
+{
+    return $this->hasMany(UserRating::class);
+}
+
+public function favorites()
+{
+    return $this->hasMany(Favorite::class);
+}
+
+public function downloads()
+{
+    return $this->hasMany(Download::class);
+}
+
     // Accessors & Mutators
     public function getFullNameAttribute() // $user->full_name
     {

@@ -45,6 +45,10 @@ class MovieRequest extends FormRequest
             'is_featured'      => ['sometimes','boolean'],
             'view_count'       => ['sometimes','integer','min:0'],
             'tmdb_id'          => ['nullable','string','max:20'],
+            'category_ids'   => ['nullable', 'array'],
+            'category_ids.*' => ['integer', 'exists:movie_categories,id'],
+            'person_ids'     => ['nullable', 'array'],
+            'person_ids.*'   => ['integer', 'exists:people,id'],
         ];
     }
 }

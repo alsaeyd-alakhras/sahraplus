@@ -63,6 +63,42 @@ class Episode extends Model
         return $this->morphMany(Comment::class, 'commentable');
     }
 
+    public function watchlists()
+{
+    return $this->morphMany(Watchlist::class, 'content');
+}
+
+public function watchProgress()
+{
+    return $this->morphMany(WatchProgres::class, 'content');
+}
+
+public function viewingHistory()
+{
+    return $this->morphMany(ViewingHistory::class, 'content');
+}
+
+public function userRatings()
+{
+    return $this->morphMany(UserRating::class, 'content');
+}
+
+public function downloads()
+{
+    return $this->morphMany(Download::class, 'content');
+}
+
+// Methods
+public function getAverageRating()
+{
+    return $this->userRatings()->approved()->avg('rating');
+}
+
+public function incrementViewCount()
+{
+    $this->increment('view_count');
+}
+
     // Accessors
     public function getTitleAttribute()
     {

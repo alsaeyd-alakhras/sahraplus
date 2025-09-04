@@ -60,6 +60,7 @@ class ShortController extends Controller
         return view('dashboard.shorts.edit', compact('short','btn_label'));
     }
 
+
     public function update(ShortRequest $request, Short $short)
     {
         $this->authorize('update', Short::class);

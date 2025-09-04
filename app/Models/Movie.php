@@ -44,14 +44,71 @@ class Movie extends Model
 
     // العلاقات
     public function categories()
-    {
-        return $this->belongsToMany(MovieCategory::class, 'movie_category_mapping', 'movie_id', 'category_id');
-    }
+{
+    return $this->belongsToMany(MovieCategory::class, 'category_movie_pivot', 'movie_id', 'category_id');
+}
+
+public function people()
+{
+    return $this->belongsToMany(
+        Person::class,
+        'movie_person_pivot',  // اسم الجدول الوسيط
+        'movie_id',            // FK الخاص بـ Movie
+        'person_id'            // FK الخاص بـ Person
+    )->withTimestamps();    
+     
+}
 
     public function cast()
     {
         return $this->hasMany(MovieCat::class);
     }
+
+    public function watchlists()
+{
+    return $this->morphMany(Watchlist::class, 'content');
+}
+
+public function watchProgress()
+{
+    return $this->morphMany(WatchProgres::class, 'content');
+}
+
+public function viewingHistory()
+{
+    return $this->morphMany(ViewingHistory::class, 'content');
+}
+
+public function userRatings()
+{
+    return $this->morphMany(UserRating::class, 'content');
+}
+
+public function favorites()
+{
+    return $this->morphMany(Favorite::class, 'content');
+}
+
+public function downloads()
+{
+    return $this->morphMany(Download::class, 'content');
+}
+
+// Methods
+public function getAverageRating()
+{
+    return $this->userRatings()->approved()->avg('rating');
+}
+
+public function getRatingCount()
+{
+    return $this->userRatings()->approved()->count();
+}
+
+public function incrementViewCount()
+{
+    $this->increment('view_count');
+}
 
     public function videoFiles()
     {
