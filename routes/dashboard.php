@@ -65,6 +65,13 @@ Route::group([
         // Series ************************
         Route::get('episodes/checkEpisodNumber', [EpisodeController::class, 'checkEpisodNumber'])->name('episodes.checkEpisodNumber');
 
+        // Movies
+        Route::get('movies/castRowPartial', [MoviesController::class, 'castRowPartial'])->name('movies.castRowPartial');
+        Route::get('movies/videoRowPartial', [MoviesController::class, 'videoRowPartial'])->name('movies.videoRowPartial');
+        Route::get('movies/subtitleRowPartial', [MoviesController::class, 'subtitleRowPartial'])->name('movies.subtitleRowPartial');
+        Route::get('people/search', [PeopleController::class, 'search'])->name('people.search');
+
+
         /* ********************************************************** */
 
         // filters

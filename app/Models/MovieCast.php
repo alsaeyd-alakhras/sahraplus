@@ -12,7 +12,11 @@ class MovieCast extends Model
     protected $table = 'movie_cast';
 
     protected $fillable = [
-        'movie_id', 'person_id', 'role_type', 'character_name', 'sort_order'
+        'movie_id',
+        'person_id',
+        'role_type',
+        'character_name',
+        'sort_order'
     ];
 
     protected $casts = [

@@ -40,9 +40,10 @@ class MovieCategory extends Model
      * علاقة Many-to-Many مع الأفلام عبر الجدول الوسيط category_movie_pivot
      */
     public function movies()
-{
-    return $this->belongsToMany(Movie::class, 'category_movie_pivot', 'category_id', 'movie_id');
-}
+    {
+        return $this->belongsToMany(Movie::class, 'category_movie_pivot', 'category_id', 'movie_id')
+            ->withTimestamps();
+    }
 
     /**
      * سكوب للتصنيفات النشطة فقط

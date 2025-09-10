@@ -167,7 +167,6 @@
                                             name="site_email"
                                             type="email"
                                             :value="$setting['site_email'] ?? ''"
-                                            required
                                             class="text-left"
                                             placeholder="contact@sahra.com" />
                                     </div>

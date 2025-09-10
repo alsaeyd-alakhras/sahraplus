@@ -1,0 +1,18 @@
+/* body {
+    font-family: "Cairo", sans-serif;
+} */
+
+.error-number {
+    text-shadow: 3px 3px 0px rgba(168, 85, 247, 0.4),
+        6px 6px 0px rgba(14, 165, 233, 0.3), 9px 9px 0px rgba(0, 0, 0, 0.2);
+}
+
+.glass-effect {
+    backdrop-filter: blur(16px);
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.hover-glow:hover {
+    box-shadow: 0 0 30px rgba(14, 165, 233, 0.4);
+}

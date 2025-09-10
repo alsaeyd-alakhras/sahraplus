@@ -47,7 +47,15 @@
                 </a>
                 <ul class="dropdown-menu dropdown-menu-end lang-dropdown">
                     @php
-                        $currentPath = preg_replace('/^\/[a-z]{2}/', '', request()->getPathInfo());
+                        $defaultLocale = 'ar';
+                        $currentLocale = app()->getLocale();
+
+                        // لو اللغة مش الافتراضية، نشيل prefix
+                        if ($currentLocale !== $defaultLocale) {
+                            $currentPath = preg_replace('/^\/[a-z]{2}/', '', request()->getPathInfo());
+                        } else {
+                            $currentPath = request()->getPathInfo();
+                        }
                     @endphp
                     <li>
                         <a class="dropdown-item {{ app()->getLocale() == 'ar' ? 'active' : '' }}"

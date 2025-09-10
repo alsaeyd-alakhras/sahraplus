@@ -54,16 +54,16 @@
     @php
         // عدلنا الحقول المعروضة: الحالة بدل is_active
         $fields = [
-            'title_ar'   => 'العنوان بالعربي',
-            'title_en'   => 'العنوان بالإنجليزي',
-            'status'     => 'الحالة',
+            'title_ar'   => __('admin.title_ar'),
+            'title_en'   => __('admin.title_en'),
+            'status'     => __('admin.status'),
         ];
     @endphp
 
     <div class="shadow-lg enhanced-card">
         <div class="table-header-title">
             <i class="icon ph ph-monitor-play e-2"></i>
-            جدول المسلسلات
+            {{ __('admin.series_table_title') }}
         </div>
         <div class="enhanced-card-body">
             <div class="col-12" style="padding: 0;">

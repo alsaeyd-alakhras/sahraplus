@@ -91,4 +91,25 @@ class PeopleController extends Controller
             ? response()->json(['status' => true, 'message' => __('controller.Deleted_item_successfully')])
             : redirect()->route('dashboard.people.index')->with('success', __('controller.Deleted_item_successfully'));
     }
+    public function search(Request $request)
+    {
+        $term = $request->get('term', '');
+
+        $people = \App\Models\Person::query()
+            ->when($term, function ($q) use ($term) {
+                $q->where('name_ar', 'like', "%{$term}%")
+                ->orWhere('name_en', 'like', "%{$term}%");
+            })
+            ->limit(20)
+            ->get(['id', 'name_ar', 'name_en', 'photo_url']);
+        return $people->map(function ($p) {
+            return [
+                'id' => $p->id,
+                'text' => $p->name_ar ?? $p->name_en,
+                'photo_url' => $p->photo_full_url,
+            ];
+        });
+    }
+
+
 }

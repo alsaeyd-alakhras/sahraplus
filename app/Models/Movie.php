@@ -40,81 +40,66 @@ class Movie extends Model
         'view_count' => 'integer',
     ];
 
-    protected $appends = ['poster_full_url', 'backdrop_full_url'];
+    protected $appends = ['poster_full_url', 'backdrop_full_url','trailer_full_url'];
 
     // العلاقات
     public function categories()
-{
-    return $this->belongsToMany(MovieCategory::class, 'category_movie_pivot', 'movie_id', 'category_id');
-}
+    {
+        return $this->belongsToMany(MovieCategory::class, 'category_movie_pivot', 'movie_id', 'category_id')
+        ->withTimestamps();
+    }
 
-public function people()
-{
-    return $this->belongsToMany(
-        Person::class,
-        'movie_person_pivot',  // اسم الجدول الوسيط
-        'movie_id',            // FK الخاص بـ Movie
-        'person_id'            // FK الخاص بـ Person
-    )->withTimestamps();    
-     
-}
+    /** الطاقم (pivot: movie_cast) */
+    public function people()
+    {
+        // pivot يحتوي حقول إضافية اختيارية: role, character_name, job, ordering
+        return $this->belongsToMany(Person::class, 'movie_cast', 'movie_id', 'person_id')
+            ->withPivot(['role_type', 'character_name', 'sort_order'])
+            ->withTimestamps();
+    }
 
     public function cast()
     {
-        return $this->hasMany(MovieCat::class);
+        return $this->hasMany(MovieCast::class);
     }
 
     public function watchlists()
-{
-    return $this->morphMany(Watchlist::class, 'content');
-}
+    {
+        return $this->morphMany(Watchlist::class, 'content');
+    }
 
-public function watchProgress()
-{
-    return $this->morphMany(WatchProgres::class, 'content');
-}
+    public function watchProgress()
+    {
+        return $this->morphMany(WatchProgres::class, 'content');
+    }
 
-public function viewingHistory()
-{
-    return $this->morphMany(ViewingHistory::class, 'content');
-}
+    public function viewingHistory()
+    {
+        return $this->morphMany(ViewingHistory::class, 'content');
+    }
 
-public function userRatings()
-{
-    return $this->morphMany(UserRating::class, 'content');
-}
+    public function userRatings()
+    {
+        return $this->morphMany(UserRating::class, 'content');
+    }
 
-public function favorites()
-{
-    return $this->morphMany(Favorite::class, 'content');
-}
+    public function favorites()
+    {
+        return $this->morphMany(Favorite::class, 'content');
+    }
 
-public function downloads()
-{
-    return $this->morphMany(Download::class, 'content');
-}
+    public function downloads()
+    {
+        return $this->morphMany(Download::class, 'content');
+    }
 
-// Methods
-public function getAverageRating()
-{
-    return $this->userRatings()->approved()->avg('rating');
-}
-
-public function getRatingCount()
-{
-    return $this->userRatings()->approved()->count();
-}
-
-public function incrementViewCount()
-{
-    $this->increment('view_count');
-}
-
+    /** ملفات الفيديو (Morph) */
     public function videoFiles()
     {
         return $this->morphMany(VideoFiles::class, 'content');
     }
 
+    /** الترجمات (Morph) */
     public function subtitles()
     {
         return $this->morphMany(Subtitle::class, 'content');
@@ -128,6 +113,22 @@ public function incrementViewCount()
     public function creator()
     {
         return $this->belongsTo(Admin::class, 'created_by');
+    }
+
+    // Methods
+    public function getAverageRating()
+    {
+        return $this->userRatings()->approved()->avg('rating');
+    }
+
+    public function getRatingCount()
+    {
+        return $this->userRatings()->approved()->count();
+    }
+
+    public function incrementViewCount()
+    {
+        $this->increment('view_count');
     }
 
     // Accessors
@@ -149,7 +150,7 @@ public function incrementViewCount()
     }
     public function getPosterFullUrlAttribute() // $this->poster_full_url
     {
-        if(Str::startsWith($this->poster_url, ['http', 'https'])) {
+        if (Str::startsWith($this->poster_url, ['http', 'https'])) {
             return $this->poster_url;
         }
         if (empty($this->poster_url)) {
@@ -159,13 +160,23 @@ public function incrementViewCount()
     }
     public function getBackdropFullUrlAttribute() // $this->backdrop_full_url
     {
-        if(Str::startsWith($this->backdrop_url, ['http', 'https'])) {
+        if (Str::startsWith($this->backdrop_url, ['http', 'https'])) {
             return $this->backdrop_url;
         }
         if (empty($this->backdrop_url)) {
             return null;
         }
         return asset('storage/' . $this->backdrop_url);
+    }
+    public function getTrailerFullUrlAttribute() // $this->trailer_full_url
+    {
+        if (Str::startsWith($this->trailer_url, ['http', 'https'])) {
+            return $this->trailer_url;
+        }
+        if (empty($this->trailer_url)) {
+            return null;
+        }
+        return asset('storage/' . $this->trailer_url);
     }
 
     // Scopes

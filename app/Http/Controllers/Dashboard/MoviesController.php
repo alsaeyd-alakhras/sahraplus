@@ -70,12 +70,8 @@ class MoviesController extends Controller
     {
         $this->authorize('create', Movie::class);
         $movie = new Movie();
-        $categories = MovieCategory::query()
-        ->orderBy('sort_order')
-        ->get(['id','name_ar','name_en']);
-        $people = Person::query()
-        ->orderBy('name_ar')
-        ->get(['id','name_ar','name_en']);
+        $allCategories = MovieCategory::select('id','name_ar','name_en')->orderBy('name_ar')->get();
+        $allPeople     = Person::select('id','name_ar','name_en')->orderBy('name_ar')->get();
         $contentRatingOptions = $this->contentRatingOptions;
         $languageOptions = $this->languageOptions;
         $countries = Country::select('code', 'name_ar', 'name_en')->get()->map(function ($country) {
@@ -85,7 +81,7 @@ class MoviesController extends Controller
         });
         $statusOptions = $this->statusOptions;
 
-        return view('dashboard.movies.create', compact('movie', 'contentRatingOptions', 'languageOptions', 'countries', 'statusOptions', 'categories', 'people'));
+        return view('dashboard.movies.create', compact('movie', 'contentRatingOptions', 'languageOptions', 'countries', 'statusOptions', 'allCategories', 'allPeople'));
     }
 
     /**
@@ -118,6 +114,8 @@ class MoviesController extends Controller
     {
         $this->authorize('update', Movie::class);
 
+        $movie->load(['categories:id','people','videoFiles','subtitles']);
+
         $btn_label = "تعديل";
         $contentRatingOptions = $this->contentRatingOptions;
 
@@ -127,18 +125,10 @@ class MoviesController extends Controller
                 $country->code => app()->getLocale() == 'ar' ? $country->name_ar : $country->name_en,
             ];
         });
-
-         $categories = MovieCategory::query()
-        ->orderBy('sort_order')
-        ->get(['id','name_ar','name_en']);
-
-         $people = Person::query()
-        ->orderBy('name_ar')
-        ->get(['id','name_ar','name_en']);
-
-
+        $allCategories = MovieCategory::select('id','name_ar','name_en')->orderBy('name_ar')->get();
+        $allPeople     = Person::select('id','name_ar','name_en')->orderBy('name_ar')->get();
         $statusOptions = $this->statusOptions;
-        return view('dashboard.movies.edit', compact('movie', 'btn_label', 'contentRatingOptions', 'languageOptions', 'countries', 'statusOptions','categories','people'));
+        return view('dashboard.movies.edit', compact('movie', 'btn_label', 'contentRatingOptions', 'languageOptions', 'countries', 'statusOptions','allCategories','allPeople'));
     }
 
     /**
@@ -167,5 +157,31 @@ class MoviesController extends Controller
         return request()->ajax()
             ? response()->json(['status' => true, 'message' => __('controller.Deleted_item_successfully')])
             : redirect()->route('dashboard.movies.index')->with('success', __('controller.Deleted_item_successfully'));
+    }
+
+    public function castRowPartial(Request $request)
+    {
+        $i = $request->i;
+        $allPeople = Person::select('id','name_ar','name_en')->orderBy('name_ar')->get();
+        $roleTypes = [
+            'actor'           => __('admin.actor'),
+            'director'        => __('admin.director'),
+            'writer'          => __('admin.writer'),
+            'producer'        => __('admin.producer'),
+            'cinematographer' => __('admin.cinematographer'),
+            'composer'        => __('admin.composer'),
+        ];
+        return view('dashboard.movies.partials._cast_row', compact('i', 'allPeople', 'roleTypes'));
+    }
+    public function videoRowPartial(Request $request)
+    {
+        $i   = (int) $request->get('i', 0);
+        $row = [];
+        return view('dashboard.movies.partials._video_row', compact('i', 'row'));
+    }
+    public function subtitleRowPartial(Request $request)
+    {
+        $i = $request->i;
+        return view('dashboard.movies.partials._subtitle_row', compact('i'));
     }
 }

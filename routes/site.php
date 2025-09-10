@@ -23,6 +23,7 @@ Route::group([
         Route::get('/',[FrontController::class,'index'])->name('home');
         Route::get('/series',[FrontController::class,'series'])->name('series');
         Route::get('/movies',[FrontController::class,'movies'])->name('movies');
+        Route::get('movies/{id}',[FrontController::class,'movie'])->name('movie');
         Route::get('/live',[FrontController::class,'live'])->name('live');
         Route::get('/categories',[FrontController::class,'categories'])->name('categories');
     });

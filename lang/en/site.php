@@ -7,6 +7,16 @@ return [
     | Front Site Language Lines
     |--------------------------------------------------------------------------
     */
+
+    '404_title' => 'Oops! Page Not Found',
+    '404_message' => 'The page you\'re looking for might have been moved, deleted, or you entered the wrong URL.',
+    '403_title' => 'Forbidden',
+    '419_title' => 'Page Expired',
+    '500_title' => 'Server Error',
+    'error_button' => 'Go to Home',
+    'error_back' => 'Go Back',
+    'error_code_time' => 'Error Code: 404 | Time: ',
+
     // Nav
     'Home' => 'Home',
     'Series' => 'Series',
@@ -52,4 +62,10 @@ return [
     'birth_date' => 'Birth Date',
     'email_cannot_be_edited' => 'Email cannot be edited, if you want to change it please contact',
     'customer_service' => 'Customer Service',
+
+    // Movie
+    'watch_now' => 'Watch Now',
+    'add_to_watchlist' => 'Add to Watchlist',
+    'share' => 'Share',
+    'copied' => 'Copied',
 ];

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Site;
 
 use App\Http\Controllers\Controller;
+use App\Models\Movie;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -14,6 +15,13 @@ class FrontController extends Controller
     {
         return view('site.index');
     }
+
+    public function movie($id)
+    {
+        $movie = Movie::findOrFail($id);
+        return view('site.movie', compact('movie'));
+    }
+
 
     public function settings()
     {
@@ -48,4 +56,5 @@ class FrontController extends Controller
 
         return back()->with('success', __('site.password_changed_successfully'));
     }
+
 }

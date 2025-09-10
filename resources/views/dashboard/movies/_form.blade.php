@@ -1,13 +1,20 @@
 <div class="row">
     @push('styles')
-    <link rel="stylesheet" href="{{ asset('css/custom/media.css') }}">
+        <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+        <link rel="stylesheet" href="{{ asset('css/custom/media.css') }}">
+        <link rel="stylesheet" href="{{ asset('css/custom/movies.css') }}">
     @endpush
-
+    @if ($errors->any())
+        <div class="alert alert-danger">
+            <ul>
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
     @php
         $locale = app()->getLocale();
-        // القيم المختارة مسبقًا (للـ edit) + دعم old() عند فشل التحقق
-        $selectedCategories = old('category_ids', isset($movie) ? $movie->categories->pluck('id')->toArray() : []);
-        $selectedPeople     = old('person_ids',   isset($movie) ? $movie->people->pluck('id')->toArray()     : []);
     @endphp
 
     <div class="col-md-12">
@@ -15,92 +22,28 @@
             <div class="pt-4 card-body">
                 <div class="row">
                     {{-- العناوين --}}
-                    <div class="mb-4 col-md-6">
-                        <x-form.input label="عنوان الفيلم (عربي)" :value="old('title_ar', $movie->title_ar)" name="title_ar"
-                                      placeholder="مثال: الطريق إلى القدس" required autofocus />
+                    <div class="col-md-6">
+                        <x-form.input label="عنوان الفيلم (عربي)" :value="$movie->title_ar" name="title_ar"
+                            placeholder="مثال: الطريق إلى القدس" required autofocus />
                     </div>
-                    <div class="mb-4 col-md-6">
-                        <x-form.input label="عنوان الفيلم (إنجليزي)" :value="old('title_en', $movie->title_en)" name="title_en"
-                                      placeholder="Movie Title (EN)" />
-                    </div>
-
-                    {{-- الأوصاف --}}
-                    <div class="mb-4 col-md-6">
-                        <x-form.textarea label="الوصف (عربي)" name="description_ar" rows="2"
-                                         :value="old('description_ar', $movie->description_ar)"
-                                         placeholder="نبذة عن الفيلم..." />
-                    </div>
-                    <div class="mb-4 col-md-6">
-                        <x-form.textarea label="الوصف (En)" name="description_en" rows="2"
-                                         :value="old('description_en', $movie->description_en)"
-                                         placeholder="نبذة عن الفيلم..." />
-                    </div>
-
-                    {{-- الحالة --}}
-                    <div class="mb-4 col-md-6">
-                        <x-form.selectkey label="حالة النشر" name="status" required
-                                          :selected="old('status', $movie->status ?? 'draft')"
-                                          :options="$statusOptions" />
-                    </div>
-
-                    {{-- مميز --}}
-                    <div class="mb-4 col-md-6">
-                        <label class="form-label d-block">مميز</label>
-                        <div class="form-check form-switch">
-                            <input type="hidden" name="is_featured" value="0">
-                            <input class="form-check-input" type="checkbox" id="is_featured" name="is_featured"
-                                   value="1" @checked(old('is_featured', $movie->is_featured))>
-                            <label class="form-check-label" for="is_featured">عرض كفيلم مميز</label>
-                        </div>
-                    </div>
-
-                    {{-- التريلر --}}
-                    <div class="mb-4 col-md-6">
-                        <x-form.input label="رابط التريلر" :value="old('trailer_url', $movie->trailer_url)" name="trailer_url"
-                                      placeholder="https://youtube.com/..." />
+                    <div class="col-md-6">
+                        <x-form.input label="عنوان الفيلم (إنجليزي)" :value="$movie->title_en" name="title_en"
+                            placeholder="Movie Title (EN)" />
                     </div>
                 </div>
             </div>
         </div>
-
-        {{-- 🆕 التصنيفات + الأشخاص (Many-to-Many) --}}
         <div class="mb-3 border shadow card border-1">
             <div class="pt-4 card-body">
                 <div class="row">
-                    {{-- التصنيفات --}}
-                    <div class="mb-4 col-md-6">
-                        <label class="form-label">التصنيفات</label>
-                        <select class="form-control" name="category_ids[]" multiple>
-                            @foreach($categories as $cat)
-                                @php
-                                    $label = $locale === 'ar'
-                                        ? ($cat->name_ar ?? $cat->name_en)
-                                        : ($cat->name_en ?: $cat->name_ar);
-                                @endphp
-                                <option value="{{ $cat->id }}" @selected(in_array($cat->id, (array)$selectedCategories))>
-                                    {{ $label }}
-                                </option>
-                            @endforeach
-                        </select>
-                        <small class="text-muted">يمكنك اختيار أكثر من تصنيف.</small>
+                    {{-- الأوصاف --}}
+                    <div class="col-md-6">
+                        <x-form.textarea label="الوصف (عربي)" name="description_ar" rows="2" :value="$movie->description_ar"
+                            placeholder="نبذة عن الفيلم..." />
                     </div>
-
-                    {{-- الأشخاص (ممثلون/فريق العمل) --}}
-                    <div class="mb-4 col-md-6">
-                        <label class="form-label">الأشخاص (ممثلون/مشاركون)</label>
-                        <select class="form-control" name="person_ids[]" multiple>
-                            @foreach($people as $p)
-                                @php
-                                    $pLabel = $locale === 'ar'
-                                        ? ($p->name_ar ?? $p->name_en)
-                                        : ($p->name_en ?: $p->name_ar);
-                                @endphp
-                                <option value="{{ $p->id }}" @selected(in_array($p->id, (array)$selectedPeople))>
-                                    {{ $pLabel }}
-                                </option>
-                            @endforeach
-                        </select>
-                        <small class="text-muted">اختر المشاركين في هذا الفيلم.</small>
+                    <div class="col-md-6">
+                        <x-form.textarea label="الوصف (En)" name="description_en" rows="2" :value="$movie->description_en"
+                            placeholder="نبذة عن الفيلم..." />
                     </div>
                 </div>
             </div>
@@ -111,36 +54,44 @@
                 <div class="row">
                     {{-- تاريخ/مدة/تقييم --}}
                     <div class="mb-4 col-md-4">
-                        <x-form.input type="date" label="تاريخ الإصدار"
-                                      :value="old('release_date', $movie->release_date?->format('Y-m-d'))"
-                                      name="release_date" />
+                        <x-form.input type="date" label="تاريخ الإصدار" :value="$movie->release_date?->format('Y-m-d')" name="release_date" />
                     </div>
                     <div class="mb-4 col-md-4">
-                        <x-form.input type="number" label="المدة بالدقائق"
-                                      :value="old('duration_minutes', $movie->duration_minutes)"
-                                      name="duration_minutes" placeholder="120" min="0" />
+                        <x-form.input type="number" label="المدة بالدقائق" :value="$movie->duration_minutes" name="duration_minutes"
+                            placeholder="120" min="0" />
                     </div>
                     <div class="mb-4 col-md-4">
-                        <x-form.input type="number" step="0.1" label="تقييم IMDb (0-10)"
-                                      :value="old('imdb_rating', $movie->imdb_rating)"
-                                      name="imdb_rating" placeholder="7.8" min="0" max="10" />
+                        <x-form.input type="number" step="0.1" label="تقييم IMDb (0-10)" :value="$movie->imdb_rating"
+                            name="imdb_rating" placeholder="7.8" min="0" max="10" />
                     </div>
 
                     {{-- التصنيف/اللغة/الدولة --}}
                     <div class="mb-4 col-md-4">
-                        <x-form.selectkey label="التصنيف العمري" name="content_rating"
-                                          :selected="old('content_rating', $movie->content_rating ?? 'G')"
-                                          :options="$contentRatingOptions" />
+                        <x-form.selectkey label="التصنيف العمري" name="content_rating" :selected="$movie->content_rating ?? 'G'"
+                            :options="$contentRatingOptions" />
                     </div>
                     <div class="mb-4 col-md-4">
-                        <x-form.selectkey label="اللغة" name="language"
-                                          :selected="old('language', $movie->language ?? 'ar')"
-                                          :options="$languageOptions" />
+                        <x-form.selectkey label="اللغة" name="language" :selected="$movie->language ?? 'ar'" :options="$languageOptions" />
                     </div>
                     <div class="mb-4 col-md-4">
-                        <x-form.selectkey label="بلد الإنتاج" name="country"
-                                          :selected="old('country', $movie->country)"
-                                          :options="$countries" />
+                        <x-form.selectkey label="بلد الإنتاج" name="country" :selected="$movie->country" :options="$countries" />
+                    </div>
+
+                    {{-- الحالة --}}
+                    <div class="mb-4 col-md-6">
+                        <x-form.selectkey label="حالة النشر" name="status" required :selected="$movie->status ?? 'draft'"
+                            :options="$statusOptions" />
+                    </div>
+
+                    {{-- مميز --}}
+                    <div class="mb-4 col-md-6">
+                        <label class="form-label d-block">مميز</label>
+                        <div class="form-check form-switch">
+                            <input type="hidden" name="is_featured" value="0">
+                            <input class="form-check-input" type="checkbox" id="is_featured" name="is_featured"
+                                value="1" @checked(old('is_featured', $movie->is_featured))>
+                            <label class="form-check-label" for="is_featured">عرض كفيلم مميز</label>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -151,72 +102,56 @@
                 <div class="row">
                     {{-- الروابط/الرفع: بوستر وخلفية --}}
                     <div class="mb-4 col-md-6">
-                        <x-form.input type="url" label="رابط البوستر"
-                                      :value="old('poster_url_out', $movie->poster_url)"
-                                      name="poster_url_out"
-                                      placeholder="أو اختر من الوسائط" />
+                        @php
+                            $poster_url = Str::startsWith($movie->poster_url, ['http', 'https']);
+                            $poster_url_out = ($poster_url ? $movie->poster_url : null);
+                        @endphp
+                        <x-form.input type="url" label="رابط البوستر" :value="$poster_url_out" name="poster_url_out"
+                            placeholder="أو اختر من الوسائط" />
                         <input type="text" id="imageInput" name="poster_url"
-                               value="{{ old('poster_url', $movie->poster_url) }}"
-                               class="d-none form-control">
+                            value="{{ old('poster_url', $movie->poster_url) }}" class="d-none form-control">
                         <div class="d-flex justify-content-between align-items-center">
-                            <button type="button"
-                                    data-bs-toggle="modal"
-                                    data-bs-target="#mediaModal"
-                                    data-clear-btn="#clearImageBtn1"
-                                    data-img="#poster_img"
-                                    data-mode="single"
-                                    data-input="#imageInput"
-                                    class="mt-3 btn btn-primary openMediaModal">
+                            <button type="button" data-bs-toggle="modal" data-bs-target="#mediaModal"
+                                data-clear-btn="#clearImageBtn1" data-img="#poster_img" data-mode="single"
+                                data-input="#imageInput" class="mt-3 btn btn-primary openMediaModal">
                                 اختر من الوسائط
                             </button>
                             <button type="button"
-                                    class="clear-btn mt-3 btn btn-danger {{ !empty($movie->poster_url) ? '' : 'd-none' }}"
-                                    id="clearImageBtn1"
-                                    data-img="#poster_img"
-                                    data-input="#imageInput">
+                                class="clear-btn mt-3 btn btn-danger {{ !empty($movie->poster_url) ? '' : 'd-none' }}"
+                                id="clearImageBtn1" data-img="#poster_img" data-input="#imageInput">
                                 <i class="fas fa-trash"></i>
                             </button>
                         </div>
                         <div class="mt-2">
-                            <img src="{{ $movie->poster_full_url }}"
-                                 alt="poster" id="poster_img"
-                                 class="{{ !empty($movie->poster_url) ? '' : 'd-none' }}"
-                                 style="max-height:100px">
+                            <img src="{{ $movie->poster_full_url }}" alt="poster" id="poster_img"
+                                class="{{ !empty($movie->poster_url) ? '' : 'd-none' }}" style="max-height:100px">
                         </div>
                     </div>
 
                     <div class="mb-4 col-md-6">
-                        <x-form.input type="url" label="رابط الخلفية"
-                                      :value="old('backdrop_url_out', $movie->backdrop_url)"
-                                      name="backdrop_url_out"
-                                      placeholder="أو اختر من الوسائط" />
+                        @php
+                            $backdrop_url = Str::startsWith($movie->backdrop_url, ['http', 'https']);
+                            $backdrop_url_out = ($backdrop_url ? $movie->backdrop_url : null);
+                        @endphp
+                        <x-form.input type="url" label="رابط الخلفية" :value="$backdrop_url_out" name="backdrop_url_out"
+                            placeholder="أو اختر من الوسائط" />
                         <input type="text" id="imageInput2" name="backdrop_url"
-                               value="{{ old('backdrop_url', $movie->backdrop_url) }}"
-                               class="d-none form-control">
+                            value="{{ old('backdrop_url', $movie->backdrop_url) }}" class="d-none form-control">
                         <div class="d-flex justify-content-between align-items-center">
-                            <button type="button"
-                                    data-bs-toggle="modal"
-                                    data-bs-target="#mediaModal"
-                                    data-clear-btn="#clearImageBtn2"
-                                    data-img="#backdrop_img"
-                                    data-mode="single"
-                                    data-input="#imageInput2"
-                                    class="mt-3 btn btn-primary openMediaModal">
+                            <button type="button" data-bs-toggle="modal" data-bs-target="#mediaModal"
+                                data-clear-btn="#clearImageBtn2" data-img="#backdrop_img" data-mode="single"
+                                data-input="#imageInput2" class="mt-3 btn btn-primary openMediaModal">
                                 اختر من الوسائط
                             </button>
                             <button type="button"
-                                    class="clear-btn mt-3 btn btn-danger {{ !empty($movie->backdrop_url) ? '' : 'd-none' }}"
-                                    id="clearImageBtn2"
-                                    data-img="#backdrop_img"
-                                    data-input="#imageInput2">
+                                class="clear-btn mt-3 btn btn-danger {{ !empty($movie->backdrop_url) ? '' : 'd-none' }}"
+                                id="clearImageBtn2" data-img="#backdrop_img" data-input="#imageInput2">
                                 <i class="fas fa-trash"></i>
                             </button>
                         </div>
                         <div class="mt-2">
-                            <img src="{{ $movie->backdrop_full_url }}"
-                                 alt="backdrop" id="backdrop_img"
-                                 class="{{ !empty($movie->backdrop_url) ? '' : 'd-none' }}"
-                                 style="max-height:100px">
+                            <img src="{{ $movie->backdrop_full_url }}" alt="backdrop" id="backdrop_img"
+                                class="{{ !empty($movie->backdrop_url) ? '' : 'd-none' }}" style="max-height:100px">
                         </div>
                     </div>
                 </div>
@@ -228,21 +163,209 @@
             <div class="pt-4 card-body">
                 <div class="row">
                     <div class="mb-4 col-md-6">
-                        <x-form.input type="number" min="0" label="TMDB ID"
-                                      :value="old('tmdb_id', $movie->tmdb_id)" name="tmdb_id"
-                                      placeholder="مثال: 550" />
+                        <x-form.input type="number" min="0" label="TMDB ID" :value="$movie->tmdb_id"
+                            name="tmdb_id" placeholder="مثال: 550" />
                     </div>
                     <div class="mb-4 col-md-6">
-                        <x-form.input type="number" min="0" label="عدد المشاهدات"
-                                      :value="old('view_count', $movie->view_count ?? 0)"
-                                      name="view_count" placeholder="0" readonly />
+                        <x-form.input type="number" min="0" label="عدد المشاهدات" :value="$movie->view_count ?? 0"
+                            name="view_count" placeholder="0" readonly />
                     </div>
                 </div>
             </div>
         </div>
 
+        {{-- 🆕 التصنيفات + الأشخاص (Many-to-Many) --}}
+        <div class="mb-3 border shadow card border-1">
+            <div class="pt-4 card-body">
+                <div class="row">
+                    {{-- Categories (movie_category_mapping) --}}
+                    <div class="col-12">
+                        <label class="form-label fw-bold">{{ __('admin.Movie Category') }}</label>
+
+                        {{-- الحاوية للمختارة --}}
+                        <div id="selected-categories" class="mb-2 d-none">
+                            <div class="flex-wrap gap-2 d-flex"></div>
+                            <hr class="mt-2 mb-3">
+                        </div>
+                        {{-- مهم: لو ما في اختيار، هالحقل يرسل قيمة فاضية بدل ما يختفي المفتاح --}}
+                        <input type="hidden" name="category_ids" value="">
+                        {{-- الحاوية للكل --}}
+
+                        <div id="category-badges" class="d-flex flex-wrap gap-2">
+                        @foreach($allCategories as $category)
+                            <label class="btn btn-outline-primary rounded-pill px-3 py-1 mb-2">
+                            <input type="checkbox" class="d-none"
+                                    name="category_ids[]" value="{{ $category->id }}"
+                                    {{ in_array($category->id, old('category_ids', $movie->categories->pluck('id')->toArray() ?? [])) ? 'checked' : '' }}>
+                            {{ $category->name_ar }}
+                            </label>
+                        @endforeach
+                        </div>
+
+
+                        <span class="text-muted">{{ __('admin.select_at_least_one_category') }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="mb-3 border shadow card border-1">
+            <div class="pt-4 card-body">
+                <div class="row">
+                    {{-- Cast (movie_cast) --}}
+                    <div class="col-12">
+                        <div class="mb-2 d-flex justify-content-between align-items-center">
+                            <label class="fw-semibold">{{ __('admin.Cast') }}</label>
+                            <button type="button" id="add-cast-row" class="btn btn-dark btn-sm">
+                                + {{ __('admin.Create') }}
+                            </button>
+                        </div>
+
+                        {{-- المختار حالياً --}}
+                        <div id="cast-selected" class="mb-2 d-none">
+                            <div class="flex-wrap gap-2 d-flex"></div>
+                            <hr class="mt-2 mb-3">
+                        </div>
+
+                        {{-- صفوف التحرير --}}
+                        <div id="cast-rows" class="gap-3 d-grid">
+                            @php
+                                $oldCast = old(
+                                    'cast',
+                                    isset($movie)
+                                        ? $movie->people
+                                            ->map(function ($p) {
+                                                return [
+                                                    'person_id' => $p->id,
+                                                    'person_name' => $p->name_ar ?? $p->name_en,
+                                                    'role_type' => $p->pivot->role_type,
+                                                    'character_name' => $p->pivot->character_name,
+                                                    'sort_order' => $p->pivot->sort_order,
+                                                ];
+                                            })
+                                            ->toArray()
+                                        : [],
+                                );
+                                $roleTypes = [
+                                    'actor'           => __('admin.actor'),
+                                    'director'        => __('admin.director'),
+                                    'writer'          => __('admin.writer'),
+                                    'producer'        => __('admin.producer'),
+                                    'cinematographer' => __('admin.cinematographer'),
+                                    'composer'        => __('admin.composer'),
+                                ];
+                            @endphp
+
+                            @forelse($oldCast as $i => $row)
+                                @include('dashboard.movies.partials._cast_row', [
+                                    'i' => $i,
+                                    'row' => $row,
+                                    'allPeople' => $allPeople ?? collect(),
+                                    'roleTypes' => $roleTypes,
+                                ])
+                            @empty
+                                @include('dashboard.movies.partials._cast_row', [
+                                    'i' => 0,
+                                    'row' => [],
+                                    'allPeople' => $allPeople ?? collect(),
+                                    'roleTypes' => $roleTypes,
+                                ])
+                            @endforelse
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+        <div class="mb-3 border shadow card border-1">
+            <div class="pt-4 card-body">
+                <div class="row">
+                    <div class="col-12">
+                        <div class="mb-2 d-flex justify-content-between align-items-center">
+                            <label class="fw-semibold">{{ __('admin.video_files') }}</label>
+                            <button type="button" id="add-video-row" class="btn btn-dark btn-sm">
+                                + {{ __('admin.add') }}
+                            </button>
+                        </div>
+
+                        <div id="video-rows" class="gap-3 d-grid">
+                            @php
+                                $oldVideos = old(
+                                    'video_files',
+                                    isset($movie)
+                                        ? $movie->videoFiles
+                                            ->map(function ($vf) {
+                                                return [
+                                                    'video_type' => $vf->video_type,
+                                                    'quality' => $vf->quality,
+                                                    'file_url' => $vf->file_url,
+                                                    'format' => $vf->format,
+                                                ];
+                                            })
+                                            ->toArray()
+                                        : [],
+                                );
+                            @endphp
+
+                            @if (empty($oldVideos) && !isset($btn_label))
+                                @include('dashboard.movies.partials._video_row', ['i' => 0, 'row' => []])
+                            @else
+                                @foreach ($oldVideos as $i => $row)
+                                    @include('dashboard.movies.partials._video_row', [
+                                        'i' => $i,
+                                        'row' => $row,
+                                    ])
+                                @endforeach
+                            @endif
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="mb-3 border shadow card border-1">
+            <div class="pt-4 card-body">
+                <div class="row">
+                    <div class="col-12">
+                        <div class="mb-2 d-flex justify-content-between align-items-center">
+                            <label class="fw-semibold">{{ __('admin.subtitles') }}</label>
+                            <button type="button" id="add-sub-row" class="btn btn-dark btn-sm">
+                                + {{ __('admin.add') }}
+                            </button>
+                        </div>
+
+                        <div id="sub-rows" class="gap-3 d-grid">
+                            @php
+                                $oldSubs = old(
+                                    'subtitles',
+                                    isset($movie)
+                                        ? $movie->subtitles->map
+                                            ->only(['language', 'label', 'url', 'is_default'])
+                                            ->toArray()
+                                        : [],
+                                );
+                            @endphp
+
+                            @if (empty($oldSubs) && !isset($btn_label))
+                                @include('dashboard.movies.partials._subtitle_row', [
+                                    'i' => 0,
+                                    'row' => [],
+                                ])
+                            @else
+                                @foreach ($oldSubs as $i => $row)
+                                    @include('dashboard.movies.partials._subtitle_row', [
+                                        'i' => $i,
+                                        'row' => $row,
+                                    ])
+                                @endforeach
+                            @endif
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
         <div class="d-flex justify-content-end">
-            <button type="submit" class="btn btn-primary">
+            <button type="submit" class="btn btn-primary" id="submitBtn">
                 {{ $btn_label ?? 'أضف' }}
             </button>
         </div>
@@ -277,7 +400,7 @@
 </div>
 
 <div class="modal fade" id="confirmDeleteModal" tabindex="-1" role="dialog"
-     aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
+    aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
@@ -290,7 +413,8 @@
                 هل أنت متأكد من حذف هذه الصورة؟
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" id="closeDeleteModal">إلغاء</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
+                    id="closeDeleteModal">إلغاء</button>
                 <button type="button" class="btn btn-danger" id="confirmDeleteBtn">نعم، حذف</button>
             </div>
         </div>
@@ -299,11 +423,21 @@
 
 @push('scripts')
     <script>
+        let person_duplicate = "{{ __('admin.person_duplicate') }}";
+        const form_type = "{{ isset($btn_label)}}";
+        const urlPeopleSearch = "{{ route('dashboard.people.search') }}";
+        const castRowPartial = "{{ route('dashboard.movies.castRowPartial') }}";
+        const videoRowPartial = "{{ route('dashboard.movies.videoRowPartial') }}";
+        const subtitleRowPartial = "{{ route('dashboard.movies.subtitleRowPartial') }}";
+
+        // media
         const urlIndex = "{{ route('dashboard.media.index') }}";
         const urlStore = "{{ route('dashboard.media.store') }}";
         const urlDelete = "{{ route('dashboard.media.destroy', ':id') }}";
         const _token = "{{ csrf_token() }}";
         const urlAssetPath = "{{ config('app.asset_url') }}";
     </script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <script src="{{ asset('js/custom/mediaPage.js') }}"></script>
+    <script src="{{ asset('js/custom/movies.js') }}"></script>
 @endpush
