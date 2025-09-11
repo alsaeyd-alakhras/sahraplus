@@ -65,15 +65,15 @@
     </x-slot:extra_nav>
     @php
         $fields = [
-            'name' => 'الاسم',
-            'status' => 'الحالة',
-            'last_activity' => 'اخر موعد تواجد',
+            'name' =>  __('admin.Name'),
+            'status' =>  __('admin.Status'),
+            'last_activity' =>  __('admin.Last_activity')
         ];
     @endphp
     <div class="shadow-lg enhanced-card">
         <div class="table-header-title">
             <i class="icon ph ph-admins me-2"></i>
-            جدول الأدمن - الموظفين
+          {{ __('admin.Admin') }}
         </div>
         <div class="enhanced-card-body">
             <div class="col-12" style="padding: 0;">
@@ -146,11 +146,11 @@
                 <div class="modal-footer justify-content-center">
                     <button type="button" class="btn btn-cancel" data-bs-dismiss="modal">
                         <i class="fas fa-times me-2"></i>
-                        إلغاء
+                        {{ __('admin.Cancel') }}
                     </button>
                     <button type="button" class="text-white btn btn-confirm-delete" id="confirmDeleteBtn">
                         <i class="fas fa-trash me-2"></i>
-                        حذف نهائي
+                          {{ __('admin.Final_Delete') }}
                     </button>
                 </div>
             </div>

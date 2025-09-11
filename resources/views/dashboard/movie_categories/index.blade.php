@@ -31,9 +31,9 @@
 
     @php
         $fields = [
-            'name_ar'   => 'الاسم (عربي)',
-            'name_en'   => 'الاسم (EN)',
-            'is_active' => 'الحالة',
+            'name_ar'   =>  __('admin.Name_ar'),
+            'name_en'   =>  __('admin.Name_en'),
+            'is_active' =>  __('admin.Is_active'),
         ];
     @endphp
 
@@ -67,7 +67,7 @@
                                                         </div>
                                                         <div class="enhanced-checkbox-list checkbox-list-box">
                                                             <label style="display:block;">
-                                                                <input type="checkbox" value="all" class="all-checkbox" data-index="{{ $loop->index+1 }}"> الكل
+                                                                <input type="checkbox" value="all" class="all-checkbox" data-index="{{ $loop->index+1 }}"> {{ __('admin.All') }}
                                                             </label>
                                                             <div class="checkbox-list checkbox-list-{{ $loop->index+1 }}"></div>
                                                         </div>
@@ -77,7 +77,7 @@
                                         </div>
                                     </th>
                                 @endforeach
-                                <th class="enhanced-sticky">العمليات</th>
+                                <th class="enhanced-sticky">{{ __('admin.Action') }}</th>
                             </tr>
                         </thead>
                     </table>

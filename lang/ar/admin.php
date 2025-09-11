@@ -34,6 +34,7 @@ return [
 'Delete Confirmation' => 'تأكيد الحذف',
 'Are you sure?' => 'هل أنت متأكد؟',
 'You will not be able to revert this!' => 'لن تتمكن من التراجع عن هذا!',
+''=>'',
 
 
 ];

@@ -23,28 +23,28 @@
             <div class="pt-4 card-body">
                 <div class="row">
                     <div class="mb-4 col-md-6">
-                        <x-form.input label="الاسم" :value="$admin->name" name="name" placeholder="محمد ...." required
+                        <x-form.input label="{{ __('admin.Name') }}" :value="$admin->name" name="name" placeholder="{{ __('admin.Name_placeholder') }}" required
                             autofocus />
                     </div>
                     <div class="mb-4 col-md-6">
-                        <x-form.input type="email" label="البريد الالكتروني" :value="$admin->email" name="email"
-                            placeholder="example@gmail.com" required />
+                        <x-form.input type="email" label="{{ __('admin.Email') }}" :value="$admin->email" name="email"
+                            placeholder="{{ __('admin.Email_placeholder') }}" required />
                     </div>
                     <div class="mb-4 col-md-6">
-                        <x-form.input label="اسم المستخدم" :value="$admin->username" name="username" placeholder="username"
+                        <x-form.input label=" {{ __('admin.Username') }}" :value="$admin->username" name="username" placeholder="{{ __('admin.Username_placeholder') }}"
                             />
                     </div>
                     <div class="mb-4 col-md-6">
                         @if (isset($btn_label))
-                            <x-form.input type="password" min="6" label="كلمة المرور" name="password" placeholder="****" />
+                            <x-form.input type="password" min="6" label="{{ __('admin.Password') }}" name="password" placeholder="****" />
                         @else
-                            <x-form.input type="password" min="6" label="كلمة المرور" name="password" placeholder="****"
+                            <x-form.input type="password" min="6" label="{{ __('admin.Password') }}" name="password" placeholder="****"
                                 required />
                         @endif
                     </div>
                     <div class="mb-4 col-md-6">
                         @if (!isset($btn_label))
-                            <x-form.input type="password" min="6" label="تأكيد كلمة المرور" name="confirm_password"
+                            <x-form.input type="password" min="6" label="{{ __('admin.Confirm_password') }}" name="confirm_password"
                                     placeholder="****" required />
                         @endif
                     </div>
@@ -68,7 +68,7 @@
                             <table class="table table-bordered table-hover">
                                 <thead class="table-light">
                                     <tr>
-                                        <th>صلاحيات المستخدم</th>
+                                        <th>{{ __('admin.Permission') }} </th>
                                         <th colspan="7">التفعيل</th>
                                     </tr>
                                 </thead>

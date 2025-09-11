@@ -65,9 +65,9 @@
     </x-slot:extra_nav>
     @php
         $fields = [
-            'name_ar' => ' الاسم بالعربي',
-            'name_en' => 'الاسم بالانجليزي',
-            'is_active' => 'حالة النشاط',
+            'name_ar' =>  __('admin.Name_ar'),
+            'name_en' =>  __('admin.Name_en'),
+            'is_active' =>  __('admin.Is_active'),
         ];
     @endphp
     <div class="shadow-lg enhanced-card">
@@ -104,7 +104,7 @@
                                                     </div>
                                                     <div class="enhanced-checkbox-list checkbox-list-box">
                                                         <label style="display: block;">
-                                                            <input type="checkbox" value="all" class="all-checkbox" data-index="{{ $loop->index + 1 }}"> الكل
+                                                            <input type="checkbox" value="all" class="all-checkbox" data-index="{{ $loop->index + 1 }}"> {{ __('admin.All') }}
                                                         </label>
                                                         <div class="checkbox-list checkbox-list-{{ $loop->index + 1 }}">
                                                         </div>
@@ -115,7 +115,7 @@
                                     </div>
                                 </th>
                                 @endforeach
-                                <th class="enhanced-sticky">العمليات</th>
+                                <th class="enhanced-sticky">{{ __('admin.Action') }}</th>
                             </tr>
                         </thead>
                     </table>
@@ -131,26 +131,26 @@
                 <div class="modal-header">
                     <h5 class="modal-title" id="deleteConfirmModalLabel">
                         <i class="fas fa-exclamation-triangle me-2"></i>
-                        تأكيد الحذف
+                        {{ __('admin.Delete Confirmation') }}
                     </h5>
                 </div>
                 <div class="modal-body">
                     <div class="delete-icon">
                         <i class="fas fa-trash-alt"></i>
                     </div>
-                    <div class="delete-warning-text">هل أنت متأكد؟</div>
+                    <div class="delete-warning-text">{{ __('admin.Are you sure?') }}</div>
                     <p class="delete-sub-text">
-                        لن تتمكن من التراجع عن هذا الإجراء بعد الحذف!
+                         {{ __('admin.You will not be able to revert this!') }}
                     </p>
                 </div>
                 <div class="modal-footer justify-content-center">
                     <button type="button" class="btn btn-cancel" data-bs-dismiss="modal">
                         <i class="fas fa-times me-2"></i>
-                        إلغاء
+                       {{ __('admin.Cancel') }}
                     </button>
                     <button type="button" class="text-white btn btn-confirm-delete" id="confirmDeleteBtn">
                         <i class="fas fa-trash me-2"></i>
-                        حذف نهائي
+                      {{ __('admin.Final_Delete') }}
                     </button>
                 </div>
             </div>
