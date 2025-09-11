@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('movie_cats', function (Blueprint $table) {
+        Schema::create('movie_cast', function (Blueprint $table) {
             $table->id(); // المعرف الفريد
             $table->foreignId('movie_id')->constrained('movies')->cascadeOnDelete(); // معرف الفيلم
             $table->foreignId('person_id')->constrained('people')->cascadeOnDelete(); // معرف الشخص

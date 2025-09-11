@@ -33,28 +33,25 @@ class Person extends Model
         'is_active' => 'boolean',
     ];
 
-    // العلاقات
+    protected $appends = ['photo_full_url', 'age'];
+
+    //relationships
     public function movieRoles()
     {
-        return $this->hasMany(MovieCat::class);
+        return $this->hasMany(MovieCast::class);
     }
 
     public function movies()
     {
-        return $this->belongsToMany(
-            Movie::class,
-            'movie_person_pivot',
-            'person_id',
-            'movie_id'
-        )->withTimestamps();
+        return $this->belongsToMany(Movie::class, 'movie_cast', 'person_id', 'movie_id')
+        ->withPivot(['role_type', 'character_name', 'sort_order'])
+        ->withTimestamps();
     }
 
     public function seriesRoles()
     {
         return $this->hasMany(SeriesCast::class);
     }
-
-
 
     public function series()
     {

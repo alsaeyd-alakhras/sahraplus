@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('subtitles', function (Blueprint $table) {
             $table->id();
-            $table->enum('content_type', ['movie', 'episode', 'short']); // نوع المحتوى
+            $table->string('content_type'); // نوع المحتوى
             $table->bigInteger('content_id'); // معرف المحتوى
             $table->string('language', 5); // لغة الترجمة
             $table->string('label', 50); // تسمية الترجمة للعرض

@@ -44,6 +44,15 @@
         <li class="menu-header small">
             <span class="menu-header-text" data-i18n="Apps &amp; Pages">{{ __('admin.Media') }}</span>
         </li>
+        @can('view', 'App\\Models\Series')
+            <li
+                class="menu-item {{ request()->is('dashboard/series') || request()->is('dashboard/series/*') ? 'active' : '' }}">
+                <a href="{{ route('dashboard.series.index') }}" class="menu-link">
+                    <i class="ph ph-monitor-play me-2"></i>
+                    <div data-i18n="series">المسلسلات</div>
+                </a>
+            </li>
+        @endcan
         @can('view', 'App\\Models\Movie')
             <li
                 class="menu-item {{ request()->is('dashboard/movies') || request()->is('dashboard/movies/*') ? 'active' : '' }}">

@@ -1,4 +1,4 @@
-@include('layouts.partials.front.head', ['title' => "سهرة بلس - تسجيل الدخول" ?? Config::get('app.name')])
+@include('layouts.partials.front.head', ['title' => "سهرة بلس - تسجيل الدخول" ?? Config::get('app.name'), 'lang' =>  app()->getLocale()])
 <style>
     body {
         background: linear-gradient(135deg, #0c0c0c 0%, #1a1a2e 50%, #16213e 100%);
@@ -107,14 +107,6 @@
 </div>
 
 <div class="flex flex-col min-h-screen">
-    <!-- Header -->
-    <header class="py-8 text-center">
-        <div class="mb-4">
-            <h1 class="text-5xl font-black tracking-wider text-white">سهرة بلس</h1>
-            <div class="mx-auto mt-3 w-24 h-1 bg-gradient-to-r from-red-600 to-red-400 rounded-full"></div>
-        </div>
-    </header>
-
     @if($errors->any())
     <div class="alert alert-danger">
         <ul>
@@ -127,6 +119,22 @@
     <!-- Main Content -->
     <main class="flex flex-1 justify-center items-center px-4 py-8">
         <div class="w-full max-w-lg">
+            <!-- Header -->
+            <header class="pt-8 pb-4 text-center">
+                <div class="flex flex-col justify-center items-center">
+                    <div class="flex justify-center items-center mb-4">
+                        @php
+                        $logo = $settings['logo_url'] ?? null;
+                        @endphp
+                        @if($logo)
+                            <img src="{{asset('storage/'.$logo)}}" alt="Logo" class="w-32" />
+                        @else
+                            <h1 class="text-5xl font-black tracking-wider text-white">سهرة بلس</h1>
+                        @endif
+                    </div>
+                    <div class="mx-auto mt-3 w-24 h-1 bg-gradient-to-r from-red-600 to-red-400 rounded-full"></div>
+                </div>
+            </header>
             <!-- Auth Card -->
             <div class="overflow-hidden relative p-8 rounded-3xl card-glow">
                 <!-- Tabs -->
@@ -169,10 +177,10 @@
                                 <input type="checkbox" class="ml-2 w-4 h-4 accent-red-600">
                                 <span class="text-sm">تذكرني</span>
                             </label>
-                            <a href="#"
+                            {{-- <a href="#"
                                 class="text-sm font-medium text-red-400 transition-colors hover:text-red-300">
                                 نسيت كلمة المرور؟
-                            </a>
+                            </a> --}}
                         </div>
 
                         <button type="submit"

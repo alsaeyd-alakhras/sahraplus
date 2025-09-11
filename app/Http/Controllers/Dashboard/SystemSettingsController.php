@@ -20,10 +20,10 @@ class SystemSettingsController extends Controller
     // صفحة واحدة للعرض/التعديل
     public function edit()
     {
-        $this->authorize('update', \App\Models\SystemSetting::class);
-        $settings = $this->service->getFormData();   // ← اسم المتغير settings
+        $this->authorize('update', SystemSetting::class);
+        $setting = $this->service->getFormData();   // ← اسم المتغير settings
         $btn_label = 'تحديث';
-        return view('dashboard.pages.settings', compact('settings', 'btn_label'));
+        return view('dashboard.pages.settings', compact('setting', 'btn_label'));
     }
 
     public function update(SystemSettingsRequest $request)

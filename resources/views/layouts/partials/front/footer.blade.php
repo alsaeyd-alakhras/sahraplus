@@ -3,10 +3,16 @@
 
         <!-- الشعار والوصف -->
         <div>
-            <h1 class="mb-3 text-2xl font-extrabold text-red-600">سهرة بلس</h1>
+            @php
+            $logo = $settings['logo_url'] ?? null;
+            @endphp
+            @if($logo)
+                <img src="{{asset('storage/'.$logo)}}" alt="Logo" class="w-32" />
+            @else
+                <h1 class="mb-3 text-2xl font-extrabold text-red-600">سهرة بلس</h1>
+            @endif
             <p class="text-sm leading-relaxed text-gray-400">
-                منصة ترفيهية لمشاهدة أحدث الأفلام والمسلسلات بجودة عالية وبدون إعلانات مزعجة. استمتع بمحتوى متجدد
-                يوميًا أينما كنت.
+                {{ $settings['description'] ?? 'منصة ترفيهية لمشاهدة أحدث الأفلام والمسلسلات بجودة عالية وبدون إعلانات مزعجة. استمتع بمحتوى متجدد يوميًا أينما كنت.' }}
             </p>
         </div>
 

@@ -13,8 +13,11 @@ use App\Http\Controllers\Dashboard\PeopleController;
 use App\Http\Controllers\Dashboard\CountryController;
 use App\Http\Controllers\Dashboard\UserAvatarController;
 use App\Http\Controllers\Dashboard\ActivityLogController;
+use App\Http\Controllers\Dashboard\EpisodeController;
 use App\Http\Controllers\Dashboard\NotificationController;
 use App\Http\Controllers\Dashboard\MovieCategoryController;
+use App\Http\Controllers\Dashboard\SeasonController;
+use App\Http\Controllers\Dashboard\SeriesController;
 use App\Http\Controllers\Dashboard\SystemSettingsController;
 use Mcamara\LaravelLocalization\Facades\LaravelLocalization;
 
@@ -59,6 +62,16 @@ Route::group([
         Route::get('settings', [SystemSettingsController::class, 'edit'])->name('settings.edit');
         Route::put('settings', [SystemSettingsController::class, 'update'])->name('settings.update');
 
+        // Series ************************
+        Route::get('episodes/checkEpisodNumber', [EpisodeController::class, 'checkEpisodNumber'])->name('episodes.checkEpisodNumber');
+
+        // Movies
+        Route::get('movies/castRowPartial', [MoviesController::class, 'castRowPartial'])->name('movies.castRowPartial');
+        Route::get('movies/videoRowPartial', [MoviesController::class, 'videoRowPartial'])->name('movies.videoRowPartial');
+        Route::get('movies/subtitleRowPartial', [MoviesController::class, 'subtitleRowPartial'])->name('movies.subtitleRowPartial');
+        Route::get('people/search', [PeopleController::class, 'search'])->name('people.search');
+
+
         /* ********************************************************** */
 
         // filters
@@ -69,7 +82,12 @@ Route::group([
         Route::get('people-filters/{column}', [ PeopleController::class, 'getFilterOptions'])->name('people.filters');
         Route::get('short-filters/{column}', [ ShortController::class, 'getFilterOptions'])->name('short.filters');
         Route::get('movie-categories-filters/{column}', [ MovieCategoryController::class, 'getFilterOptions'])->name('movie-categories.filters');
+        Route::get('series-filters/{column}', [ SeriesController::class, 'getFilterOptions'])->name('series.filters');
 
+
+        Route::resource('seasons', SeasonController::class)->except(['index']);
+        Route::resource('episodes', EpisodeController::class)->except(['index']);
+        Route::resource('shorts', ShortController::class)->parameters(['shorts' => 'short'])->names('shorts');
 
         // resources
         Route::resources([
@@ -80,8 +98,9 @@ Route::group([
             'countries' => CountryController::class,
             'movies'    => MoviesController::class,
             'people'    => PeopleController::class,
-            'shorts'    => ShortController::class,
+            // 'shorts'    => ShortController::class,
             'movie-categories'    => MovieCategoryController::class,
+            'series'    => SeriesController::class,
         ]);
     });
 });

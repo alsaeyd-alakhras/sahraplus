@@ -30,7 +30,7 @@ class DatabaseSeeder extends Seeder
             'is_active' => 1,
         ]);
 
-        
+
         User::create([
             'first_name' => 'User',
             'last_name' => null,
@@ -43,5 +43,14 @@ class DatabaseSeeder extends Seeder
             'avatar' => null,
             'last_activity' => now()
         ]);
+
+
+        // settings
+        // $settings = [
+        //     'site_name_ar' => '',
+        //     'site_name_en' => '',
+        //     'site_description_ar' => '',
+        //     'site_description_en' => '',
+        // ];
     }
 }

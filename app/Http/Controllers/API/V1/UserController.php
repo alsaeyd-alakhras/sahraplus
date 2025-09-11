@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\API;
+namespace App\Http\Controllers\API\V1;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\UserRequest;
@@ -32,10 +32,10 @@ class UserController extends Controller
     /**
      * Update authenticated user profile
      */
-    public function update(UserRequest $request)
+    public function update(Request $request)
     {
         try {
-            $user = $this->userService->update($request->validated(), Auth::guard('sanctum')->user()->id);
+            $user = $this->userService->update($request->all(), Auth::guard('sanctum')->user()->id);
             return new UserResource($user);
         } catch (\Exception $exception) {
             report($exception);

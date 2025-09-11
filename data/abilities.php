@@ -39,7 +39,7 @@ return [
         'export' => 'تصدير',
     ],
 
-   
+
     'comments' => [
         'name' => 'التعليقات',
         'view' => 'عرض',

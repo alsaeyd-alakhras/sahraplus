@@ -3,11 +3,13 @@ $(document).ready(function () {
     let input = "";
     let img = "";
     let clearBtn = "";
+    let modelNext = "";
     $(document).on("click", ".openMediaModal", function () {
         mode = $(this).data("mode");
         input = $(this).data("input");
         clearBtn = $(this).data("clear-btn");
         img = $(this).data("img");
+        modelNext = $(this).data("model-next");
         loadMedia();
     });
 
@@ -104,7 +106,7 @@ $(document).ready(function () {
         $(img).attr("src","");
         $(img).addClass("d-none");
         $(this).addClass("d-none");
-        toast.error("تم حذف الصورة");
+        toastr.error("تم حذف الصورة");
     });
     // اختيار الصورة
     $(document).on("click", ".masonry-item", function () {
@@ -114,6 +116,9 @@ $(document).ready(function () {
         $(img).attr("src",urlAssetPath + "storage/" + path);
         $(img).removeClass("d-none");
         $(clearBtn).removeClass("d-none");
-        toast.success("تم اختيار الصورة");
+        toastr.success("تم اختيار الصورة");
+        if(modelNext){
+            $(modelNext).modal('show');
+        }
     });
 });
