@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
@@ -52,6 +53,12 @@ class Short extends Model
         return $this->morphMany(Comment::class, 'commentable');
     }
 
+    public function categories()
+    {
+        return $this->belongsToMany(MovieCategory::class, 'category_short_pivot', 'short_id', 'category_id')
+            ->withTimestamps();
+    }
+
     // Accessors
     public function getVideoUrlAttribute()
     {
@@ -62,6 +69,33 @@ class Short extends Model
     {
         return $this->poster_path ? asset('storage/' . $this->poster_path) : null;
     }
+
+     public function getPosterFullUrlAttribute() // $this->poster_full_url
+    {
+        if (Str::startsWith($this->poster_url, ['http', 'https'])) {
+            return $this->poster_url;
+        }
+        if (empty($this->poster_url)) {
+            return null;
+        }
+        return asset('storage/' . $this->poster_url);
+    }
+
+    public function getVideoFullUrlAttribute()
+    {
+        if (!$this->video_path) return null;
+        if (Str::startsWith($this->video_path, ['http', 'https'])) {
+            return $this->video_path;
+        }
+        return asset('storage/' . ltrim($this->video_path, '/'));
+    }
+
+
+ 
+
+    
+
+    
 
     // Methods
     public function incrementLikes()
@@ -98,5 +132,10 @@ class Short extends Model
     public function scopeHorizontal($query)
     {
         return $query->where('aspect_ratio', 'horizontal');
+    }
+
+    public function scopeByCategory($q, $categoryId)
+    {
+        return $q->whereHas('categories', fn($qq) => $qq->where('movie_categories.id', $categoryId));
     }
 }

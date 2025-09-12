@@ -7,7 +7,12 @@ use Illuminate\Database\Eloquent\Builder;
 
 class ShortRepository
 {
-    public function __construct(protected Short $short) {}
+
+     protected Short $short;
+    public function __construct(Short $short)
+     {
+            $this->short = $short;
+    }
 
     public function getQuery(): Builder
     {
