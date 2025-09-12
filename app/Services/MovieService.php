@@ -279,8 +279,7 @@ class MovieService
                 'is_active'        => true,
             ];
             if ($type == 'trailer') {
-                $trailer = $movie->videoFiles()->where('video_type', 'trailer')->first();
-                $movie->trailer_url = $trailer?->file_url;
+                $movie->trailer_url = $fileUrl;
                 $movie->save();
             }
         }

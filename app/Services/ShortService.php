@@ -81,8 +81,13 @@ class ShortService
             $videoFiles  = $data['video_files']  ?? [];
             unset($data['category_ids'], $data['video_files']);
 
-            // حسم مصادر البوستر/الفيديو
-            $data = $this->resolvePosterAndVideo($data);
+            if (array_key_exists('poster_path_out', $data) && $data['poster_path_out'] !== null && $data['poster_path_out'] !== '') {
+                $data['poster_path'] = $data['poster_path_out'];
+            } else {
+                $data['poster_path'] = $data['poster_path'] ?? null;
+            }
+            unset($data['poster_path_out']);
+            $data['video_path'] = '-';
 
             $short = $this->repo->save($data);
 
@@ -107,7 +112,14 @@ class ShortService
             $videoFiles  = $data['video_files']  ?? [];
             unset($data['category_ids'], $data['video_files']);
 
-            $data = $this->resolvePosterAndVideo($data, $short->poster_path, $short->video_path);
+            if (array_key_exists('poster_path_out', $data) && $data['poster_path_out'] !== null && $data['poster_path_out'] !== '') {
+                $data['poster_path'] = $data['poster_path_out'];
+            } else {
+                $data['poster_path'] = $data['poster_path'] ?? $short->poster_path;
+            }
+            unset($data['poster_path_out']);
+
+            $data['video_path'] = '-';
 
             $short = $this->repo->update($data, $id);
 
@@ -139,99 +151,92 @@ class ShortService
 
     private function syncCategories(Short $short, array $categoryIds): void
     {
-        $ids = collect($categoryIds)->map(fn($v)=>(int)$v)->filter()->unique()->values()->toArray();
+        $ids = array_filter(array_map('intval', $categoryIds)); // تنظيف
         $short->categories()->sync($ids);
     }
 
-    // ملاحظة: ما منرسل content_type ولا content_id في الـpayload
+
+
     private function syncVideoFiles(Short $short, array $files, bool $replace = false): void
     {
-        if ($replace) {
-            $short->videoFiles()->delete();
-        }
 
-        $payload   = [];
-        $usedPairs = []; // type|quality
+        // if ($replace) {
+        //     $short->videoFiles()->delete();
+        // }
 
+        $payload = [];
+        $usedTypes = [];
+        $usedQualities = [];
         foreach ($files as $f) {
             $type       = $f['video_type'] ?? null;
             $quality    = $f['quality']    ?? null;
             $sourceType = $f['source_type'] ?? 'url';
             if (!$type || !$quality) continue;
+            
+            // التحقق من وجود file أو file_url أولاً
+            if ((!isset($f['file']) || empty($f['file'])) &&
+                (!isset($f['file_url']) || empty($f['file_url']))) {
+                continue;
+            }
 
-            $pairKey = $type.'|'.$quality;
-            if (isset($usedPairs[$pairKey])) continue;
-            $usedPairs[$pairKey] = true;
+            // الآن نتحقق من التكرار (بعد التأكد من وجود بيانات صالحة)
+            if (in_array($type, $usedTypes) || in_array($quality, $usedQualities)) {
+                continue; // تجاهل المكرر
+            }
 
-            $fileUrl = $f['file_url'] ?? null;
+            // إضافة للمصفوفات فقط إذا كان العنصر صالح للتخزين
+            $usedTypes[] = $type;
+            $usedQualities[] = $quality;
+
+            $fileUrl = isset($f['file_url']) ? $f['file_url'] : null;
             $format  = $f['format']   ?? null;
             $size    = null;
-
-            if ($sourceType === 'file') {
-                if (($f['file'] ?? null) instanceof \Illuminate\Http\UploadedFile) {
+            // لو رُفع ملف
+            if ($sourceType == 'file') {
+                if ($replace) {
+                    $short->videoFiles()->where('video_type', $type)->where('quality', $quality)->delete();
+                }
+                if (isset($f['file']) && $f['file'] instanceof \Illuminate\Http\UploadedFile) {
                     $path    = $f['file']->store('video_files/shorts', 'public');
-                    $fileUrl = $path; // خزّن المسار (مو URL)
+                    $fileUrl = Storage::url($path);
                     $format  = $format ?: strtolower($f['file']->getClientOriginalExtension());
                     $size    = $f['file']->getSize();
                 } else {
+                    // ما في ملف جديد؟ استخدم الرابط القديم إن وُجد
                     $fileUrl = $f['existing_url'] ?? null;
                 }
-            } else {
+            } else { // url
                 $fileUrl = $f['file_url'] ?? null;
             }
 
-            if (!$fileUrl) continue;
+            // لو ما في لا ملف ولا رابط → تجاهل هذا الصف
+            if (!$fileUrl) {
+                continue;
+            }
 
             $payload[] = [
+                'content_type'     => 'short',
+                'content_id'       => $short->id,
                 'video_type'       => $type,
                 'quality'          => $quality,
                 'format'           => $format,
                 'file_url'         => $fileUrl,
                 'file_size'        => $size,
-                'duration_seconds' => null,
+                'duration_seconds' => null,      // ممكن نحسبها لاحقاً بـ ffmpeg
                 'is_downloadable'  => false,
                 'is_active'        => true,
             ];
+            if ($type == 'main') {
+                $short->video_path = $fileUrl;
+                $short->save();
+            }
         }
 
         if (!empty($payload)) {
-            // morphMany سيملأ content_type و content_id تلقائيًا (باستخدام morph map)
-            $short->videoFiles()->createMany($payload);
+            $short->videoFiles()->createMany($payload); // morphMany يملأ content_type/id تلقائيًا
         }
     }
 
-    private function resolvePosterAndVideo(array $data, ?string $oldPoster = null, ?string $oldVideo = null): array
-    {
-        // Poster
-        if (($data['posterUpload'] ?? null) instanceof UploadedFile) {
-            if ($oldPoster && !$this->isExternalUrl($oldPoster)) {
-                Storage::disk('public')->delete($oldPoster);
-            }
-            $path = $data['posterUpload']->store('shorts/posters', 'public');
-            $data['poster_path'] = $path;
-        } elseif (!empty($data['poster_path_out'])) {
-            $data['poster_path'] = $data['poster_path_out'];
-        } else {
-            $data['poster_path'] = $data['poster_path'] ?? $oldPoster;
-        }
-
-        // Video
-        if (($data['videoUpload'] ?? null) instanceof UploadedFile) {
-            if ($oldVideo && !$this->isExternalUrl($oldVideo)) {
-                Storage::disk('public')->delete($oldVideo);
-            }
-            $path = $data['videoUpload']->store('shorts/videos', 'public');
-            $data['video_path'] = $path;
-        } elseif (!empty($data['video_path_out'])) {
-            $data['video_path'] = $data['video_path_out'];
-        } else {
-            $data['video_path'] = $data['video_path'] ?? $oldVideo;
-        }
-
-        unset($data['posterUpload'], $data['poster_path_out'], $data['videoUpload'], $data['video_path_out']);
-
-        return $data;
-    }
 
     private function isExternalUrl(string $v): bool
     {

@@ -70,15 +70,15 @@ class Short extends Model
         return $this->poster_path ? asset('storage/' . $this->poster_path) : null;
     }
 
-     public function getPosterFullUrlAttribute() // $this->poster_full_url
+     public function getPosterFullPathAttribute() // $this->poster_full_path
     {
-        if (Str::startsWith($this->poster_url, ['http', 'https'])) {
-            return $this->poster_url;
+        if (Str::startsWith($this->poster_path, ['http', 'https'])) {
+            return $this->poster_path;
         }
-        if (empty($this->poster_url)) {
+        if (empty($this->poster_path)) {
             return null;
         }
-        return asset('storage/' . $this->poster_url);
+        return asset('storage/' . $this->poster_path);
     }
 
     public function getVideoFullUrlAttribute()

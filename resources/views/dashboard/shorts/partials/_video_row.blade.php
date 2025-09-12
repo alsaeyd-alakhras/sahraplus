@@ -6,15 +6,14 @@
 
     // نعتبر المحلي إذا بدأ الرابط بـ /storage/ أو asset('storage')
     $isLocal = Str::startsWith($url, ['/storage/', asset('storage')]);
-    $source = $isLocal ? 'file' : 'url';
+    $source = $url ? ($isLocal ? 'file' : 'url') : 'file';
 @endphp
-
 <div class="p-3 rounded border video-row card">
     <div class="row g-3 align-items-end">
         {{-- اختيار المصدر: ملف أو رابط --}}
         <div class="col-md-6">
             <label class="form-label small fw-bold">{{ __('admin.source') }}</label>
-            <input type="hidden" class="source-type" value="{{ $source }}">
+            <input type="hidden" class="source-type" name="video_files[{{ $i }}][source_type]" value="{{ $source }}">
 
             <div class="d-flex gap-3 mb-2">
                 <div class="form-check form-check-inline">
@@ -42,7 +41,7 @@
             <input type="file" class="form-control video-file {{ $source == 'url' ? 'd-none' : '' }}"
                 name="video_files[{{ $i }}][file]"
                 accept="video/mp4,video/webm,video/quicktime,video/x-matroska">
-            @if ($source == 'file')
+            @if ($source == 'file' && $url)
                 <a href="{{ $url }}" class="btn btn-primary mt-2" target="_blank">{{ __('admin.open_file') }}</a>
             @endif
 
@@ -56,6 +55,7 @@
         </div>
 
         {{-- نوع الفيديو --}}
+        {{-- 
         <div class="col-md-3">
             <label class="form-label small fw-bold">{{ __('admin.video_type') }}</label>
             <select name="video_files[{{ $i }}][video_type]" class="form-select video-type">
@@ -65,14 +65,9 @@
                 <option value="trailer" {{ $type == 'trailer' ? 'selected' : '' }}>
                     {{ __('admin.video_type_trailer') }}
                 </option>
-                {{-- <option value="teaser" {{ $type == 'teaser' ? 'selected' : '' }}>
-                    {{ __('admin.video_type_teaser') }}
-                </option>
-                <option value="clip" {{ $type == 'clip' ? 'selected' : '' }}>
-                    {{ __('admin.video_type_clip') }}
-                </option> --}}
             </select>
-        </div>
+        </div> --}}
+        <input type="hidden" class="video-type" name="video_files[{{ $i }}][video_type]" value="main">
 
         {{-- الجودة (لازم تكون فريدة) --}}
         <div class="col-md-3">

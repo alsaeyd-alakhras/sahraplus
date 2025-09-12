@@ -72,6 +72,7 @@ Route::group([
         Route::get('people/search', [PeopleController::class, 'search'])->name('people.search');
 
        
+        Route::get('shorts/video-row-partial', [ShortController::class, 'videoRowPartial'])->name('shorts.videoRowPartial');
 
 
         /* ********************************************************** */
@@ -86,7 +87,6 @@ Route::group([
         Route::get('movie-categories-filters/{column}', [ MovieCategoryController::class, 'getFilterOptions'])->name('movie-categories.filters');
         Route::get('series-filters/{column}', [ SeriesController::class, 'getFilterOptions'])->name('series.filters');
 
-         Route::get('shorts/video-row-partial', [ShortController::class, 'videoRowPartial'])->name('shorts.videoRowPartial');
 
 
         Route::resource('seasons', SeasonController::class)->except(['index']);
