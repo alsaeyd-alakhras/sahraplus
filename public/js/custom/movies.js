@@ -47,7 +47,7 @@ $(function () {
     $(function () {
         refreshSelected();
     });
-})();
+});
 
 // Cast
 $(function() {
@@ -184,7 +184,7 @@ $(function() {
 
     function renumberOrdering() {
         $('#cast-rows .cast-row').each(function(index) {
-            $(this).find('input[name*="[ordering]"]').val(index);
+            $(this).find('input[name*="[sort_order]"]').val(index);
         });
     }
 
@@ -241,7 +241,7 @@ $(function() {
         renumberOrdering();
         refreshSelected();
     });
-})();
+});
 
 // Video Files
 $(function() {
@@ -381,13 +381,16 @@ $(function() {
         const source = $(this).val();
         const $file  = $row.find('.video-file');
         const $url   = $row.find('.video-url');
+        let $sourceType = $row.find('.source-type');
 
         if (source === 'file') {
             $file.removeClass('d-none').prop('disabled', false).prop('required', true);
             $url.addClass('d-none').prop('disabled', true).prop('required', false).val('');
+            $sourceType.val('file');
         } else {
             $file.addClass('d-none').prop('disabled', true).prop('required', false).val('');
             $url.removeClass('d-none').prop('disabled', false).prop('required', true);
+            $sourceType.val('url');
         }
     });
 
@@ -397,7 +400,7 @@ $(function() {
     $('#video-rows .video-row').each(function() {
         initVideoRow($(this));
     });
-})();
+});
 
 // Subtitles
 $(function() {
@@ -561,4 +564,4 @@ $(function() {
         initSubRow($(this));
     });
 
-})();
+});

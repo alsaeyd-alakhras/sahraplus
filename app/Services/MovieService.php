@@ -122,8 +122,8 @@ class MovieService
             return $movie;
         } catch (\Throwable $e) {
             DB::rollBack();
-            throw $e;
-            // return baZck()->with('error', $e->getMessage());
+            // throw $e;
+            return back()->with('danger', $e->getMessage());
         }
     }
 
@@ -139,7 +139,6 @@ class MovieService
             $video_files   = $data['video_files']   ?? [];
             $subtitles   = $data['subtitles']   ?? [];
             unset($data['category_ids'], $data['cast'], $data['video_files'], $data['subtitles']);
-
             // الصور: نفضل *_out إذا وُجدت وغير فارغة، وإلا نحافظ على القيمة السابقة
             if (array_key_exists('poster_url_out', $data) && $data['poster_url_out'] !== null && $data['poster_url_out'] !== '') {
                 $data['poster_url'] = $data['poster_url_out'];
@@ -171,7 +170,8 @@ class MovieService
             return $movie;
         } catch (\Throwable $e) {
             DB::rollBack();
-            return back()->with('error', $e->getMessage());
+            throw $e;
+            return back()->with('danger', $e->getMessage());
         }
     }
     public function deleteById(int $id)
@@ -191,10 +191,7 @@ class MovieService
     private function syncCategories(Movie $movie, array $categoryIds): void
     {
         $ids = array_filter(array_map('intval', $categoryIds)); // تنظيف
-        dd($ids);
-        $movie->categories()->sync($ids);              // يضيف ويحذف حسب الحالة
-        // dd($categoryIds);
-        // $movie->categories()->sync(collect($categoryIds)->unique()->values());
+        $movie->categories()->sync($ids); // يضيف ويحذف حسب الحالة
     }
 
     private function syncCast(Movie $movie, array $castRows): void
@@ -215,34 +212,42 @@ class MovieService
     private function syncVideoFiles(Movie $movie, array $files, bool $replace = false): void
     {
 
-        if ($replace) {
-            $movie->videoFiles()->delete();
-        }
+        // if ($replace) {
+        //     $movie->videoFiles()->delete();
+        // }
 
         $payload = [];
         $usedTypes = [];
         $usedQualities = [];
-
         foreach ($files as $f) {
             $type       = $f['video_type'] ?? null;
             $quality    = $f['quality']    ?? null;
             $sourceType = $f['source_type'] ?? 'url';
-
             if (!$type || !$quality) continue;
+            
+            // التحقق من وجود file أو file_url أولاً
+            if ((!isset($f['file']) || empty($f['file'])) &&
+                (!isset($f['file_url']) || empty($f['file_url']))) {
+                continue;
+            }
 
+            // الآن نتحقق من التكرار (بعد التأكد من وجود بيانات صالحة)
             if (in_array($type, $usedTypes) || in_array($quality, $usedQualities)) {
                 continue; // تجاهل المكرر
             }
+
+            // إضافة للمصفوفات فقط إذا كان العنصر صالح للتخزين
             $usedTypes[] = $type;
             $usedQualities[] = $quality;
 
-
-            $fileUrl = $f['file_url'] ?? null;
+            $fileUrl = isset($f['file_url']) ? $f['file_url'] : null;
             $format  = $f['format']   ?? null;
             $size    = null;
-
             // لو رُفع ملف
-            if ($sourceType === 'file') {
+            if ($sourceType == 'file') {
+                if ($replace) {
+                    $movie->videoFiles()->where('video_type', $type)->where('quality', $quality)->delete();
+                }
                 if (isset($f['file']) && $f['file'] instanceof \Illuminate\Http\UploadedFile) {
                     $path    = $f['file']->store('video_files/movies', 'public');
                     $fileUrl = Storage::url($path);
@@ -273,15 +278,15 @@ class MovieService
                 'is_downloadable'  => false,
                 'is_active'        => true,
             ];
+            if ($type == 'trailer') {
+                $trailer = $movie->videoFiles()->where('video_type', 'trailer')->first();
+                $movie->trailer_url = $trailer?->file_url;
+                $movie->save();
+            }
         }
 
         if (!empty($payload)) {
             $movie->videoFiles()->createMany($payload); // morphMany يملأ content_type/id تلقائيًا
-        }
-        if ($type == 'trailer') {
-            $trailer = $movie->videoFiles()->where('video_type', 'trailer')->first();
-            $movie->trailer_url = $trailer?->file_url;
-            $movie->save();
         }
     }
 
@@ -289,9 +294,9 @@ class MovieService
 
     private function syncSubtitles(Movie $movie, array $subs, bool $replace = false): void
     {
-        if ($replace) {
-            $movie->subtitles()->delete();
-        }
+        // if ($replace) {
+        //     $movie->subtitles()->delete();
+        // }
 
         $payload = [];
         $seenLangs  = [];
@@ -313,6 +318,9 @@ class MovieService
 
             // إذا مرفوع ملف
             if ($sourceType === 'file') {
+                if ($replace) {
+                    $movie->subtitles()->where('language', $lang)->where('label', $label)->delete();
+                }
                 if (isset($s['file']) && $s['file'] instanceof \Illuminate\Http\UploadedFile) {
                     $path = $s['file']->store('subtitle_files/movies', 'public');
                     $url  = Storage::url($path);
@@ -324,7 +332,7 @@ class MovieService
             }
 
             if (!$url) continue; // لا تضف صف فاضي
-            
+
             $payload[] = [
                 'content_type' => 'movie',
                 'content_id'   => $movie->id,

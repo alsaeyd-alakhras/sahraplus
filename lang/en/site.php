@@ -68,4 +68,68 @@ return [
     'add_to_watchlist' => 'Add to Watchlist',
     'share' => 'Share',
     'copied' => 'Copied',
+
+    // Hero Section
+    'hero_background' => 'Hero Background',
+    'watch_now' => 'Watch Now',
+    'add_to_watchlist' => 'Add to Watchlist',
+    'share' => 'Share',
+    'copied' => 'Copied',
+    'copy_failed' => 'Copy Failed',
+
+    // Video Player
+    'skip_intro' => 'Skip Intro',
+    'auto' => 'Auto',
+    'off' => 'Off',
+    'failed_to_load_subtitles' => 'Failed to load subtitles',
+
+    // Tabs
+    'related' => 'Related',
+    'details' => 'Details',
+    'cast' => 'Cast',
+    'comments' => 'Comments',
+
+    // Movie Details
+    'movie_details' => 'Movie Details',
+    'categories' => 'Categories',
+    'duration' => 'Duration',
+    'release_year' => 'Release Year',
+    'rating' => 'Rating',
+    'language' => 'Language',
+    'country' => 'Country',
+    'not_available' => 'Not Available',
+
+    // Related Movies
+    'related_movies' => 'Related Movies',
+
+    // Cast
+    'unknown_actor' => 'Unknown Actor',
+    'no_cast_available' => 'No cast information available',
+
+    // Comments
+    'add_comment' => 'Add Comment',
+    'add_your_comment' => 'Add Your Comment',
+    'write_your_comment_here' => 'Write your comment here...',
+    'cancel' => 'Cancel',
+    'publish' => 'Publish',
+    'no_comments_yet' => 'No comments yet',
+    'you' => 'You',
+    'now' => 'Now',
+
+    // General
+    'loading' => 'Loading...',
+    'error' => 'Error',
+    'success' => 'Success',
+    'close' => 'Close',
+    'save' => 'Save',
+    'edit' => 'Edit',
+    'delete' => 'Delete',
+    'view' => 'View',
+    'back' => 'Back',
+    'next' => 'Next',
+    'previous' => 'Previous',
+    'search' => 'Search',
+    'filter' => 'Filter',
+    'sort' => 'Sort',
+    'reset' => 'Reset',
 ];

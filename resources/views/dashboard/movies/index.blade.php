@@ -153,7 +153,7 @@
             const urlIndex   = `{{ route('dashboard.movies.index') }}`;
             const urlFilters = `{{ route('dashboard.movies.filters', ':column') }}`; // ← صححنا اسم الراوت
             const urlCreate  = '{{ route("dashboard.movies.create") }}';
-            const urlShow    = '{{ route("dashboard.movies.show", ":id") }}';
+            const urlShow    = '{{ route("site.movie.show", ":slug") }}';
             const urlEdit    = '{{ route("dashboard.movies.edit", ":id") }}';
             const urlDelete  = '{{ route("dashboard.movies.destroy", ":id") }}';
 
@@ -194,21 +194,20 @@
                     const cls = map[label] ?? 'bg-light text-dark';
                     return `<span class="badge ${cls}">${label ?? ''}</span>`;
                 }},
-
                 // العمليات
-                { data: 'edit', name: 'edit', orderable: false, searchable: false, render: function (id) {
+                { data: 'edit', name: 'edit', orderable: false, searchable: false, render: function (data, type, row) {
                     let linkshow = ``;
                     let linkedit = ``;
                     let linkdelete = ``;
 
                     if (abilityShow) {
-                        linkshow = `<a href="${urlShow.replace(':id', id)}" class="action-btn btn-show" title="عرض"><i class="fas fa-eye"></i></a>`;
+                        linkshow = `<a href="${urlShow.replace(':slug', row.slug)}" target="_blank" class="action-btn btn-show" title="عرض"><i class="fas fa-eye"></i></a>`;
                     }
                     if (abilityEdit) {
-                        linkedit = `<a href="${urlEdit.replace(':id', id)}" class="action-btn btn-edit" title="تعديل"><i class="fas fa-edit"></i></a>`;
+                        linkedit = `<a href="${urlEdit.replace(':id', data)}" class="action-btn btn-edit" title="تعديل"><i class="fas fa-edit"></i></a>`;
                     }
                     if (abilityDelete) {
-                        linkdelete = `<button class="action-btn btn-delete delete_row" data-id="${id}" title="حذف"><i class="fas fa-trash"></i></button>`;
+                        linkdelete = `<button class="action-btn btn-delete delete_row" data-id="${data}" title="حذف"><i class="fas fa-trash"></i></button>`;
                     }
 
                     return `<div class="d-flex align-items-center justify-content-evenly">

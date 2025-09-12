@@ -61,4 +61,67 @@ return [
     'email_cannot_be_edited' => 'لا يمكن تعديل البريد الإلكتروني، إذا أردت تغييره يرجى التواصل مع',
     'customer_service' => 'خدمة العملاء',
 
+    // Hero Section
+    'hero_background' => 'خلفية البطل',
+    'watch_now' => 'شاهد الآن',
+    'add_to_watchlist' => 'أضف للمفضلة',
+    'share' => 'مشاركة',
+    'copied' => 'تم النسخ',
+    'copy_failed' => 'فشل النسخ',
+
+    // Video Player
+    'skip_intro' => 'تخطي المقدمة',
+    'auto' => 'تلقائي',
+    'off' => 'إيقاف',
+    'failed_to_load_subtitles' => 'فشل تحميل الترجمة',
+
+    // Tabs
+    'related' => 'ذات صلة',
+    'details' => 'التفاصيل',
+    'cast' => 'الممثلين',
+    'comments' => 'التعليقات',
+
+    // Movie Details
+    'movie_details' => 'تفاصيل الفيلم',
+    'categories' => 'التصنيف',
+    'duration' => 'المدة',
+    'release_year' => 'سنة الإنتاج',
+    'rating' => 'التقييم',
+    'language' => 'اللغة',
+    'country' => 'البلد',
+    'not_available' => 'غير متوفر',
+
+    // Related Movies
+    'related_movies' => 'أفلام ذات صلة',
+
+    // Cast
+    'unknown_actor' => 'ممثل مجهول',
+    'no_cast_available' => 'لا توجد معلومات عن الممثلين',
+
+    // Comments
+    'add_comment' => 'أضف تعليق',
+    'add_your_comment' => 'أضف تعليقك',
+    'write_your_comment_here' => 'اكتب تعليقك هنا...',
+    'cancel' => 'إلغاء',
+    'publish' => 'نشر',
+    'no_comments_yet' => 'لا توجد تعليقات بعد',
+    'you' => 'أنت',
+    'now' => 'الآن',
+
+    // General
+    'loading' => 'جاري التحميل...',
+    'error' => 'خطأ',
+    'success' => 'نجح',
+    'close' => 'إغلاق',
+    'save' => 'حفظ',
+    'edit' => 'تعديل',
+    'delete' => 'حذف',
+    'view' => 'عرض',
+    'back' => 'رجوع',
+    'next' => 'التالي',
+    'previous' => 'السابق',
+    'search' => 'بحث',
+    'filter' => 'فلتر',
+    'sort' => 'ترتيب',
+    'reset' => 'إعادة تعيين',
 ];

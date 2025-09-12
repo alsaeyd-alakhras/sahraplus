@@ -49,7 +49,7 @@ class MovieRequest extends FormRequest
             'status'           => ['required', Rule::in(['draft','published','archived'])],
             'is_featured'      => ['sometimes','boolean'],
             // الأفضل ما يجي من الفورم بل من الكود
-            'view_count'       => ['prohibited'],
+            'view_count'       => ['nullable','integer','min:0'],
             'tmdb_id'          => ['nullable','string','max:20'],
 
 
@@ -75,6 +75,7 @@ class MovieRequest extends FormRequest
                 ? ['nullable', 'url', 'max:2000']
                 : ['nullable', 'url', 'max:2000', 'required_without:video_files.*.file'],
             'video_files.*.format'         => ['nullable', 'string', 'max:20'],
+            'video_files.*.source_type'    => ['nullable', 'string', 'max:20', 'in:url,file'],
 
             // الترجمات
             'subtitles'              => ['nullable', 'array'],

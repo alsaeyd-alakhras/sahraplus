@@ -47,7 +47,6 @@
                     <div class="col-md-6">
                         <x-form.textarea label="الوصف (En)" name="description_en" rows="2" :value="$movie->description_en"
                             placeholder="نبذة عن الفيلم..." />
->>>>>>> f003124a25d2eb48d18b4a4ea159cdab28e74928
                     </div>
                 </div>
             </div>
@@ -205,13 +204,13 @@
                         <input type="hidden" name="category_ids" value="">
                         {{-- الحاوية للكل --}}
 
-                        <div id="category-badges" class="d-flex flex-wrap gap-2">
+                        <div id="category-badges" class="flex-wrap gap-2 d-flex">
                         @foreach($allCategories as $category)
-                            <label class="btn btn-outline-primary rounded-pill px-3 py-1 mb-2">
-                            <input type="checkbox" class="d-none"
-                                    name="category_ids[]" value="{{ $category->id }}"
-                                    {{ in_array($category->id, old('category_ids', $movie->categories->pluck('id')->toArray() ?? [])) ? 'checked' : '' }}>
-                            {{ $category->name_ar }}
+                            <label class="px-3 py-1 mb-2 btn btn-outline-primary rounded-pill" data-id="{{ $category->id }}">
+                                <input type="checkbox" class="d-none"
+                                        name="category_ids[]" value="{{ $category->id }}"
+                                        {{ in_array($category->id, old('category_ids', $movie->categories->pluck('id')->toArray() ?? [])) ? 'checked' : '' }}>
+                                {{ $category->name_ar }}
                             </label>
                         @endforeach
                         </div>

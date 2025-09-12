@@ -1,7 +1,8 @@
 <?php
 
-use App\Http\Controllers\Site\FrontController;
-use App\Http\Controllers\Site\ProfileController;
+use App\Http\Controllers\Frontend\MovieController;
+use App\Http\Controllers\Frontend\FrontController;
+use App\Http\Controllers\Frontend\ProfileController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Mcamara\LaravelLocalization\Facades\LaravelLocalization;
@@ -23,9 +24,27 @@ Route::group([
         Route::get('/',[FrontController::class,'index'])->name('home');
         Route::get('/series',[FrontController::class,'series'])->name('series');
         Route::get('/movies',[FrontController::class,'movies'])->name('movies');
-        Route::get('movies/{id}',[FrontController::class,'movie'])->name('movie');
         Route::get('/live',[FrontController::class,'live'])->name('live');
         Route::get('/categories',[FrontController::class,'categories'])->name('categories');
+
+
+        // Movie routes
+        Route::prefix('movies')->name('movie.')->group(function () {
+            // عرض الفيلم
+            Route::get('/{slug}', [MovieController::class, 'show'])->name('show');
+
+            // AJAX routes for authenticated users
+            Route::middleware('auth')->group(function () {
+                // إضافة تعليق
+                Route::post('/{slug}/comments', [MovieController::class, 'addComment'])->name('comment.add');
+
+                // إضافة/إزالة من قائمة المشاهدة
+                Route::post('/{slug}/watchlist', [MovieController::class, 'toggleWatchlist'])->name('watchlist.toggle');
+
+                // تحديث تقدم المشاهدة
+                Route::post('/{slug}/progress', [MovieController::class, 'updateWatchProgress'])->name('progress.update');
+            });
+        });
     });
 
     Route::group([
