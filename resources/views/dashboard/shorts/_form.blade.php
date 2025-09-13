@@ -18,12 +18,12 @@
                 <div class="row">
                     {{-- عنوان + مشاركة --}}
                     <div class="mb-4 col-md-6">
-                        <label class="form-label">عنوان الفيديو</label>
+                        <label class="form-label">{{__('admin.title_video')}}</label>
                         <input type="text" name="title" class="form-control" required
                             value="{{ old('title', $short->title) }}">
                     </div>
                     <div class="mb-4 col-md-6">
-                        <label class="form-label">رابط المشاركة</label>
+                        <label class="form-label">{{__('admin.share_url')}} </label>
                         <input type="url" name="share_url" class="form-control"
                             value="{{ old('share_url', $short->share_url) }}">
                     </div>
@@ -36,7 +36,7 @@
                 <div class="row">
                     {{-- الوصف --}}
                     <div class="mb-4 col-md-6">
-                        <label class="form-label">الوصف</label>
+                        <label class="form-label">{{__('admin.description')}}</label>
                         <textarea class="form-control" name="description" rows="3">{{ old('description', $short->description) }}</textarea>
                     </div>
                     <div class="mb-4 col-md-6">
@@ -45,8 +45,8 @@
                             $poster_path = Str::startsWith($short->poster_path, ['http', 'https']);
                             $poster_path_out = $poster_path ? $short->poster_path : null;
                         @endphp
-                        <x-form.input type="url" label="رابط البوستر" :value="$poster_path_out" name="poster_path_out"
-                            placeholder="أو اختر من الوسائط" />
+                        <x-form.input type="url" label=" {{__('admin.poster') }}" :value="$poster_path_out" name="poster_path_out"
+                            placeholder="{{__('admin.click_to_upload')}}" />
 
                         <input type="text" id="imageInput" name="poster_path"
                             value="{{ old('poster_path', $short->poster_path) }}" class="d-none form-control">
@@ -54,7 +54,7 @@
                             <button type="button" data-bs-toggle="modal" data-bs-target="#mediaModal"
                                 data-clear-btn="#clearImageBtn1" data-img="#poster_img" data-mode="single"
                                 data-input="#imageInput" class="mt-3 btn btn-primary openMediaModal">
-                                اختر من الوسائط
+                               {{__('admin.click_to_upload')}}
                             </button>
                             <button type="button"
                                 class="clear-btn mt-3 btn btn-danger {{ !empty($short->poster_path) ? '' : 'd-none' }}"
@@ -81,13 +81,13 @@
                             : null);
                 @endphp
                 <div class="mb-4 col-md-6">
-                    <label class="form-label">رابط الفيديو (خارجي)</label>
+                    <label class="form-label"> {{ __('admin.video_external') }}</label>
                     <input type="url" name="video_path_out" class="form-control" value="{{ $video_out }}">
                     <input type="file" name="videoUpload" class="form-control mt-2" />
                     <input type="text" name="video_path" id="videoPathLocal" value="{{ $video_local ?? '' }}"
                         class="d-none form-control">
                     @if ($video_preview)
-                        <a href="{{ $video_preview }}" target="_blank" class="btn btn-sm btn-primary mt-2">استعراض</a>
+                        <a href="{{ $video_preview }}" target="_blank" class="btn btn-sm btn-primary mt-2">{{__('admin.view')}}</a>
                     @endif
                 </div> --}}
             </div>
@@ -97,21 +97,21 @@
                 <div class="row">
                     {{-- إعدادات --}}
                     <div class="mb-4 col-md-4">
-                        <label class="form-label">نسبة العرض</label>
+                        <label class="form-label"> {{__('admin.order')}} </label>
                         <select class="form-control" name="aspect_ratio">
                             <option value="vertical" @selected(old('aspect_ratio', $short->aspect_ratio) == 'vertical')>عمودي</option>
                             <option value="horizontal" @selected(old('aspect_ratio', $short->aspect_ratio) == 'horizontal')>أفقي</option>
                         </select>
                     </div>
                     <div class="mb-4 col-md-4">
-                        <label class="form-label">الحالة</label>
+                        <label class="form-label">{{__('admin.status')}}</label>
                         <select class="form-control" name="status">
-                            <option value="active" @selected(old('status', $short->status) == 'active')>نشط</option>
-                            <option value="inactive" @selected(old('status', $short->status) == 'inactive')>غير نشط</option>
+                            <option value="active" @selected(old('status', $short->status) == 'active')>{{__('admin.active')}}</option>
+                            <option value="inactive" @selected(old('status', $short->status) == 'inactive')>{{__('admin.inactive')}} </option>
                         </select>
                     </div>
                     <div class="mb-4 col-md-4">
-                        <label class="form-label">مميز</label>
+                        <label class="form-label">{{__('admin.is_featured')}}</label>
                         <div class="form-check form-switch">
                             <input type="hidden" name="is_featured" value="0">
                             <input class="form-check-input" type="checkbox" name="is_featured" value="1"

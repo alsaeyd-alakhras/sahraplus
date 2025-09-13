@@ -350,6 +350,21 @@ return [
     'cinematographer' => 'Cinematographer',
     'composer'        => 'Composer',
     'open_file'       => 'Open File',
+    'shorts_table'       => 'Shorts Table',
+    'title_video'       => 'Title Video',
+    'share_url'       => 'Share Url',
+    'description'       => 'Description',
+    'click_to_upload'       => 'Click to upload',
+    'poster'       => 'Poster',
+    'view'=> 'View',
+    'order'       => 'Order',
+    'status'       => 'Status',
+    'active'       => 'Active',
+    'inactive'       => 'Inactive',
+    'is_featured'       => 'is featured',
+    'Title'       => 'Title',
+    'Short'       => 'Short',
+    
 
 
     // جديد

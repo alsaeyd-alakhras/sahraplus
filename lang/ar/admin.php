@@ -327,4 +327,19 @@ return [
     'composer'        => 'ملحن',
 
     'open_file' => 'فتح ملف',
+
+    'shorts_table'       => 'جدول الفيدوهات القصيرة',
+    'title_video'       => 'عنوان الفيديو',
+    'share_url'       => 'رابط المشاركة',
+    'description'       => 'الوصف',
+    'click_to_upload'       => 'اضغط لرفع الملف',
+    'poster'       => 'بوستر',
+    'view'=> 'استعراض',
+    'order'       => 'الترتيب',
+    'status'       => 'الحالة',
+    'active'       => 'نشط',
+    'inactive'       => 'غير نشط',
+    'is_featured'       => 'مميز',
+     'Title'       => 'العنوان',
+    'Short'       => 'فيديو قصير',
 ];

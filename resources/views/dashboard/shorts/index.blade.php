@@ -62,7 +62,7 @@
     <div class="shadow-lg enhanced-card">
         <div class="table-header-title">
             <i class="icon ph ph-video me-2"></i>
-            جدول الشورتس
+             {{ __('admin.shorts_table') }}
         </div>
         <div class="enhanced-card-body">
             <div class="col-12" style="padding: 0;">
