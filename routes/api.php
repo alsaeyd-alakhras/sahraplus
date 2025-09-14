@@ -11,6 +11,7 @@ use App\Http\Controllers\API\V1\PeopleController;
 use App\Http\Controllers\API\V1\ShortController;
 use App\Http\Controllers\API\V1\SeriesController;
 use App\Http\Controllers\API\V1\SystemSettingsController;
+use App\Http\Controllers\Frontend\MovieController;
 
 /*
 |--------------------------------------------------------------------------

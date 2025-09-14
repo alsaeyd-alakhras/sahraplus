@@ -139,7 +139,7 @@ class MoviesController extends Controller
         $this->authorize('update', Movie::class);
 
         $this->movieService->update($request->validated(), $movie->id);
-
+        
         return redirect()
             ->route('dashboard.movies.index')
             ->with('success', __('controller.Updated_item_successfully'));

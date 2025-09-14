@@ -176,7 +176,7 @@ class Movie extends Model
         if (empty($this->trailer_url)) {
             return null;
         }
-        return asset('storage/' . $this->trailer_url);
+        return asset($this->trailer_url);
     }
 
     // Scopes

@@ -26,23 +26,24 @@ Route::group([
         Route::get('/movies',[FrontController::class,'movies'])->name('movies');
         Route::get('/live',[FrontController::class,'live'])->name('live');
         Route::get('/categories',[FrontController::class,'categories'])->name('categories');
+        Route::get('/actors',[FrontController::class,'actors'])->name('actors');
 
 
         // Movie routes
         Route::prefix('movies')->name('movie.')->group(function () {
             // عرض الفيلم
             Route::get('/{slug}', [MovieController::class, 'show'])->name('show');
-
-            // AJAX routes for authenticated users
+        });
+        // API routes for AJAX calls
+        Route::prefix('api')->name('api.')->group(function () {
             Route::middleware('auth')->group(function () {
-                // إضافة تعليق
-                Route::post('/{slug}/comments', [MovieController::class, 'addComment'])->name('comment.add');
-
-                // إضافة/إزالة من قائمة المشاهدة
-                Route::post('/{slug}/watchlist', [MovieController::class, 'toggleWatchlist'])->name('watchlist.toggle');
-
-                // تحديث تقدم المشاهدة
-                Route::post('/{slug}/progress', [MovieController::class, 'updateWatchProgress'])->name('progress.update');
+                // Comments
+                Route::post('/movies/{id}/comments', [MovieController::class, 'addComment'])->name('movie.comment');
+                // Watchlist
+                Route::post('/watchlist/{id}', [MovieController::class, 'toggleWatchlist'])->name('watchlist.toggle');
+                // View count
+                Route::post('/movies/{id}/view', [MovieController::class, 'incrementView'])->name('movie.view');
+                Route::post('/movies/{id}/progress', [MovieController::class, 'updateWatchProgress'])->name('movie.progress');
             });
         });
     });

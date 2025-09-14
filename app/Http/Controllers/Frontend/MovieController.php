@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
 use App\Models\Movie;
+use App\Models\UserProfile;
+use App\Models\WatchProgres;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -11,194 +13,237 @@ class MovieController extends Controller
 {
     public function show($slug)
     {
-        // جلب الفيلم مع العلاقات المطلوبة
         $movie = Movie::with([
             'categories',
             'cast.person',
-            'videoFiles' => function($query) {
-                $query->active()->orderBy('quality', 'desc');
+            'videoFiles' => function ($query) {
+                $query->orderBy('quality', 'desc');
             },
-            'subtitles' => function($query) {
-                $query->active();
-            },
-            'comments' => function($query) {
-                $query->topLevel()->approved()->recent()->with('user')->limit(20);
+            'subtitles',
+            'comments' => function ($query) {
+                $query->topLevel()->approved()->recent()->with('user', 'profile')->limit(20);
             }
         ])
-        ->published()
-        ->where('slug', $slug)
-        ->firstOrFail();
+            ->published()
+            ->where('slug', $slug)
+            ->firstOrFail();
 
-        // زيادة عدد المشاهدات
-        $movie->incrementViewCount();
+        // فحص تقدم المشاهدة فقط إذا كان المستخدم مسجل ولديه بروفايل
+        $watchProgress = null;
+        if (Auth::check()) {
+            $activeProfileId = session('active_profile_id');
 
-        // جلب الأفلام ذات الصلة بناء على التصنيفات المشتركة
-        $relatedMovies = $this->getRelatedMovies($movie);
+            // التأكد من وجود البروفايل وأنه ينتمي للمستخدم الحالي
+            if ($activeProfileId) {
+                $profile = UserProfile::where('id', $activeProfileId)
+                    ->where('user_id', Auth::id())
+                    ->first();
 
-        return view('site.movie', compact('movie', 'relatedMovies'));
-    }
-
-    /**
-     * جلب الأفلام ذات الصلة
-     */
-    private function getRelatedMovies(Movie $movie)
-    {
-        // الحصول على معرفات التصنيفات الخاصة بالفيلم
-        $categoryIds = $movie->categories->pluck('id');
-
-        if ($categoryIds->isEmpty()) {
-            // إذا لم يكن للفيلم تصنيفات، احضر أفلام عشوائية
-            return Movie::published()
-                ->where('id', '!=', $movie->id)
-                ->with(['categories'])
-                ->inRandomOrder()
-                ->limit(12)
-                ->get();
+                if ($profile) {
+                    $watchProgress = WatchProgres::where([
+                        'profile_id' => $activeProfileId,
+                        'content_type' => Movie::class,
+                        'content_id' => $movie->id
+                    ])->first();
+                } else {
+                    // إزالة البروفايل من الجلسة إذا لم يكن صحيحاً
+                    session()->forget('active_profile_id');
+                }
+            }
         }
 
-        return Movie::published()
-            ->where('id', '!=', $movie->id)
-            ->whereHas('categories', function ($query) use ($categoryIds) {
-                $query->whereIn('movie_categories.id', $categoryIds);
-            })
-            ->with(['categories'])
-            ->withCount(['categories' => function ($query) use ($categoryIds) {
-                $query->whereIn('movie_categories.id', $categoryIds);
-            }])
-            ->orderBy('categories_count', 'desc') // ترتيب حسب عدد التصنيفات المشتركة
-            ->orderBy('view_count', 'desc') // ثم حسب المشاهدات
-            ->limit(12)
-            ->get();
+        return view('site.movie', compact('movie', 'watchProgress'));
     }
 
     /**
-     * إضافة تعليق جديد
+     * إضافة تعليق - مربوط بالبروفايل
      */
-    public function addComment(Request $request, $slug)
+    public function addComment(Request $request, $id)
     {
         $request->validate([
             'content' => 'required|string|max:1000',
         ]);
 
-        $movie = Movie::where('slug', $slug)->firstOrFail();
-
         if (!Auth::check()) {
             return response()->json([
                 'success' => false,
-                'message' => __('site.login_required')
+                'message' => 'يرجى تسجيل الدخول أولاً'
             ], 401);
         }
 
-        $comment = $movie->comments()->create([
-            'user_id' => auth()->id(),
-            'profile_id' => session('current_profile_id'), // إذا كنت تستخدم نظام الملفات الشخصية
-            'content' => $request->content,
-            'status' => 'approved' // أو 'pending' إذا كنت تريد مراجعة التعليقات
-        ]);
+        // الحصول على البروفايل النشط
+        $activeProfileId = session('active_profile_id');
+        if (!$activeProfileId) {
+            return response()->json([
+                'success' => false,
+                'message' => 'يرجى اختيار بروفايل أولاً'
+            ], 400);
+        }
 
-        $comment->load('user');
+        $movie = Movie::findOrFail($id);
+        $profile = UserProfile::find($activeProfileId);
+
+        $comment = $movie->comments()->create([
+            'user_id' => Auth::id(),
+            'profile_id' => $activeProfileId,
+            'content' => $request->content,
+            'status' => 'approved'
+        ]);
 
         return response()->json([
             'success' => true,
             'comment' => [
                 'id' => $comment->id,
                 'content' => $comment->content,
-                'user' => [
-                    'name' => $comment->user->full_name,
-                    'avatar' => $comment->user->avatar_full_url
-                ],
+                'user_name' => $profile->name,
+                'user_avatar' => $profile->avatar_full_url,
                 'created_at' => $comment->created_at->diffForHumans()
             ]
         ]);
     }
 
     /**
-     * إضافة/إزالة من قائمة المشاهدة
+     * إدارة قائمة المشاهدة - مربوطة بالبروفايل
      */
-    public function toggleWatchlist(Request $request, $slug)
+    public function toggleWatchlist(Request $request, $id)
     {
-        if (!auth()->check()) {
+        if (!Auth::check()) {
             return response()->json([
                 'success' => false,
-                'message' => __('site.login_required')
+                'message' => 'يرجى تسجيل الدخول أولاً'
             ], 401);
         }
 
-        $movie = Movie::where('slug', $slug)->firstOrFail();
-        $profileId = session('current_profile_id') ?? auth()->user()->profiles()->first()?->id;
-
-        if (!$profileId) {
+        $activeProfileId = session('active_profile_id');
+        if (!$activeProfileId) {
             return response()->json([
                 'success' => false,
-                'message' => __('site.profile_not_found')
+                'message' => 'يرجى اختيار بروفايل أولاً'
             ], 400);
         }
 
-        $exists = \App\Models\Watchlist::isInWatchlist($profileId, Movie::class, $movie->id);
+        $movie = Movie::findOrFail($id);
+
+        $exists = \App\Models\Watchlist::isInWatchlist($activeProfileId, Movie::class, $movie->id);
 
         if ($exists) {
-            \App\Models\Watchlist::removeFromWatchlist($profileId, Movie::class, $movie->id);
+            \App\Models\Watchlist::removeFromWatchlist($activeProfileId, Movie::class, $movie->id);
             return response()->json([
                 'success' => true,
                 'action' => 'removed',
-                'message' => __('site.removed_from_watchlist')
+                'message' => 'تم حذف الفيلم من قائمة المشاهدة'
             ]);
         } else {
-            \App\Models\Watchlist::addToWatchlist($profileId, Movie::class, $movie->id);
+            \App\Models\Watchlist::addToWatchlist($activeProfileId, Movie::class, $movie->id);
             return response()->json([
                 'success' => true,
                 'action' => 'added',
-                'message' => __('site.added_to_watchlist')
+                'message' => 'تم إضافة الفيلم لقائمة المشاهدة'
             ]);
         }
     }
 
     /**
-     * تسجيل تقدم المشاهدة
+     * تحديث عدد المشاهدات + إضافة تاريخ مشاهدة
      */
-    public function updateWatchProgress(Request $request, $slug)
+    public function incrementView(Request $request, $id)
+    {
+        $movie = Movie::findOrFail($id);
+        $movie->incrementViewCount();
+
+        // إضافة لتاريخ المشاهدة إذا كان مسجل
+        if (Auth::check()) {
+            $activeProfileId = session('active_profile_id');
+            if ($activeProfileId) {
+                \App\Models\ViewingHistory::create([
+                    'user_id' => Auth::id(),
+                    'profile_id' => $activeProfileId,
+                    'content_type' => Movie::class,
+                    'content_id' => $movie->id,
+                    'watch_duration_seconds' => 30, // بداية المشاهدة
+                    'completion_percentage' => 0,
+                    'watched_at' => now()
+                ]);
+            }
+        }
+
+        return response()->json(['success' => true]);
+    }
+
+    /**
+     * حفظ تقدم المشاهدة
+     */
+    public function updateWatchProgress(Request $request, $id)
     {
         $request->validate([
             'current_time' => 'required|numeric|min:0',
             'duration' => 'required|numeric|min:1'
         ]);
 
-        if (!auth()->check()) {
+        if (!Auth::check()) {
             return response()->json(['success' => false], 401);
         }
 
-        $movie = Movie::where('slug', $slug)->firstOrFail();
-        $profileId = session('current_profile_id') ?? auth()->user()->profiles()->first()?->id;
-
-        if (!$profileId) {
+        $activeProfileId = session('active_profile_id');
+        if (!$activeProfileId) {
             return response()->json(['success' => false], 400);
         }
 
-        // حفظ التقدم
-        \App\Models\WatchProgres::updateOrCreate(
+        $movie = Movie::findOrFail($id);
+
+        WatchProgres::updateProgress(
+            $activeProfileId,
+            Movie::class,
+            $movie->id,
+            $request->current_time,
+            $request->duration
+        );
+
+        return response()->json(['success' => true]);
+    }
+
+    // في MovieController.php
+    public function updateProgress(Request $request, Movie $movie)
+    {
+        $request->validate([
+            'current_time' => 'required|numeric|min:0',
+            'duration' => 'required|numeric|min:0',
+            'progress_percentage' => 'required|numeric|min:0|max:100'
+        ]);
+
+        $user = Auth::user();
+
+        $watchProgress = WatchProgres::updateOrCreate(
             [
-                'user_id' => auth()->id(),
-                'profile_id' => $profileId,
-                'content_type' => Movie::class,
-                'content_id' => $movie->id
+                'user_id' => $user->id,
+                'movie_id' => $movie->id
             ],
             [
-                'current_time' => $request->current_time,
-                'duration' => $request->duration,
-                'progress_percentage' => ($request->current_time / $request->duration) * 100,
-                'last_watched' => now()
+                'watched_seconds' => $request->current_time,
+                'total_duration' => $request->duration,
+                'progress_percentage' => $request->progress_percentage,
+                'last_watched_at' => now()
             ]
         );
 
-        // إضافة لتاريخ المشاهدة
-        \App\Models\ViewingHistory::create([
-            'user_id' => auth()->id(),
-            'profile_id' => $profileId,
-            'content_type' => Movie::class,
-            'content_id' => $movie->id,
-            'watched_at' => now(),
-            'watch_duration' => 30 // يمكن تخصيصها
-        ]);
+        return response()->json(['success' => true, 'data' => $watchProgress]);
+    }
+
+    public function markCompleted(Movie $movie)
+    {
+        $user = Auth::user();
+
+        WatchProgres::updateOrCreate(
+            [
+                'user_id' => $user->id,
+                'movie_id' => $movie->id
+            ],
+            [
+                'progress_percentage' => 100,
+                'is_completed' => true,
+                'completed_at' => now()
+            ]
+        );
 
         return response()->json(['success' => true]);
     }

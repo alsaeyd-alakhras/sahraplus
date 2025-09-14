@@ -172,7 +172,7 @@ class ShortService
             $quality    = $f['quality']    ?? null;
             $sourceType = $f['source_type'] ?? 'url';
             if (!$type || !$quality) continue;
-            
+
             // التحقق من وجود file أو file_url أولاً
             if ((!isset($f['file']) || empty($f['file'])) &&
                 (!isset($f['file_url']) || empty($f['file_url']))) {
@@ -180,7 +180,7 @@ class ShortService
             }
 
             // الآن نتحقق من التكرار (بعد التأكد من وجود بيانات صالحة)
-            if (in_array($type, $usedTypes) || in_array($quality, $usedQualities)) {
+            if (in_array($type, $usedTypes) && in_array($quality, $usedQualities)) {
                 continue; // تجاهل المكرر
             }
 
@@ -230,6 +230,9 @@ class ShortService
                 $short->video_path = $fileUrl;
                 $short->save();
             }
+        }
+        if(empty($files)){
+            $short->videoFiles()->delete();
         }
 
         if (!empty($payload)) {

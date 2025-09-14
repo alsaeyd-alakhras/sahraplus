@@ -224,7 +224,7 @@ class MovieService
             $quality    = $f['quality']    ?? null;
             $sourceType = $f['source_type'] ?? 'url';
             if (!$type || !$quality) continue;
-            
+
             // التحقق من وجود file أو file_url أولاً
             if ((!isset($f['file']) || empty($f['file'])) &&
                 (!isset($f['file_url']) || empty($f['file_url']))) {
@@ -232,14 +232,13 @@ class MovieService
             }
 
             // الآن نتحقق من التكرار (بعد التأكد من وجود بيانات صالحة)
-            if (in_array($type, $usedTypes) || in_array($quality, $usedQualities)) {
+            if (in_array($type, $usedTypes) && in_array($quality, $usedQualities)) {
                 continue; // تجاهل المكرر
             }
 
             // إضافة للمصفوفات فقط إذا كان العنصر صالح للتخزين
             $usedTypes[] = $type;
             $usedQualities[] = $quality;
-
             $fileUrl = isset($f['file_url']) ? $f['file_url'] : null;
             $format  = $f['format']   ?? null;
             $size    = null;
@@ -283,6 +282,9 @@ class MovieService
                 $movie->save();
             }
         }
+        if(empty($files)){
+            $movie->videoFiles()->delete();
+        }
 
         if (!empty($payload)) {
             $movie->videoFiles()->createMany($payload); // morphMany يملأ content_type/id تلقائيًا
@@ -308,7 +310,7 @@ class MovieService
             if (!$lang || !$label) continue;
 
             // منع تكرار اللغة / الليبل على مستوى السيرفر (حماية إضافية)
-            if (in_array($lang, $seenLangs, true) || in_array($label, $seenLabels, true)) {
+            if (in_array($lang, $seenLangs, true) && in_array($label, $seenLabels, true)) {
                 continue;
             }
 
@@ -343,6 +345,10 @@ class MovieService
 
             $seenLangs[]  = $lang;
             $seenLabels[] = $label;
+        }
+
+        if(empty($subs)){
+            $movie->subtitles()->delete();
         }
 
         if (!empty($payload)) {

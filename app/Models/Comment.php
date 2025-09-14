@@ -35,7 +35,7 @@ class Comment extends Model
 
     public function profile()
     {
-        return $this->belongsTo(UserProfile::class);
+        return $this->belongsTo(UserProfile::class, 'profile_id');
     }
 
     public function parent()
