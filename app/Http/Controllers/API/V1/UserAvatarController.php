@@ -11,7 +11,7 @@ class UserAvatarController extends Controller
 {
     public function index()
     {
-        $avatars = UserAvatar::all();
+        $avatars = UserAvatar::get();
         return UserAvatarResource::collection($avatars);
     }
 

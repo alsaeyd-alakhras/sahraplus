@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
-use App\Models\Movie;
+use App\Models\Series;
 use App\Models\MovieCategory;
 use App\Models\UserProfile;
 use App\Models\WatchProgres;
@@ -11,27 +11,27 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 
-class MovieController extends Controller
+class SeriesController extends Controller
 {
     public function index()
     {
-        $moviesHero = Movie::published()->orderBy('view_count', 'desc')->limit(5)->get();
-        $moviesHeroArray = Cache::remember('movies_hero', 3600, function () {
-            return Movie::published()
+        $seriesHero = Series::published()->orderBy('view_count', 'desc')->limit(5)->get();
+        $seriesHeroArray = Cache::remember('series_hero', 3600, function () {
+            return Series::published()
             ->orderBy('view_count', 'desc')
             ->with('categories')
                 ->limit(5)
                 ->get()
-                ->map(function ($movie) {
+                ->map(function ($series) {
                     return [
-                        'id' => $movie->id,
-                        'title' => $movie->title_ar ?: $movie->title_en,
-                        'logo' => $movie->poster_full_url,
-                        'tags' => $movie->categories->pluck('name')->toArray(),
+                        'id' => $series->id,
+                        'title' => $series->title_ar ?: $series->title_en,
+                        'logo' => $series->poster_full_url,
+                        'tags' => $series->categories->pluck('name')->toArray(),
                     ];
                 });
         });
-        return view('site.movies', compact('moviesHero','moviesHeroArray'));
+        return view('site.series', compact('seriesHero','seriesHeroArray'));
     }
 
     public function getHtmlSection(Request $request)
@@ -39,7 +39,7 @@ class MovieController extends Controller
         $title_section = $request->title_section;
         $items = $request->items;
         $display_type = $request->display_type;
-        return view('site.partials.section_movies', compact('title_section', 'items', 'display_type'));
+        return view('site.partials.section_series', compact('title_section', 'items', 'display_type'));
     }
 
     /**
@@ -50,13 +50,13 @@ class MovieController extends Controller
         $loadedSections = $request->input('loaded', []);
         $sections = [];
 
-        // قسم متابعة المشاهدة (للمستخدمين المسجلين فقط)
-        if (!in_array('continue_watching', $loadedSections) && Auth::check()) {
-            $continueWatching = $this->getContinueWatchingSection();
-            if (!empty($continueWatching['movies'])) {
-                $sections[] = $continueWatching;
-            }
-        }
+        // // قسم متابعة المشاهدة (للمستخدمين المسجلين فقط)
+        // if (!in_array('continue_watching', $loadedSections) && Auth::check()) {
+        //     $continueWatching = $this->getContinueWatchingSection();
+        //     if (!empty($continueWatching['series'])) {
+        //         $sections[] = $continueWatching;
+        //     }
+        // }
 
         // قسم أفضل 10 أفلام
         if (!in_array('top10', $loadedSections)) {
@@ -80,82 +80,82 @@ class MovieController extends Controller
         ]);
     }
 
-    /**
-     * قسم متابعة المشاهدة
-     */
-    private function getContinueWatchingSection()
-    {
-        $activeProfileId = session('active_profile_id');
+    // /**
+    //  * قسم متابعة المشاهدة
+    //  */
+    // private function getContinueWatchingSection()
+    // {
+    //     $activeProfileId = session('active_profile_id');
 
-        if (!$activeProfileId) {
-            return ['name' => 'continue_watching', 'title' => 'متابعة المشاهدة', 'movies' => []];
-        }
+    //     if (!$activeProfileId) {
+    //         return ['name' => 'continue_watching', 'title' => 'متابعة المشاهدة', 'series' => []];
+    //     }
 
-        $watchProgress = WatchProgres::with(['content' => function ($query) {
-            $query->select('id', 'title_ar', 'title_en', 'poster_url', 'imdb_rating', 'slug', 'poster_full_url', 'backdrop_full_url', 'duration_minutes', 'imdb_rating', 'language', 'slug', 'view_count', 'categories');
-        }])
-            ->forProfile($activeProfileId)
-            ->inProgress()
-            ->recent()
-            ->limit(10)
-            ->get();
+    //     $watchProgress = WatchProgres::with(['content' => function ($query) {
+    //         $query->select('id', 'title_ar', 'title_en', 'poster_url', 'imdb_rating', 'slug', 'poster_full_url', 'backdrop_full_url', 'duration_minutes', 'imdb_rating', 'language', 'slug', 'view_count', 'categories');
+    //     }])
+    //         ->forProfile($activeProfileId)
+    //         ->inProgress()
+    //         ->recent()
+    //         ->limit(10)
+    //         ->get();
 
-        $movies = $watchProgress->map(function ($progress) {
-            if ($progress->content) {
-                return [
-                    'progress_percentage' => $progress->progress_percentage,
-                    'id' => $progress->content->id,
-                    'title' => $progress->content->title_ar ?: $progress->content->title_en,
-                    'poster_full_url' => $progress->content->poster_full_url,
-                    'backdrop_full_url' => $progress->content->backdrop_full_url,
-                    'duration_minutes' => $progress->content->duration_minutes,
-                    'imdb_rating' => $progress->content->imdb_rating,
-                    'language' => $progress->content->language,
-                    'slug' => $progress->content->slug,
-                    'view_count' => $progress->content->view_count,
-                    'categories' => $progress->content->categories
-                ];
-            }
-            return null;
-        })->filter()->values();
+    //     $series = $watchProgress->map(function ($progress) {
+    //         if ($progress->content) {
+    //             return [
+    //                 'progress_percentage' => $progress->progress_percentage,
+    //                 'id' => $progress->content->id,
+    //                 'title' => $progress->content->title_ar ?: $progress->content->title_en,
+    //                 'poster_full_url' => $progress->content->poster_full_url,
+    //                 'backdrop_full_url' => $progress->content->backdrop_full_url,
+    //                 'duration_minutes' => $progress->content->duration_minutes,
+    //                 'imdb_rating' => $progress->content->imdb_rating,
+    //                 'language' => $progress->content->language,
+    //                 'slug' => $progress->content->slug,
+    //                 'view_count' => $progress->content->view_count,
+    //                 'categories' => $progress->content->categories
+    //             ];
+    //         }
+    //         return null;
+    //     })->filter()->values();
 
-        return [
-            'name' => 'continue_watching',
-            'title' => 'متابعة المشاهدة',
-            'movies' => $movies
-        ];
-    }
+    //     return [
+    //         'name' => 'continue_watching',
+    //         'title' => 'متابعة المشاهدة',
+    //         'series' => $series
+    //     ];
+    // }
 
     /**
      * قسم أفضل 10 أفلام
      */
     private function getTop10Section()
     {
-        $movies = Cache::remember('movies_top10', 3600, function () {
-            return Movie::published()
+        $series = Cache::remember('series_top10', 3600, function () {
+            return Series::published()
             ->orderBy('imdb_rating', 'desc')
             ->with('categories')
                 ->limit(10)
                 ->get()
-                ->map(function ($movie) {
+                ->map(function ($series) {
                     return [
-                        'id' => $movie->id,
-                        'title' => $movie->title_ar ?: $movie->title_en,
-                        'backdrop_full_url' => $movie->backdrop_full_url,
-                        'poster_full_url' => $movie->poster_full_url,
-                        'view_count' => $movie->view_count,
-                        'imdb_rating' => $movie->imdb_rating,
-                        'language' => $movie->language,
-                        'slug' => $movie->slug,
-                        'duration_minutes' => $movie->duration_minutes,
-                        'categories' => $movie->categories
+                        'id' => $series->id,
+                        'title' => $series->title_ar ?: $series->title_en,
+                        'backdrop_full_url' => $series->backdrop_full_url,
+                        'poster_full_url' => $series->poster_full_url,
+                        'view_count' => $series->view_count,
+                        'imdb_rating' => $series->imdb_rating,
+                        'language' => $series->language,
+                        'slug' => $series->slug,
+                        'duration_minutes' => $series->duration_minutes,
+                        'categories' => $series->categories
                     ];
                 });
         });
         return [
             'name' => 'top10',
-            'title' => 'أفضل 10 أفلام',
-            'movies' => $movies
+            'title' => 'أفضل 10 مسلسلات',
+            'series' => $series
         ];
     }
 
@@ -164,24 +164,24 @@ class MovieController extends Controller
      */
     private function getMostViewedSection()
     {
-        $movies = Cache::remember('movies_most_viewed', 3600, function () {
-            return Movie::published()
+        $series = Cache::remember('series_most_viewed', 3600, function () {
+            return Series::published()
             ->orderBy('view_count', 'desc')
             ->with('categories')
                 ->limit(12)
                 ->get()
-                ->map(function ($movie) {
+                ->map(function ($series) {
                     return [
-                        'id' => $movie->id,
-                        'title' => $movie->title_ar ?: $movie->title_en,
-                        'poster_full_url' => $movie->poster_full_url,
-                        'backdrop_full_url' => $movie->backdrop_full_url,
-                        'duration_minutes' => $movie->duration_minutes,
-                        'imdb_rating' => $movie->imdb_rating,
-                        'language' => $movie->language,
-                        'slug' => $movie->slug,
-                        'view_count' => $movie->view_count,
-                        'categories' => $movie->categories
+                        'id' => $series->id,
+                        'title' => $series->title_ar ?: $series->title_en,
+                        'poster_full_url' => $series->poster_full_url,
+                        'backdrop_full_url' => $series->backdrop_full_url,
+                        'duration_minutes' => $series->duration_minutes,
+                        'imdb_rating' => $series->imdb_rating,
+                        'language' => $series->language,
+                        'slug' => $series->slug,
+                        'view_count' => $series->view_count,
+                        'categories' => $series->categories
                     ];
                 });
         });
@@ -190,7 +190,7 @@ class MovieController extends Controller
             'name' => 'most_viewed',
             'title' => 'الأكثر مشاهدة',
             'display_type' => 'horizontal',
-            'movies' => $movies
+            'series' => $series
         ];
     }
 
@@ -199,23 +199,23 @@ class MovieController extends Controller
      */
     private function getLatestSection()
     {
-        $movies = Movie::published()
+        $series = Series::published()
             ->orderBy('created_at', 'desc')
             ->with('categories')
             ->limit(12)
             ->get()
-            ->map(function ($movie) {
+            ->map(function ($series) {
                 return [
-                    'id' => $movie->id,
-                    'title' => $movie->title_ar ?: $movie->title_en,
-                    'poster_full_url' => $movie->poster_full_url,
-                    'backdrop_full_url' => $movie->backdrop_full_url,
-                    'duration_minutes' => $movie->duration_minutes,
-                    'imdb_rating' => $movie->imdb_rating,
-                    'language' => $movie->language,
-                    'slug' => $movie->slug,
-                    'view_count' => $movie->view_count,
-                    'categories' => $movie->categories
+                    'id' => $series->id,
+                    'title' => $series->title_ar ?: $series->title_en,
+                    'poster_full_url' => $series->poster_full_url,
+                    'backdrop_full_url' => $series->backdrop_full_url,
+                    'duration_minutes' => $series->duration_minutes,
+                    'imdb_rating' => $series->imdb_rating,
+                    'language' => $series->language,
+                    'slug' => $series->slug,
+                    'view_count' => $series->view_count,
+                    'categories' => $series->categories
                 ];
             });
 
@@ -223,7 +223,7 @@ class MovieController extends Controller
             'name' => 'latest',
             'title' => 'أحدث الإضافات',
             'display_type' => 'horizontal',
-            'movies' => $movies
+            'series' => $series
         ];
     }
 
@@ -240,33 +240,33 @@ class MovieController extends Controller
             $sectionName = 'category_' . $category->id;
 
             if (!in_array($sectionName, $loadedSections)) {
-                $movies = Cache::remember("movies_category_{$category->id}", 3600, function () use ($category) {
-                    return $category->movies()
+                $series = Cache::remember("series_category_{$category->id}", 3600, function () use ($category) {
+                    return $category->series()
                         ->published()
                         ->with('categories')
                         ->limit(12)
                         ->get()
-                        ->map(function ($movie) {
+                        ->map(function ($series) {
                             return [
-                                'id' => $movie->id,
-                                'title' => $movie->title_ar ?: $movie->title_en,
-                                'poster_full_url' => $movie->poster_full_url,
-                                'backdrop_full_url' => $movie->backdrop_full_url,
-                                'duration_minutes' => $movie->duration_minutes,
-                                'imdb_rating' => $movie->imdb_rating,
-                                'language' => $movie->language,
-                                'slug' => $movie->slug,
-                                'view_count' => $movie->view_count,
-                                'categories' => $movie->categories
+                                'id' => $series->id,
+                                'title' => $series->title_ar ?: $series->title_en,
+                                'poster_full_url' => $series->poster_full_url,
+                                'backdrop_full_url' => $series->backdrop_full_url,
+                                'duration_minutes' => $series->duration_minutes,
+                                'imdb_rating' => $series->imdb_rating,
+                                'language' => $series->language,
+                                'slug' => $series->slug,
+                                'view_count' => $series->view_count,
+                                'categories' => $series->categories
                             ];
                         });
                 });
 
-                if ($movies->isNotEmpty()) {
+                if ($series->isNotEmpty()) {
                     return [
                         'name' => $sectionName,
                         'title' => $category->name_ar ?: $category->name_en,
-                        'movies' => $movies
+                        'series' => $series
                     ];
                 }
             }
@@ -277,7 +277,7 @@ class MovieController extends Controller
 
     public function show($slug)
     {
-        $movie = Movie::with([
+        $movie = Series::with([
             'categories',
             'cast.person',
             'videoFiles' => function ($query) {
@@ -306,7 +306,7 @@ class MovieController extends Controller
                 if ($profile) {
                     $watchProgress = WatchProgres::where([
                         'profile_id' => $activeProfileId,
-                        'content_type' => Movie::class,
+                        'content_type' => Series::class,
                         'content_id' => $movie->id
                     ])->first();
                 } else {
@@ -344,7 +344,7 @@ class MovieController extends Controller
             ], 400);
         }
 
-        $movie = Movie::findOrFail($id);
+        $movie = Series::findOrFail($id);
         $profile = UserProfile::find($activeProfileId);
 
         $comment = $movie->comments()->create([
@@ -386,19 +386,19 @@ class MovieController extends Controller
             ], 400);
         }
 
-        $movie = Movie::findOrFail($id);
+        $movie = Series::findOrFail($id);
 
-        $exists = \App\Models\Watchlist::isInWatchlist($activeProfileId, Movie::class, $movie->id);
+        $exists = \App\Models\Watchlist::isInWatchlist($activeProfileId, Series::class, $movie->id);
 
         if ($exists) {
-            \App\Models\Watchlist::removeFromWatchlist($activeProfileId, Movie::class, $movie->id);
+            \App\Models\Watchlist::removeFromWatchlist($activeProfileId, Series::class, $movie->id);
             return response()->json([
                 'success' => true,
                 'action' => 'removed',
                 'message' => 'تم حذف الفيلم من قائمة المشاهدة'
             ]);
         } else {
-            \App\Models\Watchlist::addToWatchlist($activeProfileId, Movie::class, $movie->id);
+            \App\Models\Watchlist::addToWatchlist($activeProfileId, Series::class, $movie->id);
             return response()->json([
                 'success' => true,
                 'action' => 'added',
@@ -412,7 +412,7 @@ class MovieController extends Controller
      */
     public function incrementView(Request $request, $id)
     {
-        $movie = Movie::findOrFail($id);
+        $movie = Series::findOrFail($id);
         $movie->incrementViewCount();
 
         // إضافة لتاريخ المشاهدة إذا كان مسجل
@@ -422,7 +422,7 @@ class MovieController extends Controller
                 \App\Models\ViewingHistory::create([
                     'user_id' => Auth::id(),
                     'profile_id' => $activeProfileId,
-                    'content_type' => Movie::class,
+                    'content_type' => Series::class,
                     'content_id' => $movie->id,
                     'watch_duration_seconds' => 30, // بداية المشاهدة
                     'completion_percentage' => 0,
@@ -453,11 +453,11 @@ class MovieController extends Controller
             return response()->json(['success' => false], 400);
         }
 
-        $movie = Movie::findOrFail($id);
+        $movie = Series::findOrFail($id);
 
         WatchProgres::updateProgress(
             $activeProfileId,
-            Movie::class,
+            Series::class,
             $movie->id,
             $request->current_time,
             $request->duration
@@ -467,7 +467,7 @@ class MovieController extends Controller
     }
 
     // في MovieController.php
-    public function updateProgress(Request $request, Movie $movie)
+    public function updateProgress(Request $request, Series $movie)
     {
         $request->validate([
             'current_time' => 'required|numeric|min:0',
@@ -493,7 +493,7 @@ class MovieController extends Controller
         return response()->json(['success' => true, 'data' => $watchProgress]);
     }
 
-    public function markCompleted(Movie $movie)
+    public function markCompleted(Series $movie)
     {
         $user = Auth::user();
 

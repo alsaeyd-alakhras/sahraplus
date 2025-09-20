@@ -3,20 +3,22 @@
 namespace App\Http\Controllers\API\V1;
 
 use App\Http\Controllers\Controller;
-use App\Http\Resources\PersonResource;
 use App\Models\Person;
-use Illuminate\Http\Request;
+use App\Http\Resources\PersonResource;
+use App\Http\Resources\MovieResource;
+use App\Http\Resources\EpisodeResource;
 
 class PeopleController extends Controller
 {
-    public function index()
-    {
-        $people = Person::all();
-        return PersonResource::collection($people);
-    }
-
+    // GET /api/v1/people/{id}
     public function show(Person $person)
     {
-        return new PersonResource($person);
+        $person->load(['movies','episodes']);
+
+        return response()->json([
+            'person'   => new PersonResource($person),
+            'movies'   => MovieResource::collection($person->movies),
+            'episodes' => EpisodeResource::collection($person->episodes),
+        ]);
     }
 }

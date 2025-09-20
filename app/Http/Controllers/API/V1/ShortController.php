@@ -11,7 +11,7 @@ class ShortController extends Controller
 {
     public function index()
     {
-        $shorts = Short::active()->all();
+        $shorts = Short::active()->paginate(20);
         return ShortResource::collection($shorts);
     }
 

@@ -191,40 +191,6 @@ $(function () {
   let isMuted = true;
   let timer;
 
-  const contents = [
-    {
-      title:
-        'بعد خيانة أصدقائه والمرأة التي أحبها، يجد مجد نفسه خلف القضبان. لكنه لا ينهزم... بملامح جديدة وهوية مختلفة، يعود "آسر" لهدف واحد: الانتقام. ',
-      tags: ["إثارة", "أكشن", "لبناني", "2024"],
-      episode: "الموسم 1، الحلقة 1",
-      logo: "./assets/images/logos/logo1.avif",
-    },
-    {
-      title: "دراما مؤثرة لعشاق القصص الواقعية",
-      tags: ["دراما", "واقعي", "2023"],
-      episode: "الموسم 2، الحلقة 4",
-      logo: "./assets/images/logos/logo2.avif",
-    },
-    {
-      title: "دراما مؤثرة لعشاق القصص الواقعية",
-      tags: ["دراما", "واقعي", "2023"],
-      episode: "الموسم 2، الحلقة 4",
-      logo: "./assets/images/logos/logo3.avif",
-    },
-    {
-      title: "دراما مؤثرة لعشاق القصص الواقعية",
-      tags: ["دراما", "واقعي", "2023"],
-      episode: "الموسم 2، الحلقة 4",
-      logo: "./assets/images/logos/logo4.avif",
-    },
-    {
-      title: "دراما مؤثرة لعشاق القصص الواقعية",
-      tags: ["دراما", "واقعي", "2023"],
-      episode: "الموسم 2، الحلقة 4",
-      logo: "./assets/images/logos/logo5.avif",
-    },
-  ];
-
   function updateContent(index) {
     const data = contents[index];
     heroContent.find(".logo-wrapper img").attr("src", data.logo);

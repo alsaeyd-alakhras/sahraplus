@@ -3,6 +3,7 @@
 use App\Http\Controllers\Frontend\MovieController;
 use App\Http\Controllers\Frontend\FrontController;
 use App\Http\Controllers\Frontend\ProfileController;
+use App\Http\Controllers\Frontend\SeriesController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Mcamara\LaravelLocalization\Facades\LaravelLocalization;
@@ -23,15 +24,19 @@ Route::group([
     ], function () {
         Route::get('/',[FrontController::class,'index'])->name('home');
         Route::get('/series',[FrontController::class,'series'])->name('series');
-        Route::get('/movies',[FrontController::class,'movies'])->name('movies');
         Route::get('/live',[FrontController::class,'live'])->name('live');
         Route::get('/categories',[FrontController::class,'categories'])->name('categories');
         Route::get('/actors',[FrontController::class,'actors'])->name('actors');
 
 
         // Movie routes
+        Route::get('/movies',[MovieController::class,'index'])->name('movies');
         Route::prefix('movies')->name('movie.')->group(function () {
+
             // عرض الفيلم
+            Route::get('/html_sections', [MovieController::class, 'getHtmlSection'])->name('get-html-section');
+            Route::get('/sections', [MovieController::class, 'getSections'])->name('sections');
+
             Route::get('/{slug}', [MovieController::class, 'show'])->name('show');
         });
         // API routes for AJAX calls
@@ -45,6 +50,17 @@ Route::group([
                 Route::post('/movies/{id}/view', [MovieController::class, 'incrementView'])->name('movie.view');
                 Route::post('/movies/{id}/progress', [MovieController::class, 'updateWatchProgress'])->name('movie.progress');
             });
+        });
+
+        // Series routes
+        Route::get('/series',[SeriesController::class,'index'])->name('series');
+        Route::prefix('series')->name('series.')->group(function () {
+
+            // عرض الفيلم
+            Route::get('/html_sections', [SeriesController::class, 'getHtmlSection'])->name('get-html-section');
+            Route::get('/sections', [SeriesController::class, 'getSections'])->name('sections');
+
+            Route::get('/{slug}', [SeriesController::class, 'show'])->name('show');
         });
     });
 
