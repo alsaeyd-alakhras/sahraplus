@@ -45,6 +45,12 @@ class MovieCategory extends Model
             ->withTimestamps();
     }
 
+    public function series()
+{
+    return $this->belongsToMany(Series::class, 'category_series_pivot', 'category_id', 'series_id')
+        ->withTimestamps();
+}
+
     /**
      * سكوب للتصنيفات النشطة فقط
      */

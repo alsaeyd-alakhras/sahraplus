@@ -3,11 +3,13 @@
 namespace App\Http\Controllers\Dashboard;
 
 use App\Models\Series;
-use Illuminate\Http\Request;
-use App\Services\SeriesService;
-use App\Http\Requests\SeriesRequest;
-use App\Http\Controllers\Controller;
 use App\Models\Country;
+use Illuminate\Http\Request;
+use App\Models\MovieCategory;
+use App\Models\Person;
+use App\Services\SeriesService;
+use App\Http\Controllers\Controller;
+use App\Http\Requests\SeriesRequest;
 
 class SeriesController extends Controller
 {
@@ -88,7 +90,10 @@ class SeriesController extends Controller
         // جديد: خيارات حالة المسلسل
         $seriesStatusOptions = $this->seriesStatusOptions;
 
-        return view('dashboard.series.create', compact( 'series', 'contentRatingOptions', 'languageOptions', 'countries', 'statusOptions', 'seriesStatusOptions'));
+        $allCategories = MovieCategory::select('id','name_ar','name_en')->orderBy('name_ar')->get();
+        $allPeople = Person::select('id','name_ar','name_en')->orderBy('name_ar')->get();
+
+        return view('dashboard.series.create', compact( 'series', 'contentRatingOptions', 'languageOptions', 'countries', 'statusOptions', 'seriesStatusOptions','allCategories','allPeople'));
     }
 
     /**
@@ -129,7 +134,13 @@ class SeriesController extends Controller
         });
         $statusOptions = $this->statusOptions;
         $seriesStatusOptions = $this->seriesStatusOptions;
-        return view('dashboard.series.edit', compact('series', 'btn_label', 'contentRatingOptions', 'languageOptions', 'countries', 'statusOptions', 'seriesStatusOptions'));
+
+        $series->load(['categories:id','people']); 
+
+       $allCategories = MovieCategory::select('id','name_ar','name_en')->orderBy('name_ar')->get();
+       $allPeople     = Person::select('id','name_ar','name_en')->orderBy('name_ar')->get();
+
+        return view('dashboard.series.edit', compact('series', 'btn_label', 'contentRatingOptions', 'languageOptions', 'countries', 'statusOptions', 'seriesStatusOptions','allCategories','allPeople',));
     }
 
     /**
@@ -159,4 +170,19 @@ class SeriesController extends Controller
             ? response()->json(['status' => true, 'message' => __('controller.Deleted_item_successfully')])
             : redirect()->route('dashboard.series.index')->with('success', __('controller.Deleted_item_successfully'));
     }
+
+    public function castRowPartial(Request $request)
+{
+    $i = (int) $request->get('i', 0);
+    $allPeople = Person::select('id','name_ar','name_en')->orderBy('name_ar')->get();
+    $roleTypes = [
+        'actor'           => __('admin.actor'),
+        'director'        => __('admin.director'),
+        'writer'          => __('admin.writer'),
+        'producer'        => __('admin.producer'),
+        'cinematographer' => __('admin.cinematographer'),
+        'composer'        => __('admin.composer'),
+    ];
+    return view('dashboard.series.partials._cast_row', compact('i','allPeople','roleTypes'));
+}
 }

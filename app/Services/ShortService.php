@@ -3,73 +3,58 @@
 namespace App\Services;
 
 use App\Models\Short;
-use App\Repositories\ShortRepository;
+use App\Models\Series;
+use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
+use App\Repositories\ShortRepository;
+use App\Repositories\SeriesRepository;
 use Illuminate\Support\Facades\Storage;
 use Yajra\DataTables\Facades\DataTables;
 
 class ShortService
 {
-    public function __construct(private ShortRepository $repo) {}
+    public function __construct(private SeriesRepository $repo) {}
 
     public function datatableIndex(Request $request)
     {
-        $q = $this->repo->getQuery();
+        $query = $this->repo->getQuery();
 
         if ($request->column_filters) {
-            foreach ($request->column_filters as $field => $values) {
-                $vals = array_values(array_filter((array)$values, fn($v) => !in_array($v, ['الكل','all','All'])));
-                if (!$vals) continue;
-
-                if ($field === 'is_featured') {
-                    $map = ['مميز' => 1, '1' => 1, 1 => 1, true => 1, 'غير مميز' => 0, '0' => 0, 0 => 0, false => 0];
-                    $q->whereIn('is_featured', array_map(fn($v) => $map[$v] ?? $v, $vals));
-                } else {
-                    $q->whereIn($field, $vals);
+            foreach ($request->column_filters as $fieldName => $values) {
+                if (!empty($values)) {
+                    $filteredValues = array_filter($values, fn($v)=>!in_array($v,['الكل','all','All']));
+                    if (!empty($filteredValues)) $query->whereIn($fieldName, $filteredValues);
                 }
             }
         }
 
-        return DataTables::of($q)
+        return DataTables::of($query)
             ->addIndexColumn()
-            ->addColumn('is_featured', fn($m) => $m->is_featured ? 'مميز' : 'غير مميز')
-            ->addColumn('status_label', fn($m) => $m->status === 'active' ? 'نشط' : 'غير نشط')
-            ->addColumn('edit', fn($m) => $m->id)
+            ->addColumn('edit', fn($m)=> $m->id)
             ->make(true);
     }
 
     public function getFilterOptions(Request $request, string $column)
     {
-        $q = $this->repo->getQuery();
+        $query = $this->repo->getQuery();
 
         if ($request->active_filters) {
-            foreach ($request->active_filters as $field => $values) {
-                if ($field === $column) continue;
-                $vals = array_values(array_filter((array)$values, fn($v) => !in_array($v, ['الكل','all','All'])));
-                if (!$vals) continue;
-
-                if ($field === 'is_featured') {
-                    $map = ['مميز' => 1, '1' => 1, 1 => 1, true => 1, 'غير مميز' => 0, '0' => 0, 0 => 0, false => 0];
-                    $q->whereIn('is_featured', array_map(fn($v) => $map[$v] ?? $v, $vals));
-                } else {
-                    $q->whereIn($field, $vals);
+            foreach ($request->active_filters as $fieldName => $values) {
+                if (!empty($values) && $fieldName !== $column) {
+                    $filteredValues = array_filter($values, fn($v)=>!in_array($v,['الكل','all','All']));
+                    if (!empty($filteredValues)) $query->whereIn($fieldName, $filteredValues);
                 }
             }
         }
 
-        if ($column === 'status')   return response()->json(['active' => 'نشط', 'inactive' => 'غير نشط']);
-        if ($column === 'is_featured') return response()->json(['مميز', 'غير مميز']);
+        $uniqueValues = $query->whereNotNull($column)
+            ->where($column,'!=','')->distinct()->pluck($column)->filter()->values()->toArray();
 
-        $unique = $q->whereNotNull($column)->where($column, '!=', '')
-            ->distinct()->pluck($column)->filter()->values()->toArray();
-
-        return response()->json($unique);
+        return response()->json($uniqueValues);
     }
-
-    public function getById(int $id) { return $this->repo->getById($id); }
 
     public function save(array $data)
     {
@@ -77,25 +62,38 @@ class ShortService
         try {
             $data['created_by'] = $data['created_by'] ?? optional(Auth::guard('admin')->user())->id;
 
+            // العلاقات المركبة
             $categoryIds = $data['category_ids'] ?? [];
-            $videoFiles  = $data['video_files']  ?? [];
-            unset($data['category_ids'], $data['video_files']);
+            $cast        = $data['cast'] ?? [];
+            unset($data['category_ids'], $data['cast']);
 
-            if (array_key_exists('poster_path_out', $data) && $data['poster_path_out'] !== null && $data['poster_path_out'] !== '') {
-                $data['poster_path'] = $data['poster_path_out'];
+            // الصور: نفضّل *_out إذا غير فارغين (نفس منطق الفيلم)
+            if (array_key_exists('poster_url_out', $data) && $data['poster_url_out'] !== null && $data['poster_url_out'] !== '') {
+                $data['poster_url'] = $data['poster_url_out'];
             } else {
-                $data['poster_path'] = $data['poster_path'] ?? null;
+                $data['poster_url'] = $data['poster_url'] ?? null;
             }
-            unset($data['poster_path_out']);
-            $data['video_path'] = '-';
 
-            $short = $this->repo->save($data);
+            if (array_key_exists('backdrop_url_out', $data) && $data['backdrop_url_out'] !== null && $data['backdrop_url_out'] !== '') {
+                $data['backdrop_url'] = $data['backdrop_url_out'];
+            } else {
+                $data['backdrop_url'] = $data['backdrop_url'] ?? null;
+            }
 
-            $this->syncCategories($short, $categoryIds);
-            $this->syncVideoFiles($short, $videoFiles);
+            unset($data['poster_url_out'], $data['backdrop_url_out']);
+
+            // slug
+            $data['slug'] = Str::slug($data['title_en'] ?? $data['title_ar']);
+
+            // إنشاء
+            $series = $this->repo->save($data);
+
+            // sync العلاقات
+            $this->syncCategories($series, $categoryIds ?? []);
+            $this->syncCast($series, $cast ?? []);
 
             DB::commit();
-            return $short;
+            return $series;
         } catch (\Throwable $e) {
             DB::rollBack();
             throw $e;
@@ -106,28 +104,40 @@ class ShortService
     {
         DB::beginTransaction();
         try {
-            $short = $this->repo->getById($id);
+            $series = $this->repo->getById($id);
 
+            // العلاقات
             $categoryIds = $data['category_ids'] ?? [];
-            $videoFiles  = $data['video_files']  ?? [];
-            unset($data['category_ids'], $data['video_files']);
+            $cast        = $data['cast'] ?? [];
+            unset($data['category_ids'], $data['cast']);
 
-            if (array_key_exists('poster_path_out', $data) && $data['poster_path_out'] !== null && $data['poster_path_out'] !== '') {
-                $data['poster_path'] = $data['poster_path_out'];
+            // الصور: نفضّل *_out إذا غير فارغين، وإلا نبقي القديمة
+            if (array_key_exists('poster_url_out', $data) && $data['poster_url_out'] !== null && $data['poster_url_out'] !== '') {
+                $data['poster_url'] = $data['poster_url_out'];
             } else {
-                $data['poster_path'] = $data['poster_path'] ?? $short->poster_path;
+                $data['poster_url'] = $data['poster_url'] ?? $series->poster_url;
             }
-            unset($data['poster_path_out']);
 
-            $data['video_path'] = '-';
+            if (array_key_exists('backdrop_url_out', $data) && $data['backdrop_url_out'] !== null && $data['backdrop_url_out'] !== '') {
+                $data['backdrop_url'] = $data['backdrop_url_out'];
+            } else {
+                $data['backdrop_url'] = $data['backdrop_url'] ?? $series->backdrop_url;
+            }
 
-            $short = $this->repo->update($data, $id);
+            unset($data['poster_url_out'], $data['backdrop_url_out']);
 
-            $this->syncCategories($short, $categoryIds);
-            $this->syncVideoFiles($short, $videoFiles, replace: true);
+            // slug
+            $data['slug'] = Str::slug($data['title_en'] ?? $data['title_ar']);
+
+            // تحديث
+            $series = $this->repo->update($data, $id);
+
+            // sync العلاقات
+            $this->syncCategories($series, $categoryIds ?? []);
+            $this->syncCast($series, $cast ?? []);
 
             DB::commit();
-            return $short;
+            return $series;
         } catch (\Throwable $e) {
             DB::rollBack();
             throw $e;
@@ -147,102 +157,26 @@ class ShortService
         }
     }
 
-    /* ===== Helpers ===== */
+    /** --- Helpers --- */
 
-    private function syncCategories(Short $short, array $categoryIds): void
+    private function syncCategories(Series $series, array $categoryIds): void
     {
-        $ids = array_filter(array_map('intval', $categoryIds)); // تنظيف
-        $short->categories()->sync($ids);
+        $ids = array_filter(array_map('intval', $categoryIds));
+        $series->categories()->sync($ids);
     }
 
-
-
-    private function syncVideoFiles(Short $short, array $files, bool $replace = false): void
+    private function syncCast(Series $series, array $castRows): void
     {
-
-        // if ($replace) {
-        //     $short->videoFiles()->delete();
-        // }
-
-        $payload = [];
-        $usedTypes = [];
-        $usedQualities = [];
-        foreach ($files as $f) {
-            $type       = $f['video_type'] ?? null;
-            $quality    = $f['quality']    ?? null;
-            $sourceType = $f['source_type'] ?? 'url';
-            if (!$type || !$quality) continue;
-
-            // التحقق من وجود file أو file_url أولاً
-            if ((!isset($f['file']) || empty($f['file'])) &&
-                (!isset($f['file_url']) || empty($f['file_url']))) {
-                continue;
-            }
-
-            // الآن نتحقق من التكرار (بعد التأكد من وجود بيانات صالحة)
-            if (in_array($type, $usedTypes) && in_array($quality, $usedQualities)) {
-                continue; // تجاهل المكرر
-            }
-
-            // إضافة للمصفوفات فقط إذا كان العنصر صالح للتخزين
-            $usedTypes[] = $type;
-            $usedQualities[] = $quality;
-
-            $fileUrl = isset($f['file_url']) ? $f['file_url'] : null;
-            $format  = $f['format']   ?? null;
-            $size    = null;
-            // لو رُفع ملف
-            if ($sourceType == 'file') {
-                if ($replace) {
-                    $short->videoFiles()->where('video_type', $type)->where('quality', $quality)->delete();
-                }
-                if (isset($f['file']) && $f['file'] instanceof \Illuminate\Http\UploadedFile) {
-                    $path    = $f['file']->store('video_files/shorts', 'public');
-                    $fileUrl = Storage::url($path);
-                    $format  = $format ?: strtolower($f['file']->getClientOriginalExtension());
-                    $size    = $f['file']->getSize();
-                } else {
-                    // ما في ملف جديد؟ استخدم الرابط القديم إن وُجد
-                    $fileUrl = $f['existing_url'] ?? null;
-                }
-            } else { // url
-                $fileUrl = $f['file_url'] ?? null;
-            }
-
-            // لو ما في لا ملف ولا رابط → تجاهل هذا الصف
-            if (!$fileUrl) {
-                continue;
-            }
-
-            $payload[] = [
-                'content_type'     => 'short',
-                'content_id'       => $short->id,
-                'video_type'       => $type,
-                'quality'          => $quality,
-                'format'           => $format,
-                'file_url'         => $fileUrl,
-                'file_size'        => $size,
-                'duration_seconds' => null,      // ممكن نحسبها لاحقاً بـ ffmpeg
-                'is_downloadable'  => false,
-                'is_active'        => true,
+        // مثل الفيلم بالضبط: شخص واحد = صف واحد (دور واحد) بسبب مفهرسة الـsync على person_id
+        $pivotData = [];
+        foreach ($castRows as $row) {
+            if (!isset($row['person_id'])) continue;
+            $pivotData[$row['person_id']] = [
+                'role_type'      => $row['role_type'] ?? 'actor',
+                'character_name' => $row['character_name'] ?? null,
+                'sort_order'     => $row['sort_order'] ?? 0,
             ];
-            if ($type == 'main') {
-                $short->video_path = $fileUrl;
-                $short->save();
-            }
         }
-        if(empty($files)){
-            $short->videoFiles()->delete();
-        }
-
-        if (!empty($payload)) {
-            $short->videoFiles()->createMany($payload); // morphMany يملأ content_type/id تلقائيًا
-        }
-    }
-
-
-    private function isExternalUrl(string $v): bool
-    {
-        return str_starts_with($v, 'http://') || str_starts_with($v, 'https://');
+        $series->people()->sync($pivotData);
     }
 }

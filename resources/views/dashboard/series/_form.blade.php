@@ -1,5 +1,6 @@
 <div class="row">
     @push('styles')
+       <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
         <link rel="stylesheet" href="{{ asset('css/custom/media.css') }}">
     @endpush
     <div class="col-md-12">
@@ -88,6 +89,106 @@
                 </div>
             </div>
         </div>
+
+
+{{-- … أعلى الفورم كالمعتاد … --}}
+
+{{-- 🆕 التصنيفات (category_series_pivot) --}}
+<div class="mb-3 border shadow card border-1">
+  <div class="pt-4 card-body">
+    <div class="row">
+      <div class="col-12">
+        <label class="form-label fw-bold">{{ __('admin.Movie Category') }}</label>
+
+        <div id="selected-categories" class="mb-2 d-none">
+            <div class="flex-wrap gap-2 d-flex"></div>
+            <hr class="mt-2 mb-3">
+        </div>
+
+        <input type="hidden" name="category_ids" value="">
+
+        <div id="category-badges" class="flex-wrap gap-2 d-flex">
+          @foreach($allCategories as $category)
+            <label class="px-3 py-1 mb-2 btn btn-outline-primary rounded-pill" data-id="{{ $category->id }}">
+              <input type="checkbox" class="d-none"
+                     name="category_ids[]" value="{{ $category->id }}"
+                     {{ in_array($category->id, old('category_ids', $series->categories->pluck('id')->toArray() ?? [])) ? 'checked' : '' }}>
+              {{ $category->name_ar }}
+            </label>
+          @endforeach
+        </div>
+
+        <span class="text-muted">{{ __('admin.select_at_least_one_category') }}</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+{{-- 🆕 الطاقم (series_cast) --}}
+<div class="mb-3 border shadow card border-1">
+  <div class="pt-4 card-body">
+    <div class="row">
+      <div class="col-12">
+        <div class="mb-2 d-flex justify-content-between align-items-center">
+          <label class="fw-semibold">{{ __('admin.Cast') }}</label>
+          <button type="button" id="add-cast-row" class="btn btn-dark btn-sm">+ {{ __('admin.Create') }}</button>
+        </div>
+
+        <div id="cast-selected" class="mb-2 d-none">
+          <div class="flex-wrap gap-2 d-flex"></div>
+          <hr class="mt-2 mb-3">
+        </div>
+
+        <div id="cast-rows" class="gap-3 d-grid">
+          @php
+            $oldCast = old(
+                'cast',
+                isset($series)
+                  ? $series->people->map(function($p){
+                        return [
+                            'person_id'     => $p->id,
+                            'person_name'   => $p->name_ar ?? $p->name_en,
+                            'role_type'     => $p->pivot->role_type,
+                            'character_name'=> $p->pivot->character_name,
+                            'sort_order'    => $p->pivot->sort_order,
+                        ];
+                    })->toArray()
+                  : []
+            );
+            $roleTypes = [
+                'actor'           => __('admin.actor'),
+                'director'        => __('admin.director'),
+                'writer'          => __('admin.writer'),
+                'producer'        => __('admin.producer'),
+                'cinematographer' => __('admin.cinematographer'),
+                'composer'        => __('admin.composer'),
+            ];
+          @endphp
+
+          @forelse($oldCast as $i => $row)
+            @include('dashboard.series.partials._cast_row', [
+                'i' => $i,
+                'row' => $row,
+                'allPeople' => $allPeople ?? collect(),
+                'roleTypes' => $roleTypes,
+            ])
+          @empty
+            @include('dashboard.series.partials._cast_row', [
+                'i' => 0,
+                'row' => [],
+                'allPeople' => $allPeople ?? collect(),
+                'roleTypes' => $roleTypes,
+            ])
+          @endforelse
+        </div>
+
+        
+
+      </div>
+    </div>
+  </div>
+</div>
+
 
         {{-- القسم الخامس: التصنيفات --}}
         <div class="mb-3 border shadow card border-1">
@@ -240,4 +341,19 @@
         const urlAssetPath = "{{ config('app.asset_url') }}";
     </script>
     <script src="{{ asset('js/custom/mediaPage.js') }}"></script>
+
+    <script>
+    // نفس المتغيّرات اللي بتستخدمها عند الأفلام
+  
+
+    let person_duplicate = "{{ __('admin.person_duplicate') }}";
+        const form_type = "{{ isset($btn_label)}}";
+        const urlPeopleSearch = "{{ route('dashboard.people.search') }}";
+       
+
+    // IMPORTANT: الراوت اللي حكيته أنت
+     const seriesCastRowPartial = "{{ route('dashboard.series.castRowPartial') }}";
+</script>
+ <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script src="{{ asset('js/custom/series.js') }}"></script>
 @endpush

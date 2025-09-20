@@ -44,8 +44,8 @@ class Person extends Model
     public function movies()
     {
         return $this->belongsToMany(Movie::class, 'movie_cast', 'person_id', 'movie_id')
-        ->withPivot(['role_type', 'character_name', 'sort_order'])
-        ->withTimestamps();
+            ->withPivot(['role_type', 'character_name', 'sort_order'])
+            ->withTimestamps();
     }
 
     public function seriesRoles()
@@ -53,9 +53,13 @@ class Person extends Model
         return $this->hasMany(SeriesCast::class);
     }
 
+
+
     public function series()
     {
-        return $this->belongsToMany(Series::class, 'series_cast')->withPivot('role_type', 'character_name', 'sort_order');
+        return $this->belongsToMany(Series::class, 'series_cast', 'person_id', 'series_id')
+            ->withPivot('role_type', 'character_name', 'sort_order')
+            ->withTimestamps();
     }
 
     // Accessors

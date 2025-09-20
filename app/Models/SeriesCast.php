@@ -10,7 +10,7 @@ class SeriesCast extends Model
     protected $table = 'series_cast';
 
     protected $fillable = [
-        'series_id', 'person_id', 'role_type', 'character_name', 'sort_order'
+        'series_id','person_id','role_type','character_name','sort_order'
     ];
 
     protected $casts = [
@@ -18,15 +18,17 @@ class SeriesCast extends Model
     ];
 
     // العلاقات
+    
     public function series()
-    {
+     { 
         return $this->belongsTo(Series::class);
-    }
+     }
+
 
     public function person()
-    {
-        return $this->belongsTo(Person::class);
-    }
+     { 
+        return $this->belongsTo(Person::class); 
+     }
 
     // Scopes
     public function scopeActors($query)

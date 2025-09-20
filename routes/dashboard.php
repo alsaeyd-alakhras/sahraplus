@@ -74,6 +74,9 @@ Route::group([
        
         Route::get('shorts/video-row-partial', [ShortController::class, 'videoRowPartial'])->name('shorts.videoRowPartial');
 
+        Route::get('series/castRowPartial', [SeriesController::class, 'castRowPartial'])
+        ->name('series.castRowPartial');
+
 
         /* ********************************************************** */
 
