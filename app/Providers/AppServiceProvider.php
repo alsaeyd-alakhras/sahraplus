@@ -63,6 +63,7 @@ class AppServiceProvider extends ServiceProvider
         Relation::enforceMorphMap([
             'movie' => Movie::class,
             'short' => Short::class,
+            'episode' => Episode::class,
         ]);
 
         // Observers

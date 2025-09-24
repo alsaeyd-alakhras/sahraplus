@@ -379,6 +379,7 @@
 <script>
   const episodeVideoRowPartial   = "{{ route('dashboard.episodes.videoRowPartial') }}";
   const episodeSubtitleRowPartial= "{{ route('dashboard.episodes.subtitleRowPartial') }}";
+                                              
 </script>
 <script src="{{ asset('js/custom/episodes.js') }}"></script>
 

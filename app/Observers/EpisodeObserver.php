@@ -2,12 +2,13 @@
 
 namespace App\Observers;
 
-use App\Models\Episod;
+
+use App\Models\Episode;
 use App\Services\ActivityLogService;
 
 class EpisodeObserver
 {
-    public function created(Episod $episod): void
+    public function created(Episode $episod): void
     {
         ActivityLogService::log(
             'Created',
@@ -21,7 +22,7 @@ class EpisodeObserver
     /**
      * Handle the Episod "updated" event.
      */
-    public function updated(Episod $episod): void
+    public function updated(Episode $episod): void
     {
         //
     }
@@ -29,7 +30,7 @@ class EpisodeObserver
     /**
      * Handle the Episod "deleted" event.
      */
-    public function deleted(Episod $episod): void
+    public function deleted(Episode $episod): void
     {
         ActivityLogService::log(
             'Deleted',
@@ -43,7 +44,7 @@ class EpisodeObserver
     /**
      * Handle the Episod "restored" event.
      */
-    public function restored(Episod $episod): void
+    public function restored(Episode $episod): void
     {
         //
     }
@@ -51,7 +52,7 @@ class EpisodeObserver
     /**
      * Handle the Episod "force deleted" event.
      */
-    public function forceDeleted(Episod $episod): void
+    public function forceDeleted(Episode $episod): void
     {
         //
     }

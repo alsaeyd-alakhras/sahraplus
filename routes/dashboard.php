@@ -78,7 +78,7 @@ Route::group([
         ->name('series.castRowPartial');
 
          Route::get('episodes/videoRowPartial', [EpisodeController::class, 'videoRowPartial'])->name('episodes.videoRowPartial');
-        Route::get('episodes/subtitleRowPartial', [EpisodeController::class, 'subtitleRowPartial'])->name('movies.subtitleRowPartial');
+        Route::get('episodes/subtitleRowPartial', [EpisodeController::class, 'subtitleRowPartial'])->name('episodes.subtitleRowPartial');
 
 
         /* ********************************************************** */
