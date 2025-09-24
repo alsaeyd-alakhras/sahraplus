@@ -145,6 +145,96 @@
             </div>
         </div>
 
+
+       <div class="mb-3 border shadow card border-1">
+            <div class="pt-4 card-body">
+                <div class="row">
+                    <div class="col-12">
+                        <div class="mb-2 d-flex justify-content-between align-items-center">
+                            <label class="fw-semibold">{{ __('admin.video_files') }}</label>
+                            <button type="button" id="add-video-row" class="btn btn-dark btn-sm">
+                                + {{ __('admin.add') }}
+                            </button>
+                        </div>
+
+                        <div id="video-rows" class="gap-3 d-grid">
+                            @php
+                                $oldVideos = old(
+                                    'video_files',
+                                    isset($episode)
+                                        ? $episode->videoFiles
+                                            ->map(function ($vf) {
+                                                return [
+                                                    'video_type' => $vf->video_type,
+                                                    'quality' => $vf->quality,
+                                                    'file_url' => $vf->file_url,
+                                                    'format' => $vf->format,
+                                                ];
+                                            })
+                                            ->toArray()
+                                        : [],
+                                );
+                            @endphp
+
+                            @if (empty($oldVideos) && !isset($btn_label))
+                                @include('dashboard.series.episodes.partials._video_row', ['i' => 0, 'row' => []])
+                            @else
+                                @foreach ($oldVideos as $i => $row)
+                                    @include('dashboard.series.episodes.partials._video_row', [
+                                        'i' => $i,
+                                        'row' => $row,
+                                    ])
+                                @endforeach
+                            @endif
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="mb-3 border shadow card border-1">
+            <div class="pt-4 card-body">
+                <div class="row">
+                    <div class="col-12">
+                        <div class="mb-2 d-flex justify-content-between align-items-center">
+                            <label class="fw-semibold">{{ __('admin.subtitles') }}</label>
+                            <button type="button" id="add-sub-row" class="btn btn-dark btn-sm">
+                                + {{ __('admin.add') }}
+                            </button>
+                        </div>
+
+                        <div id="sub-rows" class="gap-3 d-grid">
+                            @php
+                                $oldSubs = old(
+                                    'subtitles',
+                                    isset($episode)
+                                        ? $episode->subtitles->map
+                                            ->only(['language', 'label', 'url', 'is_default'])
+                                            ->toArray()
+                                        : [],
+                                );
+                            @endphp
+
+                            @if (empty($oldSubs) && !isset($btn_label))
+                                @include('dashboard.series.episodes.partials._subtitle_row', [
+                                    'i' => 0,
+                                    'row' => [],
+                                ])
+                            @else
+                                @foreach ($oldSubs as $i => $row)
+                                    @include('dashboard.series.episodes.partials._subtitle_row', [
+                                        'i' => $i,
+                                        'row' => $row,
+                                    ])
+                                @endforeach
+                            @endif
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+
         {{-- القسم السادس: الصور والروابط --}}
         <div class="mb-3 border shadow card border-1">
             <div class="pt-4 card-body">
@@ -284,4 +374,13 @@
             });
         });
     </script>
+
+  
+<script>
+  const episodeVideoRowPartial   = "{{ route('dashboard.episodes.videoRowPartial') }}";
+  const episodeSubtitleRowPartial= "{{ route('dashboard.episodes.subtitleRowPartial') }}";
+</script>
+<script src="{{ asset('js/custom/episodes.js') }}"></script>
+
+
 @endpush

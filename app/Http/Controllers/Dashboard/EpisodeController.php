@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\Dashboard;
 
+use App\Http\Requests\EpisodeRequest;
+use App\Services\EpisodeService;
 use App\Models\Episode;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
@@ -12,6 +14,9 @@ use Carbon\Carbon;
 
 class EpisodeController extends Controller
 {
+
+    public function __construct(private EpisodeService $episodeService) {}
+
     /**
      * Display a listing of the resource.
      */
@@ -35,34 +40,27 @@ class EpisodeController extends Controller
         if ($request->ajax()) {
             return response()->json($episode);
         }
-        return view('dashboard.series.episodes.create', compact( 'episode', 'season'));
+        return view('dashboard.series.episodes.create', compact('episode', 'season'));
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(EpisodeRequest $request)
     {
         $this->authorize('create', Series::class);
-        $request->validate([
-            'season_id' => 'required|integer|exists:seasons,id',
-            'episode_number' => 'required|integer',
-            'title_ar' => 'required|string|max:200',
-            'title_en' => 'required|string|max:200',
-            'description_ar' => 'nullable|string',
-            'description_en' => 'nullable|string',
-        ]);
-        $data = $request->all();
-        if($data['thumbnail_url_out'] != null){
-            $data['thumbnail_url'] = $data['thumbnail_url_out'];
-        }
-        $episode = Episode::create($data);
-        $episode->title = app()->getLocale() == 'ar' ? $episode->title_ar : $episode->title_en;
+
+        $episode = $this->episodeService->save($request->validated());
+
+        $episode->title       = app()->getLocale() == 'ar' ? $episode->title_ar : $episode->title_en;
         $episode->description = app()->getLocale() == 'ar' ? $episode->description_ar : $episode->description_en;
-        return $request->ajax() ?
-            response()->json($episode) :
-            redirect()->route('dashboard.seasons.show', $episode->season->id)->with('success', __('controller.Created_item_successfully'));
+
+        return $request->ajax()
+            ? response()->json($episode)
+            : redirect()->route('dashboard.seasons.show', $episode->season->id)
+            ->with('success', __('controller.Created_item_successfully'));
     }
+
 
     /**
      * Display the specified resource.
@@ -93,32 +91,21 @@ class EpisodeController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Episode $episode)
+    public function update(EpisodeRequest $request, Episode $episode)
     {
         $this->authorize('update', Series::class);
-        $request->validate([
-            'season_id' => 'required|integer|exists:seasons,id',
-            'episode_number' => 'required|integer',
-            'title_ar' => 'required|string|max:200',
-            'title_en' => 'required|string|max:200',
-            'description_ar' => 'nullable|string',
-            'description_en' => 'nullable|string',
-        ]);
-        $data = $request->all();
-        if($data['thumbnail_url_out'] != null){
-            $data['thumbnail_url'] = $data['thumbnail_url_out'];
-        }
-        if($data['thumbnail_url'] == null){
-            $data['thumbnail_url'] = $episode->thumbnail_url;
-        }
-        $episode->update($data);
-        $episode->title = app()->getLocale() == 'ar' ? $episode->title_ar : $episode->title_en;
+
+        $episode = $this->episodeService->update($request->validated(), $episode->id);
+
+        $episode->title       = app()->getLocale() == 'ar' ? $episode->title_ar : $episode->title_en;
         $episode->description = app()->getLocale() == 'ar' ? $episode->description_ar : $episode->description_en;
 
-        return $request->ajax() ?
-            response()->json($episode) :
-            redirect()->route('dashboard.seasons.show', $episode->season->id)->with('success', __('controller.Updated_item_successfully'));
+        return $request->ajax()
+            ? response()->json($episode)
+            : redirect()->route('dashboard.seasons.show', $episode->season->id)
+            ->with('success', __('controller.Updated_item_successfully'));
     }
+
 
     /**
      * Remove the specified resource from storage.
@@ -139,17 +126,32 @@ class EpisodeController extends Controller
         $episodeNumber = $request->episode_number;
         $id = $request->id;
         $season_id = $request->season_id;
-        if($id == null){
+        if ($id == null) {
             $episode = Episode::where('episode_number', $episodeNumber)->where('season_id', $season_id)->first();
-            if($episode){
+            if ($episode) {
                 return response()->json(['status' => false, 'message' => __('controller.Episod_number_exists')]);
             }
-        }else{
+        } else {
             $episode = Episode::where('episode_number', $episodeNumber)->where('season_id', $season_id)->where('id', '!=', $id)->first();
-            if($episode){
+            if ($episode) {
                 return response()->json(['status' => false, 'message' => __('controller.Episod_number_exists')]);
             }
         }
         return response()->json(['status' => true, 'message' => __('controller.Episod_number_available')]);
+    }
+
+
+    public function videoRowPartial(Request $request)
+    {
+        $i = (int) $request->get('i', 0);
+        $row = [];
+        return view('dashboard.series.episodes.partials._video_row', compact('i', 'row'));
+    }
+
+    public function subtitleRowPartial(Request $request)
+    {
+        $i = (int) $request->get('i', 0);
+        $row = [];
+        return view('dashboard.series.episodes.partials._subtitle_row', compact('i', 'row'));
     }
 }

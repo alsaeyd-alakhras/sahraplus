@@ -185,4 +185,19 @@ class SeriesController extends Controller
     ];
     return view('dashboard.series.partials._cast_row', compact('i','allPeople','roleTypes'));
 }
+
+ public function videoRowPartial(Request $request)
+    {
+        $i = (int) $request->get('i', 0);
+        $row = [];
+        return view('dashboard.series.episodes.partials._video_row', compact('i', 'row'));
+    }
+
+    public function subtitleRowPartial(Request $request)
+    {
+        $i = (int) $request->get('i', 0);
+        $row = [];
+        return view('dashboard.series.episodes.partials._subtitle_row', compact('i', 'row'));
+    }
+    
 }

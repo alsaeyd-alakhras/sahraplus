@@ -62,6 +62,19 @@ class Series extends Model
         );
     }
 
+    public function videoFiles()
+    {
+        return $this->morphMany(VideoFiles::class, 'content');
+    }
+
+    /** الترجمات (Morph) */
+    public function subtitles()
+    {
+        return $this->morphMany(Subtitle::class, 'content');
+    }
+
+    
+
     public function comments() { return $this->morphMany(Comment::class, 'commentable'); }
     public function creator() { return $this->belongsTo(Admin::class, 'created_by'); }
     public function watchlists() { return $this->morphMany(Watchlist::class, 'content'); }
