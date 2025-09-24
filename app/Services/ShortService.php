@@ -64,26 +64,16 @@ class ShortService
 
             // العلاقات المركبة
             $categoryIds = $data['category_ids'] ?? [];
-            $cast        = $data['cast'] ?? [];
-            unset($data['category_ids'], $data['cast']);
+            unset($data['category_ids']);
 
             // الصور: نفضّل *_out إذا غير فارغين (نفس منطق الفيلم)
-            if (array_key_exists('poster_url_out', $data) && $data['poster_url_out'] !== null && $data['poster_url_out'] !== '') {
-                $data['poster_url'] = $data['poster_url_out'];
+            if (array_key_exists('poster_path_out', $data) && $data['poster_path_out'] !== null && $data['poster_path_out'] !== '') {
+                $data['poster_path'] = $data['poster_path_out'];
             } else {
-                $data['poster_url'] = $data['poster_url'] ?? null;
+                $data['poster_path'] = $data['poster_path'] ?? null;
             }
 
-            if (array_key_exists('backdrop_url_out', $data) && $data['backdrop_url_out'] !== null && $data['backdrop_url_out'] !== '') {
-                $data['backdrop_url'] = $data['backdrop_url_out'];
-            } else {
-                $data['backdrop_url'] = $data['backdrop_url'] ?? null;
-            }
-
-            unset($data['poster_url_out'], $data['backdrop_url_out']);
-
-            // slug
-            $data['slug'] = Str::slug($data['title_en'] ?? $data['title_ar']);
+            unset($data['poster_path_out']);
 
             // إنشاء
             $series = $this->repo->save($data);

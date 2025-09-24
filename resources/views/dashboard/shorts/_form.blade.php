@@ -37,7 +37,7 @@
                     {{-- الوصف --}}
                     <div class="mb-4 col-md-6">
                         <label class="form-label">{{__('admin.description')}}</label>
-                        <textarea class="form-control" name="description" rows="3">{{ old('description', $short->description) }}</textarea>
+                        <textarea class="form-control" name="description" rows="2">{{ old('description', $short->description) }}</textarea>
                     </div>
                     <div class="mb-4 col-md-6">
 
@@ -68,7 +68,7 @@
                         </div>
                     </div>
                 </div>
-                {{-- 
+                {{--
                 @php
                     $video_out = old('video_path_out');
                     $video_local = old('video_path', $short->video_path);
@@ -83,11 +83,11 @@
                 <div class="mb-4 col-md-6">
                     <label class="form-label"> {{ __('admin.video_external') }}</label>
                     <input type="url" name="video_path_out" class="form-control" value="{{ $video_out }}">
-                    <input type="file" name="videoUpload" class="form-control mt-2" />
+                    <input type="file" name="videoUpload" class="mt-2 form-control" />
                     <input type="text" name="video_path" id="videoPathLocal" value="{{ $video_local ?? '' }}"
                         class="d-none form-control">
                     @if ($video_preview)
-                        <a href="{{ $video_preview }}" target="_blank" class="btn btn-sm btn-primary mt-2">{{__('admin.view')}}</a>
+                        <a href="{{ $video_preview }}" target="_blank" class="mt-2 btn btn-sm btn-primary">{{__('admin.view')}}</a>
                     @endif
                 </div> --}}
             </div>

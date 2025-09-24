@@ -1,7 +1,11 @@
 @include('layouts.partials.front.head', ['title' => "سهرة بلس - تسجيل الدخول" ?? Config::get('app.name'), 'lang' =>  app()->getLocale()])
 <style>
     body {
-        background: linear-gradient(135deg, #0c0c0c 0%, #1a1a2e 50%, #16213e 100%);
+        background: url("{{ asset('assets-site/images/login_banner.jpg') }}");
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        /* background: linear-gradient(135deg, #0c0c0c 0%, #1a1a2e 50%, #16213e 100%); */
         min-height: 100vh;
     }
 
