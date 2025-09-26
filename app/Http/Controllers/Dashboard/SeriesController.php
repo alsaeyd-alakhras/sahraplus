@@ -36,9 +36,9 @@ class SeriesController extends Controller
             'es' => 'Español'
         ];
         $this->statusOptions = [
-            'draft' => 'مسودة',
-            'published' => 'منشور',
-            'archived' => 'مؤرشف'
+            'draft' => __('admin.draft'),
+            'published' => __('admin.published'),
+            'archived' => __('admin.archived')
         ];
         $this->seriesStatusOptions = [
             'returning' => __('admin.ongoing_series'),
@@ -135,7 +135,7 @@ class SeriesController extends Controller
         $statusOptions = $this->statusOptions;
         $seriesStatusOptions = $this->seriesStatusOptions;
 
-        $series->load(['categories:id','people']); 
+        $series->load(['categories:id','people']);
 
        $allCategories = MovieCategory::select('id','name_ar','name_en')->orderBy('name_ar')->get();
        $allPeople     = Person::select('id','name_ar','name_en')->orderBy('name_ar')->get();
@@ -199,5 +199,5 @@ class SeriesController extends Controller
         $row = [];
         return view('dashboard.series.episodes.partials._subtitle_row', compact('i', 'row'));
     }
-    
+
 }

@@ -1,136 +1,140 @@
 <div class="row">
     @push('styles')
-    <link rel="stylesheet" href="{{ asset('css/custom/media.css') }}">
-    <style>
-        /* Tags Input Styles - متوافق مع Bootstrap */
-        .tags-container {
-            border: 1px solid #dee2e6;
-            border-radius: 0.375rem;
-            padding: 0.5rem;
-            min-height: 60px;
-            background: #fff;
-            cursor: text;
-            transition: all 0.15s ease-in-out;
-        }
+        <link rel="stylesheet" href="{{ asset('css/custom/media.css') }}">
+        <style>
+            /* Tags Input Styles - متوافق مع Bootstrap */
+            .tags-container {
+                border: 1px solid #dee2e6;
+                border-radius: 0.375rem;
+                padding: 0.5rem;
+                min-height: 60px;
+                background: #fff;
+                cursor: text;
+                transition: all 0.15s ease-in-out;
+            }
 
-        .tags-container:hover {
-            border-color: #adb5bd;
-        }
+            .tags-container:hover {
+                border-color: #adb5bd;
+            }
 
-        .tags-container.focused {
-            border-color: #86b7fe;
-            outline: 0;
-            box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
-        }
+            .tags-container.focused {
+                border-color: #86b7fe;
+                outline: 0;
+                box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+            }
 
-        .tags-wrapper {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.375rem;
-            margin-bottom: 0.5rem;
-        }
+            .tags-wrapper {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 0.375rem;
+                margin-bottom: 0.5rem;
+            }
 
-        .tag {
-            background: #0d6efd;
-            color: white;
-            padding: 0.25rem 0.75rem;
-            border-radius: 1rem;
-            font-size: 0.875rem;
-            display: flex;
-            align-items: center;
-            gap: 0.375rem;
-        }
+            .tag {
+                background: #0d6efd;
+                color: white;
+                padding: 0.25rem 0.75rem;
+                border-radius: 1rem;
+                font-size: 0.875rem;
+                display: flex;
+                align-items: center;
+                gap: 0.375rem;
+            }
 
-        .tag .remove {
-            cursor: pointer;
-            width: 1rem;
-            height: 1rem;
-            border-radius: 50%;
-            background: rgba(255,255,255,0.3);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.75rem;
-            line-height: 1;
-        }
+            .tag .remove {
+                cursor: pointer;
+                width: 1rem;
+                height: 1rem;
+                border-radius: 50%;
+                background: rgba(255, 255, 255, 0.3);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 0.75rem;
+                line-height: 1;
+            }
 
-        .tag .remove:hover {
-            background: rgba(255,255,255,0.5);
-        }
+            .tag .remove:hover {
+                background: rgba(255, 255, 255, 0.5);
+            }
 
-        .tag-input {
-            border: none;
-            outline: none;
-            background: transparent;
-            min-width: 120px;
-            padding: 0.25rem;
-            font-size: 0.875rem;
-        }
+            .tag-input {
+                border: none;
+                outline: none;
+                background: transparent;
+                min-width: 120px;
+                padding: 0.25rem;
+                font-size: 0.875rem;
+            }
 
-        .suggestions-list {
-            position: absolute;
-            top: 100%;
-            left: 0;
-            right: 0;
-            background: white;
-            border: 1px solid #dee2e6;
-            border-radius: 0.375rem;
-            max-height: 200px;
-            overflow-y: auto;
-            z-index: 1050;
-            box-shadow: 0 0.125rem 0.25rem rgba(0,0,0,0.075);
-            display: none;
-        }
+            .suggestions-list {
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                background: white;
+                border: 1px solid #dee2e6;
+                border-radius: 0.375rem;
+                max-height: 200px;
+                overflow-y: auto;
+                z-index: 1050;
+                box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+                display: none;
+            }
 
-        .suggestion-item {
-            padding: 0.75rem 1rem;
-            cursor: pointer;
-            border-bottom: 1px solid #f8f9fa;
-            font-size: 0.875rem;
-        }
+            .suggestion-item {
+                padding: 0.75rem 1rem;
+                cursor: pointer;
+                border-bottom: 1px solid #f8f9fa;
+                font-size: 0.875rem;
+            }
 
-        .suggestion-item:last-child {
-            border-bottom: none;
-        }
+            .suggestion-item:last-child {
+                border-bottom: none;
+            }
 
-        .suggestion-item:hover,
-        .suggestion-item.highlighted {
-            background: #f8f9fa;
-            color: #0d6efd;
-        }
+            .suggestion-item:hover,
+            .suggestion-item.highlighted {
+                background: #f8f9fa;
+                color: #0d6efd;
+            }
 
-        .suggestion-item .badge {
-            background: #e9ecef;
-            color: #6c757d;
-            padding: 0.125rem 0.5rem;
-            border-radius: 0.75rem;
-            font-size: 0.75rem;
-            margin-left: 0.5rem;
-        }
+            .suggestion-item .badge {
+                background: #e9ecef;
+                color: #6c757d;
+                padding: 0.125rem 0.5rem;
+                border-radius: 0.75rem;
+                font-size: 0.75rem;
+                margin-left: 0.5rem;
+            }
 
-        .placeholder {
-            color: #6c757d;
-            font-size: 0.875rem;
-            padding: 0.25rem;
-            pointer-events: none;
-        }
-    </style>
+            .placeholder {
+                color: #6c757d;
+                font-size: 0.875rem;
+                padding: 0.25rem;
+                pointer-events: none;
+            }
+        </style>
     @endpush
     <div class="col-md-12">
         <div class="mb-3 border shadow card border-1">
             <div class="pt-4 card-body">
                 <div class="row">
                     <div class="mb-4 col-md-6">
-                        <x-form.input label="الاسم (عربي)" :value="$person->name_ar" name="name_ar" placeholder="محمد..." required autofocus />
+                        <x-form.input label="{{ __('admin.Name_ar') }}" :value="$person->name_ar" name="name_ar"
+                            placeholder="محمد..." required autofocus />
                     </div>
                     <div class="mb-4 col-md-6">
-                        <x-form.input label="الاسم (إنجليزي)" :value="$person->name_en" name="name_en" placeholder="Mohammad" />
+                        <x-form.input label="{{ __('admin.Name_en') }}" :value="$person->name_en" name="name_en"
+                            placeholder="Mohammad" />
                     </div>
-                    <div class="mb-4 col-md-6">
-                        <x-form.textarea label="نبذة (عربي)" name="bio_ar" rows="2" :value="$person->bio_ar" placeholder="السيرة الذاتية بالعربية..." />
+                    <div class="col-md-6">
+                        <x-form.textarea label="{{ __('admin.Bio_ar') }}" name="bio_ar" rows="2"
+                            :value="$person->bio_ar" placeholder="السيرة الذاتية بالعربية..." />
                     </div>
-                    <div class="mb-4 col-md-6">
-                        <x-form.textarea label="نبذة (إنجليزي)" name="bio_en" rows="2" :value="$person->bio_en" placeholder="Biography in English..." />
+                    <div class="col-md-6">
+                        <x-form.textarea label="{{ __('admin.Bio_en') }}" name="bio_en" rows="2"
+                            :value="$person->bio_en" placeholder="Biography in English..." />
                     </div>
                 </div>
             </div>
@@ -139,24 +143,42 @@
         <div class="mb-3 border shadow card border-1">
             <div class="pt-4 card-body">
                 <div class="row">
-                    <div class="mb-4 col-md-3 col-sm-12">
-                        <x-form.input type="date" label="تاريخ الميلاد" :value="$person->birth_date?->format('Y-m-d')" name="birth_date" />
+                    <div class="mb-4 col-md-4 col-sm-12">
+                        <x-form.input type="date" label="{{ __('site.birth_date') }}" :value="$person->birth_date?->format('Y-m-d')"
+                            name="birth_date" />
                     </div>
-                    <div class="mb-4 col-md-3 col-sm-12">
-                        <x-form.input label="مكان الولادة" :value="$person->birth_place" name="birth_place" />
+                    <div class="mb-4 col-md-4 col-sm-12">
+                        <x-form.input label="{{ __('admin.birth_place') }}" :value="$person->birth_place" name="birth_place" />
                     </div>
-                    <div class="mb-4 col-md-3 col-sm-12">
-                        <x-form.input label="الجنسية" :value="$person->nationality" name="nationality" />
+                    <div class="mb-4 col-md-4 col-sm-12">
+                        <x-form.input label="{{ __('admin.nationality') }}" :value="$person->nationality" name="nationality" />
                     </div>
-                    <div class="mb-4 col-md-3 col-sm-12">
+                    <div class="mb-4 col-md-4 col-sm-12">
                         @php
                             $curGender = $person->gender ?? 'male';
                             $genderOptions = [
                                 'male' => 'ذكر',
-                                'female' => 'أنثى'
-                            ]
+                                'female' => 'أنثى',
+                            ];
                         @endphp
-                        <x-form.selectkey label="الجنس" name="gender" required :selected="$curGender" :options="$genderOptions" />
+                        <x-form.selectkey label="{{ __('admin.gender') }}" name="gender" required :selected="$curGender"
+                            :options="$genderOptions" />
+                    </div>
+
+                    <div class="mb-4 col-md-4">
+                        <x-form.input type="number" min="0" label="TMDB ID" :value="$person->tmdb_id" name="tmdb_id"
+                            placeholder="مثال: 550" />
+                    </div>
+
+                    {{-- ✅ حالة النشاط --}}
+                    <div class="mb-4 col-md-4">
+                        <label class="form-label d-block">{{ __('admin.Status') }}</label>
+                        <div class="form-check form-switch">
+                            <input type="hidden" name="is_active" value="0">
+                            <input class="form-check-input" type="checkbox" id="is_active" name="is_active"
+                                value="1" @checked($person->is_active)>
+                            <label class="form-check-label" for="is_active">{{ __('admin.active') }}</label>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -165,63 +187,47 @@
             <div class="pt-4 card-body">
                 <div class="row">
 
-                    <div class="mb-4 col-md-12">
-                        <label class="form-label">مشهور بـ</label>
+                    <div class="mb-4 col-md-6">
+                        <label class="form-label">{{ __('admin.known_for') }}</label>
                         <div class="position-relative">
                             <div class="tags-container" id="known_for_container">
                                 <div class="tags-wrapper" id="known_for_wrapper"></div>
-                                <input type="text" class="tag-input" id="known_for_input" placeholder="ابحث أو أضف مهنة جديدة...">
+                                <input type="text" class="tag-input" id="known_for_input"
+                                    placeholder="ابحث أو أضف مهنة جديدة...">
                                 <div class="placeholder" id="known_for_placeholder">ابحث أو أضف مهنة جديدة...</div>
                             </div>
                             <div class="suggestions-list" id="known_for_suggestions"></div>
                         </div>
                         <input type="hidden" name="known_for" id="known_for"
-                               value="{{ is_array($person->known_for) ? implode(',', $person->known_for) : $person->known_for ?? '' }}">
+                            value="{{ is_array($person->known_for) ? implode(',', $person->known_for) : $person->known_for ?? '' }}">
                     </div>
 
                     <div class="mb-4 col-md-6">
-                        <x-form.input type="url" label="رابط الصورة" :value="$person->photo_url" name="photo_url_out"
-                            placeholder="أو اختر من الوسائط" />
-                        <input type="text" id="imageInput" name="photo_url" value="{{ $person->photo_url }}" class="d-none form-control">
+                        @php
+                            $photo_url = Str::startsWith($person->photo_url, ['http', 'https']);
+                            $photo_url_out = $photo_url ? $person->photo_url : null;
+                        @endphp
+                        <x-form.input type="url" label="{{ __('admin.photo_url') }}" :value="$photo_url_out"
+                            name="photo_url_out" placeholder="{{ __('admin.photo_url_placeholder') }}" />
+                        <input type="text" id="imageInput" name="photo_url" value="{{ $person->photo_url }}"
+                            class="d-none form-control">
                         <div class="d-flex justify-content-between align-items-center">
-                            <button type="button"
-                                data-bs-toggle="modal"
-                                data-bs-target="#mediaModal"
-                                data-clear-btn="#clearImageBtn1"
-                                data-img="#poster_img"
-                                data-mode="single"
-                                data-input="#imageInput"
-                                class="mt-3 btn btn-primary openMediaModal">
-                                اختر من الوسائط
+                            <button type="button" data-bs-toggle="modal" data-bs-target="#mediaModal"
+                                data-clear-btn="#clearImageBtn1" data-img="#poster_img" data-mode="single"
+                                data-input="#imageInput" class="mt-3 btn btn-primary openMediaModal">
+                                {{ __('admin.choose_from_media') }}
                             </button>
-                            <button type="button" class="clear-btn mt-3 btn btn-danger {{ !empty($person->photo_url) ? '' : 'd-none' }}"
-                                id="clearImageBtn1"
-                                data-img="#poster_img"
-                                data-input="#imageInput"
-                                >
+                            <button type="button"
+                                class="clear-btn mt-3 btn btn-danger {{ !empty($person->photo_url) ? '' : 'd-none' }}"
+                                id="clearImageBtn1" data-img="#poster_img" data-input="#imageInput">
                                 <i class="fas fa-trash"></i>
                             </button>
                         </div>
                         <div class="mt-2">
-                            <img src="{{ $person->photo_full_url }}"
-                                alt="poster" id="poster_img" class="{{ !empty($person->photo_url) ? '' : 'd-none' }}" style="max-height:100px">
+                            <img src="{{ $person->photo_full_url }}" alt="poster" id="poster_img"
+                                class="{{ !empty($person->photo_url) ? '' : 'd-none' }}" style="max-height:100px">
                         </div>
 
-                    </div>
-
-                    <div class="mb-4 col-md-6">
-                        <x-form.input type="number" min="0" label="TMDB ID" :value="$person->tmdb_id" name="tmdb_id" placeholder="مثال: 550" />
-                    </div>
-
-                    {{-- ✅ حالة النشاط --}}
-                    <div class="mb-4 col-md-6">
-                        <label class="form-label d-block">الحالة</label>
-                        <div class="form-check form-switch">
-                            <input type="hidden" name="is_active" value="0">
-                            <input class="form-check-input" type="checkbox" id="is_active" name="is_active" value="1"
-                                @checked($person->is_active)>
-                            <label class="form-check-label" for="is_active">نشط</label>
-                        </div>
                     </div>
                 </div>
             </div>
@@ -229,7 +235,7 @@
 
         <div class="d-flex justify-content-end">
             <button type="submit" class="btn btn-primary">
-                {{ $btn_label ?? 'أضف' }}
+                {{ $btn_label ?? __('admin.Save') }}
             </button>
         </div>
     </div>
@@ -239,7 +245,7 @@
     <div class="modal-dialog modal-lg modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="mb-6 text-2xl font-bold modal-title">📁 مكتبة الوسائط</h5>
+                <h5 class="mb-6 text-2xl font-bold modal-title">📁 {{ __('admin.media_library') }}</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" id="closeMediaModal">
                     <i class="fas fa-times"></i>
                 </button>
@@ -248,14 +254,15 @@
                 <form id="uploadForm" enctype="multipart/form-data" class="mb-3">
                     <input type="hidden" name="_token" value="{{ csrf_token() }}">
                     <input type="file" name="image" id="imageInputMedia" class="mb-2 form-control">
-                    <button type="button" id="uploadFormBtn" class="btn btn-primary">رفع صورة</button>
+                    <button type="button" id="uploadFormBtn"
+                        class="btn btn-primary">{{ __('admin.upload_image') }}</button>
                 </form>
                 <div id="mediaGrid" class="masonry">
                     {{-- الصور ستُملأ تلقائيًا عبر jQuery --}}
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-primary" id="selectMediaBtn">اختيار</button>
+                <button type="button" class="btn btn-primary" id="selectMediaBtn">{{ __('admin.select') }}</button>
             </div>
         </div>
     </div>
@@ -265,22 +272,24 @@
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">تأكيد الحذف</h5>
+                <h5 class="modal-title">{{ __('admin.confirm_delete') }}</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" id="closeDeleteModal">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
             <div class="modal-body">
-                هل أنت متأكد من حذف هذه الصورة؟
+                {{ __('admin.confirm_delete_message') }}
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
-                    id="closeDeleteModal">إلغاء</button>
-                <button type="button" class="btn btn-danger" id="confirmDeleteBtn">نعم، حذف</button>
+                    id="closeDeleteModal">{{ __('admin.cancel') }}</button>
+                <button type="button" class="btn btn-danger"
+                    id="confirmDeleteBtn">{{ __('admin.delete') }}</button>
             </div>
         </div>
     </div>
 </div>
+
 
 @push('scripts')
     <script>
@@ -442,7 +451,9 @@
             function updateSelectedValues() {
                 const $display = $('#selectedValues');
                 if (selectedTags.length > 0) {
-                    $display.html(`<strong>المهن المحددة:</strong> ${selectedTags.join(' | ')}<br><strong>القيمة النهائية:</strong> ${selectedTags.join(',')}`);
+                    $display.html(
+                        `<strong>المهن المحددة:</strong> ${selectedTags.join(' | ')}<br><strong>القيمة النهائية:</strong> ${selectedTags.join(',')}`
+                        );
                 } else {
                     $display.text('لم يتم تحديد أي قيم بعد');
                 }
@@ -528,7 +539,10 @@
                 window['removeTag_known_for'] = function(index) {
                     // نحتاج نوصل للمتغيرات داخل النطاق
                     const event = new CustomEvent('removeTag', {
-                        detail: { fieldId: 'known_for', index: index }
+                        detail: {
+                            fieldId: 'known_for',
+                            index: index
+                        }
                     });
                     document.dispatchEvent(event);
                 };
@@ -545,7 +559,9 @@
             const $display = $('#selectedValues');
             const selectedTags = $('#known_for').val().split(',').filter(tag => tag.trim());
             if (selectedTags.length > 0 && selectedTags[0] !== '') {
-                $display.html(`<strong>المهن المحددة:</strong> ${selectedTags.join(' | ')}<br><strong>القيمة النهائية:</strong> ${selectedTags.join(',')}`);
+                $display.html(
+                    `<strong>المهن المحددة:</strong> ${selectedTags.join(' | ')}<br><strong>القيمة النهائية:</strong> ${selectedTags.join(',')}`
+                    );
             } else {
                 $display.text('لم يتم تحديد أي قيم بعد');
             }

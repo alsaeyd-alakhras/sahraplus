@@ -51,14 +51,20 @@
 
     @php
         $fields = [
-            'name_ar'  => 'الاسم بالعربي',
-            'name_en'  => 'الاسم بالإنجليزي',
-            'is_active'=> 'الحالة',
+            'name_ar'  => __('admin.Name_ar'),
+            'name_en'  => __('admin.Name_en'),
+            'birth_date' => __('site.birth_date'),
+            'birth_place' => __('admin.birth_place'),
+            'known_for' => __('admin.known_for'),
+            'is_active'=> __('admin.is_active'),
         ];
     @endphp
 
     <div class="shadow-lg enhanced-card">
-        <div class="table-header-title"><i class="icon ph ph-user me-2"></i> جدول الأشخاص</div>
+        <div class="table-header-title">
+            <i class="icon ph ph-user me-2"></i>
+            {{ __('admin.People') }}
+        </div>
         <div class="enhanced-card-body">
             <div class="col-12" style="padding:0;">
                 <div class="table-container">
@@ -126,12 +132,15 @@
             const abilityEdit   = "{{ Auth::guard('admin')->user()->can('update', 'App\\Models\\Person') }}";
             const abilityDelete = "{{ Auth::guard('admin')->user()->can('delete', 'App\\Models\\Person') }}";
 
-            const fields = ['#','name_ar','name_en','is_active'];
+            const fields = ['#','name_ar','name_en','birth_date','birth_place','known_for','is_active'];
 
             const columnsTable = [
                 { data: 'DT_RowIndex', name: 'DT_RowIndex', orderable:false, class:'text-center' },
-                { data: 'name_ar', name: 'name_ar', orderable:false, render: (d)=> d ?? '' },
-                { data: 'name_en', name: 'name_en', orderable:false, render: (d)=> d ?? '' },
+                { data: 'name_ar', name: 'name_ar', orderable:false},
+                { data: 'name_en', name: 'name_en', orderable:false},
+                { data: 'birth_date', name: 'birth_date', orderable:false},
+                { data: 'birth_place', name: 'birth_place', orderable:false},
+                { data: 'known_for', name: 'known_for', orderable:false},
                 { data: 'is_active', name: 'is_active', orderable:false, render: function (data) {
                     const active = (data === 'نشط');
                     return `<span class="badge ${active ? 'bg-success' : 'bg-secondary'}">${active ? 'نشط' : 'غير نشط'}</span>`;

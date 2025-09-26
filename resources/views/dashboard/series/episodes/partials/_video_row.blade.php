@@ -15,7 +15,7 @@
             <label class="form-label small fw-bold">{{ __('admin.source') }}</label>
             <input type="hidden" class="source-type" name="video_files[{{ $i }}][source_type]" value="{{ $source }}">
 
-            <div class="d-flex gap-3 mb-2">
+            <div class="gap-3 mb-2 d-flex">
                 <div class="form-check form-check-inline">
                     <input class="form-check-input source-toggle" type="radio"
                         name="video_files[{{ $i }}][source_type]" value="file"
@@ -42,7 +42,7 @@
                 name="video_files[{{ $i }}][file]"
                 accept="video/mp4,video/webm,video/quicktime,video/x-matroska">
             @if ($source == 'file' && $url)
-                <a href="{{ $url }}" class="btn btn-primary mt-2" target="_blank">{{ __('admin.open_file') }}</a>
+                <a href="{{ $url }}" class="mt-2 btn btn-primary" target="_blank">{{ __('admin.open_file') }}</a>
             @endif
 
             {{-- مهم جداً: لو ملف محلي موجود مسبقًا وما رفع جديد، نرجع نستخدمه --}}
@@ -55,7 +55,7 @@
         </div>
 
         {{-- نوع الفيديو --}}
-        <div class="col-md-3">
+        {{-- <div class="col-md-3">
             <label class="form-label small fw-bold">{{ __('admin.video_type') }}</label>
             <select name="video_files[{{ $i }}][video_type]" class="form-select video-type">
                 <option value="main" {{ $type == 'main' ? 'selected' : '' }}>
@@ -64,14 +64,10 @@
                 <option value="trailer" {{ $type == 'trailer' ? 'selected' : '' }}>
                     {{ __('admin.video_type_trailer') }}
                 </option>
-                {{-- <option value="teaser" {{ $type == 'teaser' ? 'selected' : '' }}>
-                    {{ __('admin.video_type_teaser') }}
-                </option>
-                <option value="clip" {{ $type == 'clip' ? 'selected' : '' }}>
-                    {{ __('admin.video_type_clip') }}
-                </option> --}}
             </select>
-        </div>
+        </div> --}}
+        <input type="hidden" class="video-type" name="video_files[{{ $i }}][video_type]" value="main">
+
 
         {{-- الجودة (لازم تكون فريدة) --}}
         <div class="col-md-3">

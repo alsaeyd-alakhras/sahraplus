@@ -71,6 +71,13 @@ class MovieCategoryService
         try {
             $nameForSlug = $data['name_en'] ?: $data['name_ar'];
             $data['slug'] = $data['slug'] ?: $this->uniqueSlug($nameForSlug);
+
+            if (array_key_exists('image_url_out', $data) && $data['image_url_out'] !== null && $data['image_url_out'] !== '') {
+                $data['image_url'] = $data['image_url_out'];
+            } else {
+                $data['image_url'] = $data['image_url'] ?? null;
+            }
+
             $cat = $this->repo->save($data);
             DB::commit();
             return $cat;
@@ -84,10 +91,16 @@ class MovieCategoryService
     {
         DB::beginTransaction();
         try {
-            if (empty($data['slug'])) {
-                $nameForSlug = $data['name_en'] ?? $data['name_ar'] ?? '';
-                if ($nameForSlug) $data['slug'] = $this->uniqueSlug($nameForSlug);
+
+            $nameForSlug = $data['name_en'] ?? $data['name_ar'] ?? '';
+            if ($nameForSlug) $data['slug'] = $this->uniqueSlug($nameForSlug);
+
+            if (array_key_exists('image_url_out', $data) && $data['image_url_out'] !== null && $data['image_url_out'] !== '') {
+                $data['image_url'] = $data['image_url_out'];
+            } else {
+                $data['image_url'] = $data['image_url'] ?? null;
             }
+
             $cat = $this->repo->update($data,$id);
             DB::commit();
             return $cat;

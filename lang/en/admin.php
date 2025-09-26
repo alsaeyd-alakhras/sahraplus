@@ -231,7 +231,7 @@ return [
     'series_details' => 'Series Details',
     'series_statistics' => 'Series Statistics',
     // 'series'
-    'series_table_title' => 'Series Table Title',
+    'series_table_title' => 'Series Table',
     'title_ar'       => 'Title (Arabic)',
     'title_ar_placeholder' => 'Enter series title in Arabic',
     'title_en'       => 'Title (English)',
@@ -251,7 +251,6 @@ return [
     'country'        => 'Country',
     'series_status'  => 'Series Status',
     'is_featured'    => 'Featured',
-    'is_featured_label' => 'Featured Label',
     'view_count'     => 'Views',
     'tmdb_id'        => 'TMDB ID',
     'created_by'     => 'Created By',
@@ -262,7 +261,7 @@ return [
     'add_season'     => 'Add Season',
     'edit_season'    => 'Edit Season',
     'season_number'  => 'Season Number',
-    'poster_img_choose'     => 'Poster Image Choose',
+    'choose_from_media'     => 'Choose from media',
     'air_date'       => 'Air Date',
     'episode_count'  => 'Episode Count',
     'draft'          => 'Draft',
@@ -364,8 +363,22 @@ return [
     'is_featured'       => 'is featured',
     'Title'       => 'Title',
     'Short'       => 'Short',
-    
+
 
 
     // جديد
+    'img_choose_form_media'=> 'Img choose form Media',
+    'poster_url'=> 'Poster Url',
+    'poster_url_placeholder'=> 'Poster Url Placeholder',
+    'backdrop_url'=> 'Backdrop Url',
+    'backdrop_url_placeholder'=> 'Backdrop Url Placeholder',
+    'photo_url'=> 'Photo Url',
+    'photo_url_placeholder'=> 'Photo Url Placeholder',
+    'movies_table'=> 'Movies Table',
+    'known_for'=> 'Known For',
+    'Bio_ar'=> 'Bio_ar',
+    'Bio_en'=> 'Bio_en',
+    'birth_place'=> 'Birth Place',
+    'nationality'=> 'Nationality',
+    'gender'=> 'Gender',
 ];

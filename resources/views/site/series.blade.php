@@ -117,8 +117,8 @@
                         },
                         success: function(response) {
                             if (response.success && response.sections.length > 0) {
-                                response.sections.forEach(function(section) {
-                                    renderSection(section);
+                                response.sections.forEach(function(section,indexSection) {
+                                    renderSection(section,indexSection);
                                     loadedSections.push(section.name);
                                 });
                             }
@@ -152,8 +152,8 @@
                         },
                         success: function(response) {
                             if (response.success && response.sections.length > 0) {
-                                response.sections.forEach(function(section) {
-                                    renderSection(section);
+                                response.sections.forEach(function(section,indexSection) {
+                                    renderSection(section,indexSection);
                                     loadedSections.push(section.name);
                                 });
                             }
@@ -172,25 +172,25 @@
                 /**
                  * رسم قسم الأفلام
                  */
-                function renderSection(section) {
-                    if (section.movies.length === 0) return;
+                function renderSection(section,indexSection) {
+                    if (section.series.length === 0) return;
 
                     $.ajax({
                         url: "{{ route('site.series.get-html-section') }}",
                         method: 'GET',
                         data: {
                             title_section: section.title,
-                            items: section.movies,
-                            display_type: section.display_type
+                            items: section.series,
+                            display_type: section.display_type,
+                            index_section: indexSection
                         },
                         success: function(response) {
                             $('#movie-sections-container').append(response);
                             initializeSwiper();
-                            console.log(response);
                         },
                         error: function(xhr, status, error) {
                             console.error('خطأ في تحميل المزيد:', error);
-                            toast.error('حدث خطأ أثناء تحميل الأفلام');
+                            toastr.error('حدث خطأ أثناء تحميل الأفلام');
                             $('#load-more-indicator').hide();
                             isLoading = false;
                         }

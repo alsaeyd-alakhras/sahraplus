@@ -54,16 +54,20 @@
     @php
         // عدلنا الحقول المعروضة: الحالة بدل is_active
         $fields = [
-            'title_ar'   =>  __('admin.Title_ar'),
-            'title_en'   => __('admin.Title_en'),
+            'title_ar'   =>  __('admin.title_ar'),
+            'title_en'   => __('admin.title_en'),
+            'duration_minutes' => __('admin.duration_minutes'),
+            'imdb_rating' => __('admin.imdb_rating'),
+            'view_count' => __('admin.view_count'),
+            'language' => __('admin.language'),
             'status'     => __('admin.Status'),
         ];
     @endphp
 
     <div class="shadow-lg enhanced-card">
         <div class="table-header-title">
-            <i class="icon ph ph-movies me-2"></i>
-            جدول الأفلام
+            <i class="icon ph ph-film-strip me-2"></i>
+            {{ __('admin.movies_table') }}
         </div>
         <div class="enhanced-card-body">
             <div class="col-12" style="padding: 0;">
@@ -124,8 +128,8 @@
                 <p class="delete-sub-text"> {{ __('admin.You will not be able to revert this!') }}</p>
             </div>
             <div class="modal-footer justify-content-center">
-                <button type="button" class="btn btn-cancel" data-bs-dismiss="modal"><i class="fas fa-times me-2"></i>إلغاء</button>
-                <button type="button" class="text-white btn btn-confirm-delete" id="confirmDeleteBtn"><i class="fas fa-trash me-2"></i>حذف نهائي</button>
+                <button type="button" class="btn btn-cancel" data-bs-dismiss="modal"><i class="fas fa-times me-2"></i>Cancel</button>
+                <button type="button" class="text-white btn btn-confirm-delete" id="confirmDeleteBtn"><i class="fas fa-trash me-2"></i>Delete</button>
             </div>
         </div></div>
     </div>
@@ -168,6 +172,10 @@
                 '#',
                 'title_ar',
                 'title_en',
+                'duration_minutes',
+                'imdb_rating',
+                'view_count',
+                'language',
                 'status', // ← بدل is_active
             ];
 
@@ -182,17 +190,26 @@
                 { data: 'title_en', name: 'title_en', orderable: false, render: function (data) {
                     return data ?? '';
                 }},
+                { data: 'duration_minutes', name: 'duration_minutes', orderable: false, class: 'text-center'},
+                { data: 'imdb_rating', name: 'imdb_rating', orderable: false, class: 'text-center'},
+                { data: 'view_count', name: 'view_count', orderable: false, class: 'text-center'},
+                { data: 'language', name: 'language', orderable: false, class: 'text-center'},
 
                 // الحالة (badge)
-                { data: 'status_label', name: 'status', orderable: false, render: function (label, type, row) {
+                { data: 'status', name: 'status', orderable: false, render: function (label, type, row) {
                     // label قيمتها: مسودة/منشور/مؤرشف - صادرة من السيرفس
                     const map = {
-                        'منشور':  'bg-success',
-                        'مؤرشف':  'bg-secondary',
-                        'مسودة':  'bg-warning'
+                        'published':  'bg-success',
+                        'archived':  'bg-secondary',
+                        'draft':  'bg-warning'
                     };
+                    const labels = {
+                        'draft' : "{{ __('admin.draft') }}",
+                        'published' : "{{ __('admin.published') }}",
+                        'archived' : "{{ __('admin.archived') }}"
+                    }
                     const cls = map[label] ?? 'bg-light text-dark';
-                    return `<span class="badge ${cls}">${label ?? ''}</span>`;
+                    return `<span class="badge ${cls}">${labels[label] ?? ''}</span>`;
                 }},
                 // العمليات
                 { data: 'edit', name: 'edit', orderable: false, searchable: false, render: function (data, type, row) {

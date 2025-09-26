@@ -56,6 +56,10 @@
         $fields = [
             'title_ar'   => __('admin.title_ar'),
             'title_en'   => __('admin.title_en'),
+            'imdb_rating'   => __('admin.imdb_rating'),
+            'seasons_count'   => __('admin.seasons_count'),
+            'episodes_count'   => __('admin.episodes_count'),
+            'view_count'   => __('admin.view_count'),
             'status'     => __('admin.status'),
         ];
     @endphp
@@ -168,7 +172,11 @@
                 '#',
                 'title_ar',
                 'title_en',
-                'status', // ← بدل is_active
+                'imdb_rating',
+                'seasons_count',
+                'episodes_count',
+                'view_count',
+                'status',
             ];
 
             // أعمدة الداتا تيبل: نستخدم status_label الراجعة من السيرفس
@@ -182,17 +190,32 @@
                 { data: 'title_en', name: 'title_en', orderable: false, render: function (data) {
                     return data ?? '';
                 }},
+                { data: 'imdb_rating', name: 'imdb_rating', orderable: false, class: 'text-center', render: function (data) {
+                    return data ?? '';
+                }},
+                { data: 'seasons_count', name: 'seasons_count', orderable: false, class: 'text-center', render: function (data) {
+                    return data ?? '';
+                }},
+                { data: 'episodes_count', name: 'episodes_count', orderable: false, class: 'text-center', render: function (data) {
+                    return data ?? '';
+                }},
+                { data: 'view_count', name: 'view_count', orderable: false, class: 'text-center', render: function (data) { return data ?? '';}},
 
                 // الحالة (badge)
-                { data: 'status_label', name: 'status', orderable: false, render: function (label, type, row) {
+                { data: 'status', name: 'status', orderable: false, render: function (label, type, row) {
                     // label قيمتها: مسودة/منشور/مؤرشف - صادرة من السيرفس
                     const map = {
-                        'منشور':  'bg-success',
-                        'مؤرشف':  'bg-secondary',
-                        'مسودة':  'bg-warning'
+                        'published':  'bg-success',
+                        'archived':  'bg-secondary',
+                        'draft':  'bg-warning'
                     };
+                    const labels = {
+                        'draft' : "{{ __('admin.draft') }}",
+                        'published' : "{{ __('admin.published') }}",
+                        'archived' : "{{ __('admin.archived') }}"
+                    }
                     const cls = map[label] ?? 'bg-light text-dark';
-                    return `<span class="badge ${cls}">${label ?? ''}</span>`;
+                    return `<span class="badge ${cls}">${labels[label] ?? ''}</span>`;
                 }},
 
                 // العمليات

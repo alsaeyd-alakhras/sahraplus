@@ -117,8 +117,8 @@
                         },
                         success: function(response) {
                             if (response.success && response.sections.length > 0) {
-                                response.sections.forEach(function(section) {
-                                    renderSection(section);
+                                response.sections.forEach(function(section,indexSection) {
+                                    renderSection(section,indexSection);
                                     loadedSections.push(section.name);
                                 });
                             }
@@ -152,8 +152,8 @@
                         },
                         success: function(response) {
                             if (response.success && response.sections.length > 0) {
-                                response.sections.forEach(function(section) {
-                                    renderSection(section);
+                                response.sections.forEach(function(section,indexSection) {
+                                    renderSection(section,indexSection);
                                     loadedSections.push(section.name);
                                 });
                             }
@@ -172,7 +172,7 @@
                 /**
                  * رسم قسم الأفلام
                  */
-                function renderSection(section) {
+                function renderSection(section,indexSection) {
                     if (section.movies.length === 0) return;
 
                     $.ajax({
@@ -181,7 +181,8 @@
                         data: {
                             title_section: section.title,
                             items: section.movies,
-                            display_type: section.display_type
+                            display_type: section.display_type,
+                            index_section: indexSection
                         },
                         success: function(response) {
                             $('#movie-sections-container').append(response);

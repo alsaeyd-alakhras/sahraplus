@@ -6,8 +6,7 @@
     <h2 class="mb-4 text-2xl font-bold text-right">{{$title_section}}</h2>
 
     <!-- سلايدر Swiper -->
-    <div
-    style="z-index: {{1000 - $index_section}}"
+    <div style="z-index: {{1000 - $index_section}}"
     class="overflow-visible relative pb-44 swiper {{$display_type == 'vertical' ? 'mySwiper-vertical' : 'mySwiper-horizontal'}}">
         <div class="swiper-wrapper" >
             @php
@@ -18,8 +17,9 @@
                     // لو فيه categories حوّلها لـ Collection of Objects
                     if (isset($i->categories)) {
                         $i->categories = collect($i->categories)->map(fn($c) => (object) $c);
+                    }else{
+                        $i->categories = collect();
                     }
-
                     return $i;
                 });
             @endphp
@@ -56,7 +56,7 @@
                                             d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
                                     </svg>
                                 </button>
-                                <a href="{{route('site.movie.show', $item->slug)}}"
+                                <a href="{{route('site.series.show', $item->slug)}}"
                                     class="flex items-center px-4 py-1 space-x-2 font-bold text-white rounded-lg transition-all duration-300 text-[10px] bg-fire-red hover:bg-red-700 btn-glow rtl:space-x-reverse">
                                     <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
                                         <path d="M8 5v14l11-7z" />

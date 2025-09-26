@@ -13,11 +13,28 @@ class Series extends Model
     protected $table = 'series';
 
     protected $fillable = [
-        'title_ar','title_en','slug','description_ar','description_en',
-        'poster_url','backdrop_url','trailer_url',
-        'first_air_date','last_air_date','seasons_count','episodes_count',
-        'imdb_rating','content_rating','language','country',
-        'status','series_status','is_featured','view_count','tmdb_id','created_by'
+        'title_ar',
+        'title_en',
+        'slug',
+        'description_ar',
+        'description_en',
+        'poster_url',
+        'backdrop_url',
+        'trailer_url',
+        'first_air_date',
+        'last_air_date',
+        'seasons_count',
+        'episodes_count',
+        'imdb_rating',
+        'content_rating',
+        'language',
+        'country',
+        'status',
+        'series_status',
+        'is_featured',
+        'view_count',
+        'tmdb_id',
+        'created_by'
     ];
 
     protected $casts = [
@@ -43,7 +60,7 @@ class Series extends Model
     public function people()
     {
         return $this->belongsToMany(Person::class, 'series_cast', 'series_id', 'person_id')
-            ->withPivot(['role_type','character_name','sort_order'])
+            ->withPivot(['role_type', 'character_name', 'sort_order'])
             ->withTimestamps();
     }
 
@@ -53,63 +70,87 @@ class Series extends Model
         return $this->hasMany(SeriesCast::class);
     }
 
-    public function seasons() { return $this->hasMany(Season::class); }
+    public function seasons()
+    {
+        return $this->hasMany(Season::class);
+    }
 
     public function episodes()
     {
         return $this->hasManyThrough(
-            Episode::class, Season::class, 'series_id', 'season_id', 'id', 'id'
+            Episode::class,
+            Season::class,
+            'series_id',
+            'season_id',
+            'id',
+            'id'
         );
     }
 
-    public function videoFiles()
+
+    public function creator()
     {
-        return $this->morphMany(VideoFiles::class, 'content');
+        return $this->belongsTo(Admin::class, 'created_by');
     }
-
-    /** الترجمات (Morph) */
-    public function subtitles()
+    public function userRatings()
     {
-        return $this->morphMany(Subtitle::class, 'content');
+        return $this->morphMany(UserRating::class, 'content');
     }
-
-    
-
-    public function comments() { return $this->morphMany(Comment::class, 'commentable'); }
-    public function creator() { return $this->belongsTo(Admin::class, 'created_by'); }
-    public function watchlists() { return $this->morphMany(Watchlist::class, 'content'); }
-    public function userRatings() { return $this->morphMany(UserRating::class, 'content'); }
-    public function favorites() { return $this->morphMany(Favorite::class, 'content'); }
+    public function favorites()
+    {
+        return $this->morphMany(Favorite::class, 'content');
+    }
 
     // Methods
-    public function getAverageRating() { return $this->userRatings()->approved()->avg('rating'); }
-    public function getRatingCount() { return $this->userRatings()->approved()->count(); }
-    public function incrementViewCount() { $this->increment('view_count'); }
+    public function getAverageRating()
+    {
+        return $this->userRatings()->approved()->avg('rating');
+    }
+    public function getRatingCount()
+    {
+        return $this->userRatings()->approved()->count();
+    }
+    public function incrementViewCount()
+    {
+        $this->increment('view_count');
+    }
 
     // Accessors
-    public function getTitleAttribute() { return app()->getLocale()==='ar' ? $this->title_ar : $this->title_en; }
-    public function getDescriptionAttribute() { return app()->getLocale()==='ar' ? $this->description_ar : $this->description_en; }
+    public function getTitleAttribute()
+    {
+        return app()->getLocale() === 'ar' ? $this->title_ar : $this->title_en;
+    }
+    public function getDescriptionAttribute()
+    {
+        return app()->getLocale() === 'ar' ? $this->description_ar : $this->description_en;
+    }
     public function getPosterFullUrlAttribute()
     {
-        if (Str::startsWith($this->poster_url, ['http','https'])) return $this->poster_url;
+        if (Str::startsWith($this->poster_url, ['http', 'https'])) return $this->poster_url;
         if (empty($this->poster_url)) return null;
-        return asset('storage/'.$this->poster_url);
+        return asset('storage/' . $this->poster_url);
     }
     public function getBackdropFullUrlAttribute()
     {
-        if (Str::startsWith($this->backdrop_url, ['http','https'])) return $this->backdrop_url;
+        if (Str::startsWith($this->backdrop_url, ['http', 'https'])) return $this->backdrop_url;
         if (empty($this->backdrop_url)) return null;
-        return asset('storage/'.$this->backdrop_url);
+        return asset('storage/' . $this->backdrop_url);
     }
 
     // Scopes
-    public function scopePublished($query) { return $query->where('status','published'); }
-    public function scopeFeatured($query) { return $query->where('is_featured', true); }
+    public function scopePublished($query)
+    {
+        return $query->where('status', 'published');
+    }
+    public function scopeFeatured($query)
+    {
+        return $query->where('is_featured', true);
+    }
 
     /** مطابق لـ Movie::scopeByCategory */
     public function scopeByCategory($query, $categoryId)
     {
-        return $query->whereHas('categories', fn($q)=>$q->where('movie_categories.id',$categoryId));
+        return $query->whereHas('categories', fn($q) => $q->where('movie_categories.id', $categoryId));
     }
 
     /** تحديث العدادين كما لديك */

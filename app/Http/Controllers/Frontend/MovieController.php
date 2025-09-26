@@ -39,7 +39,8 @@ class MovieController extends Controller
         $title_section = $request->title_section;
         $items = $request->items;
         $display_type = $request->display_type;
-        return view('site.partials.section_movies', compact('title_section', 'items', 'display_type'));
+        $index_section = $request->index_section;
+        return view('site.partials.section_movies', compact('title_section', 'items', 'display_type','index_section'));
     }
 
     /**

@@ -44,9 +44,10 @@ class MovieCategoryController extends Controller
         return view('dashboard.movie_categories.show', compact('movie_category'));
     }
 
-    public function edit(MovieCategory $movie_category)
+    public function edit($id)
     {
         $this->authorize('update', MovieCategory::class);
+        $movie_category = MovieCategory::findOrFail($id);
         $btn_label = "تعديل";
         return view('dashboard.movie_categories.edit', compact('movie_category','btn_label'));
     }

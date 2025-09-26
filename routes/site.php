@@ -23,7 +23,6 @@ Route::group([
         // 'middleware' => ['auth'],
     ], function () {
         Route::get('/',[FrontController::class,'index'])->name('home');
-        Route::get('/series',[FrontController::class,'series'])->name('series');
         Route::get('/live',[FrontController::class,'live'])->name('live');
         Route::get('/categories',[FrontController::class,'categories'])->name('categories');
         Route::get('/actors',[FrontController::class,'actors'])->name('actors');
@@ -61,6 +60,9 @@ Route::group([
             Route::get('/sections', [SeriesController::class, 'getSections'])->name('sections');
 
             Route::get('/{slug}', [SeriesController::class, 'show'])->name('show');
+            // site.series.season.show
+            Route::get('/season/{id}', [SeriesController::class, 'seasonShow'])->name('season.show');
+            Route::get('/episode/{id}', [SeriesController::class, 'episodeShow'])->name('episode.show');
         });
     });
 

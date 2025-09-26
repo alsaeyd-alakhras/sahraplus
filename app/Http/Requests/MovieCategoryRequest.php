@@ -26,7 +26,6 @@ class MovieCategoryRequest extends FormRequest
         return [
             'name_ar' => ['required','string','max:100'],
             'name_en' => ['required','string','max:100'],
-            'slug'    => ['nullable','string','max:100', Rule::unique('movie_categories','slug')->ignore($id)],
             'description_ar' => ['nullable','string'],
             'description_en' => ['nullable','string'],
             'image_url' => ['nullable','string','max:2048'],
@@ -35,5 +34,5 @@ class MovieCategoryRequest extends FormRequest
             'is_active' => ['sometimes','boolean'],
         ];
     }
-    
+
 }
