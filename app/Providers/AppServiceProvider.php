@@ -64,6 +64,7 @@ class AppServiceProvider extends ServiceProvider
             'movie' => Movie::class,
             'short' => Short::class,
             'episode' => Episode::class,
+            
         ]);
 
         // Observers

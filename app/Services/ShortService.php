@@ -3,58 +3,17 @@
 namespace App\Services;
 
 use App\Models\Short;
-use App\Models\Series;
+use App\Models\VideoFiles;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use App\Repositories\ShortRepository;
-use App\Repositories\SeriesRepository;
-use Illuminate\Support\Facades\Storage;
-use Yajra\DataTables\Facades\DataTables;
 
 class ShortService
 {
-    public function __construct(private SeriesRepository $repo) {}
-
-    public function datatableIndex(Request $request)
-    {
-        $query = $this->repo->getQuery();
-
-        if ($request->column_filters) {
-            foreach ($request->column_filters as $fieldName => $values) {
-                if (!empty($values)) {
-                    $filteredValues = array_filter($values, fn($v)=>!in_array($v,['الكل','all','All']));
-                    if (!empty($filteredValues)) $query->whereIn($fieldName, $filteredValues);
-                }
-            }
-        }
-
-        return DataTables::of($query)
-            ->addIndexColumn()
-            ->addColumn('edit', fn($m)=> $m->id)
-            ->make(true);
-    }
-
-    public function getFilterOptions(Request $request, string $column)
-    {
-        $query = $this->repo->getQuery();
-
-        if ($request->active_filters) {
-            foreach ($request->active_filters as $fieldName => $values) {
-                if (!empty($values) && $fieldName !== $column) {
-                    $filteredValues = array_filter($values, fn($v)=>!in_array($v,['الكل','all','All']));
-                    if (!empty($filteredValues)) $query->whereIn($fieldName, $filteredValues);
-                }
-            }
-        }
-
-        $uniqueValues = $query->whereNotNull($column)
-            ->where($column,'!=','')->distinct()->pluck($column)->filter()->values()->toArray();
-
-        return response()->json($uniqueValues);
-    }
+    public function __construct(private ShortRepository $repo) {}
 
     public function save(array $data)
     {
@@ -62,28 +21,76 @@ class ShortService
         try {
             $data['created_by'] = $data['created_by'] ?? optional(Auth::guard('admin')->user())->id;
 
-            // العلاقات المركبة
-            $categoryIds = $data['category_ids'] ?? [];
-            unset($data['category_ids']);
+            // ====== جهّز video_path من أول فيديو مُرسل ======
+            $videoRows = $data['video_files'] ?? [];
+            unset($data['video_files']);
 
-            // الصور: نفضّل *_out إذا غير فارغين (نفس منطق الفيلم)
-            if (array_key_exists('poster_path_out', $data) && $data['poster_path_out'] !== null && $data['poster_path_out'] !== '') {
-                $data['poster_path'] = $data['poster_path_out'];
-            } else {
-                $data['poster_path'] = $data['poster_path'] ?? null;
+            $primaryUrl = null;
+            if (!empty($videoRows)) {
+                // خُذ أول صف (ولو بدك خُذ أول main)
+                $first = collect($videoRows)
+                    ->sortBy('sort_order') // لو عندك ترتيب
+                    ->first();
+
+                if ($first) {
+                    if (($first['source_type'] ?? 'url') === 'file' && !empty($first['file']) && $first['file'] instanceof UploadedFile) {
+                        // ارفع الملف وطلع رابط التخزين
+                        $stored = $first['file']->store('shorts/videos', 'public');
+                        $primaryUrl = asset('storage/' . $stored);
+                        // خزن هذا الرابط ضمن الصف نفسه ليستمر للحفظ في video_files
+                        $first['file_url'] = $primaryUrl;
+                    } else {
+                        $primaryUrl = $first['file_url'] ?? null;
+                    }
+                    // أعِد حقن أول صف بعد التطبيع
+                    $videoRows[0] = $first;
+                }
             }
 
+            // إجبار وجود قيمة بما أن العمود NOT NULL
+            if (empty($primaryUrl)) {
+                // ما في ولا فيديو = خلّي الفاليديشن يفشل لاحقًا أو ارمي إستثناء واضح
+                throw new \RuntimeException(__('admin.video_path_required'));
+            }
+            $data['video_path'] = $primaryUrl;
+
+            // بوستر (نفس منطقك)
+            if (!empty($data['poster_path_out'])) {
+                $data['poster_path'] = $data['poster_path_out'];
+            }
             unset($data['poster_path_out']);
 
-            // إنشاء
-            $series = $this->repo->save($data);
+            // إنشاء الـ Short
+            $short = $this->repo->save($data);
 
-            // sync العلاقات
-            $this->syncCategories($series, $categoryIds ?? []);
-            $this->syncCast($series, $cast ?? []);
+            // ====== حفظ بقية ملفات الفيديو في جدول video_files ======
+            foreach ($videoRows as $row) {
+                if (($row['source_type'] ?? 'url') === 'file' && !empty($row['file']) && $row['file'] instanceof UploadedFile) {
+                    $stored = $row['file']->store('shorts/videos', 'public');
+                    $row['file_url'] = asset('storage/' . $stored);
+                }
+
+                if (empty($row['file_url'])) continue;
+
+                // استنتاج الـ format لو مش مرسل
+                if (empty($row['format'])) {
+                    $ext = strtolower(pathinfo(parse_url($row['file_url'], PHP_URL_PATH) ?? '', PATHINFO_EXTENSION));
+                    $row['format'] = in_array($ext, ['mp4', 'webm', 'm3u8']) ? $ext : 'mp4';
+                }
+                $short->videoFiles()->create([
+                    'video_type'       => $row['video_type'] ?? 'main',
+                    'quality'          => $row['quality'] ?? '480p',
+                    'format'           => $row['format'] ?? 'mp4',
+                    'file_url'         => $row['file_url'],
+                    'file_size'        => $row['file_size'] ?? null,
+                    'duration_seconds' => $row['duration_seconds'] ?? null,
+                    'is_downloadable'  => !empty($row['is_downloadable']),
+                    'is_active'        => array_key_exists('is_active', $row) ? (bool)$row['is_active'] : true,
+                ]);
+            }
 
             DB::commit();
-            return $series;
+            return $short;
         } catch (\Throwable $e) {
             DB::rollBack();
             throw $e;
@@ -94,79 +101,68 @@ class ShortService
     {
         DB::beginTransaction();
         try {
-            $series = $this->repo->getById($id);
+            $short = $this->repo->getById($id);
 
-            // العلاقات
-            $categoryIds = $data['category_ids'] ?? [];
-            $cast        = $data['cast'] ?? [];
-            unset($data['category_ids'], $data['cast']);
+            $videoRows = $data['video_files'] ?? [];
+            unset($data['video_files']);
 
-            // الصور: نفضّل *_out إذا غير فارغين، وإلا نبقي القديمة
-            if (array_key_exists('poster_url_out', $data) && $data['poster_url_out'] !== null && $data['poster_url_out'] !== '') {
-                $data['poster_url'] = $data['poster_url_out'];
-            } else {
-                $data['poster_url'] = $data['poster_url'] ?? $series->poster_url;
+            // بوستر
+            if (!empty($data['poster_path_out'])) {
+                $data['poster_path'] = $data['poster_path_out'];
+            }
+            unset($data['poster_path_out']);
+
+            // لو وصل فيديوهات جديدة، حدّث video_path من أول صف
+            if (!empty($videoRows)) {
+                $first = collect($videoRows)->first();
+                $primaryUrl = null;
+                if ($first) {
+                    if (($first['source_type'] ?? 'url') === 'file' && !empty($first['file']) && $first['file'] instanceof UploadedFile) {
+                        $stored = $first['file']->store('shorts/videos', 'public');
+                        $primaryUrl = asset('storage/' . $stored);
+                        $first['file_url'] = $primaryUrl;
+                        $videoRows[0] = $first;
+                    } else {
+                        $primaryUrl = $first['file_url'] ?? null;
+                    }
+                }
+                if (!empty($primaryUrl)) {
+                    $data['video_path'] = $primaryUrl;
+                }
             }
 
-            if (array_key_exists('backdrop_url_out', $data) && $data['backdrop_url_out'] !== null && $data['backdrop_url_out'] !== '') {
-                $data['backdrop_url'] = $data['backdrop_url_out'];
-            } else {
-                $data['backdrop_url'] = $data['backdrop_url'] ?? $series->backdrop_url;
+            $short = $this->repo->update($data, $id);
+
+            // لو بدك: امسح القديم ثم أعد الإدخال أو اعمل upsert حسب مفاتيحك
+            foreach ($videoRows as $row) {
+                if (($row['source_type'] ?? 'url') === 'file' && !empty($row['file']) && $row['file'] instanceof UploadedFile) {
+                    $stored = $row['file']->store('shorts/videos', 'public');
+                    $row['file_url'] = asset('storage/' . $stored);
+                }
+                if (empty($row['file_url'])) continue;
+
+                if (empty($row['format'])) {
+                    $ext = strtolower(pathinfo(parse_url($row['file_url'], PHP_URL_PATH) ?? '', PATHINFO_EXTENSION));
+                    $row['format'] = in_array($ext, ['mp4', 'webm', 'm3u8']) ? $ext : 'mp4';
+                }
+
+                $short->videoFiles()->create([
+                    'video_type'       => $row['video_type'] ?? 'main',
+                    'quality'          => $row['quality'] ?? '480p',
+                    'format'           => $row['format'] ?? 'mp4',
+                    'file_url'         => $row['file_url'],
+                    'file_size'        => $row['file_size'] ?? null,
+                    'duration_seconds' => $row['duration_seconds'] ?? null,
+                    'is_downloadable'  => !empty($row['is_downloadable']),
+                    'is_active'        => array_key_exists('is_active', $row) ? (bool)$row['is_active'] : true,
+                ]);
             }
-
-            unset($data['poster_url_out'], $data['backdrop_url_out']);
-
-            // slug
-            $data['slug'] = Str::slug($data['title_en'] ?? $data['title_ar']);
-
-            // تحديث
-            $series = $this->repo->update($data, $id);
-
-            // sync العلاقات
-            $this->syncCategories($series, $categoryIds ?? []);
-            $this->syncCast($series, $cast ?? []);
 
             DB::commit();
-            return $series;
+            return $short;
         } catch (\Throwable $e) {
             DB::rollBack();
             throw $e;
         }
-    }
-
-    public function deleteById(int $id)
-    {
-        DB::beginTransaction();
-        try {
-            $deleted = $this->repo->delete($id);
-            DB::commit();
-            return $deleted;
-        } catch (\Throwable $e) {
-            DB::rollBack();
-            throw $e;
-        }
-    }
-
-    /** --- Helpers --- */
-
-    private function syncCategories(Series $series, array $categoryIds): void
-    {
-        $ids = array_filter(array_map('intval', $categoryIds));
-        $series->categories()->sync($ids);
-    }
-
-    private function syncCast(Series $series, array $castRows): void
-    {
-        // مثل الفيلم بالضبط: شخص واحد = صف واحد (دور واحد) بسبب مفهرسة الـsync على person_id
-        $pivotData = [];
-        foreach ($castRows as $row) {
-            if (!isset($row['person_id'])) continue;
-            $pivotData[$row['person_id']] = [
-                'role_type'      => $row['role_type'] ?? 'actor',
-                'character_name' => $row['character_name'] ?? null,
-                'sort_order'     => $row['sort_order'] ?? 0,
-            ];
-        }
-        $series->people()->sync($pivotData);
     }
 }

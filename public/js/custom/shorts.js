@@ -154,7 +154,7 @@ $(function() {
         const used = new Set(usedQualities());
         const $q = $row.find('.video-quality');
         if (!$q.val()) {
-            for (const candidate of ['sd', 'hd', 'fhd', 'uhd']) {
+          for (const candidate of ['240p', '360p', '480p', '720p', '1080p', '4k']) {
                 if (!used.has(candidate)) {
                     $q.val(candidate);
                     break;

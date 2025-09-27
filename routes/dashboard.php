@@ -72,7 +72,7 @@ Route::group([
         Route::get('people/search', [PeopleController::class, 'search'])->name('people.search');
 
        
-        Route::get('shorts/video-row-partial', [ShortController::class, 'videoRowPartial'])->name('shorts.videoRowPartial');
+        Route::get('shorts/videoRowPartial', [ShortController::class, 'videoRowPartial'])->name('shorts.videoRowPartial');
 
         Route::get('series/castRowPartial', [SeriesController::class, 'castRowPartial'])
         ->name('series.castRowPartial');
