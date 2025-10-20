@@ -45,6 +45,7 @@ class Series extends Model
         'imdb_rating'    => 'decimal:1',
         'is_featured'    => 'boolean',
         'view_count'     => 'integer',
+        'logo_url'     => 'integer',
     ];
 
     protected $appends = ['poster_full_url', 'backdrop_full_url'];

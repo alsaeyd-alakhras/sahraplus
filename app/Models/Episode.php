@@ -24,7 +24,8 @@ class Episode extends Model
         'imdb_rating',
         'status',
         'view_count',
-        'tmdb_id'
+        'tmdb_id',
+        'intro_skip_time',
     ];
 
     protected $casts = [
@@ -33,6 +34,7 @@ class Episode extends Model
         'air_date' => 'date:Y-m-d',
         'imdb_rating' => 'decimal:1',
         'view_count' => 'integer',
+        'intro_skip_time' => 'integer'
     ];
 
     protected $appends = ['thumbnail_full_url'];

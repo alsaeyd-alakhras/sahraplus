@@ -29,7 +29,9 @@ class Movie extends Model
         'is_featured',
         'view_count',
         'tmdb_id',
-        'created_by'
+        'created_by',
+        'intro_skip_time',
+        'logo_url',
     ];
 
     protected $casts = [
@@ -38,6 +40,7 @@ class Movie extends Model
         'imdb_rating' => 'decimal:1',
         'is_featured' => 'boolean',
         'view_count' => 'integer',
+        'intro_skip_time' => 'integer'
     ];
 
     protected $appends = ['poster_full_url', 'backdrop_full_url','trailer_full_url'];
