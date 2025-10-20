@@ -152,7 +152,7 @@
             const urlIndex   = `{{ route('dashboard.shorts.index') }}`;
             const urlFilters = `{{ route('dashboard.short.filters', ':column') }}`;
             const urlCreate  = '{{ route("dashboard.shorts.create") }}';
-            const urlShow    = '{{ route("dashboard.shorts.show", ":id") }}';
+            const urlShow    = '{{ route("site.shorts", ":id") }}';
             const urlEdit    = '{{ route("dashboard.shorts.edit", ":id") }}';
             const urlDelete  = '{{ route("dashboard.shorts.destroy", ":id") }}';
 

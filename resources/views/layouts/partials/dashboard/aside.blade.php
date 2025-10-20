@@ -101,7 +101,7 @@
                 class="menu-item {{ request()->is('dashboard/admins') || request()->is('dashboard/admins/*') ? 'active' : '' }}">
                 <a href="{{ route('dashboard.admins.index') }}" class="menu-link">
                     <i class="ph ph-users-three me-2"></i>
-                    <div data-i18n="admins">{{ __('admin.Admin') }}</ </div>
+                    <div data-i18n="admins">{{ __('admin.Admin') }}</div>
                 </a>
             </li>
         @endcan

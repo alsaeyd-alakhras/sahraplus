@@ -2,6 +2,7 @@
     @php
         $title = 'title_' . app()->getLocale();
         $description = 'description_' . app()->getLocale();
+        $name = 'name_' . app()->getLocale();
 
         // متغيرات التحكم في الوصول
         $requireLogin = $movie->require_login ?? false;
@@ -36,9 +37,9 @@
             ->get();
 
         // جلب الممثلين والمخرجين
-        $actors = $movie->cast()->person()->actors()->ordered()->get();
-        $directors = $movie->cast()->person()->directors()->ordered()->get();
-        $allCast = $movie->cast()->person()->ordered()->get();
+        $actors = $movie->people()->wherePivot('role_type', 'actor')->orderBy('pivot_sort_order')->get();
+        $directors = $movie->people()->wherePivot('role_type', 'director')->orderBy('pivot_sort_order')->get();
+        $allCast = $movie->people()->orderBy('pivot_sort_order')->get();
     @endphp
 
     @push('styles')
@@ -552,14 +553,14 @@
                             @foreach ($directors as $director)
                                 <div class="transition-transform duration-300 group hover:scale-105">
                                     <div class="overflow-hidden rounded-lg shadow-md">
-                                        <img src="{{ $director->person->photo_full_url ?: 'https://via.placeholder.com/150x200?text=No+Image' }}"
-                                            alt="{{ $director->person->name }}"
+                                        <img src="{{ $director->photo_full_url ?: 'https://via.placeholder.com/150x200?text=No+Image' }}"
+                                            alt="{{ $director->$name }}"
                                             class="object-cover w-full h-52 rounded-lg group-hover:opacity-90" />
                                     </div>
-                                    <span
+                                    <a href="{{ route('site.cast', $actor->id) }}"
                                         class="block mt-2 text-sm font-semibold text-gray-300 group-hover:text-white">
-                                        {{ $director->person->name }}
-                                    </span>
+                                        {{ $director->$name }}
+                                    </a>
                                     <span class="block text-xs text-gray-500">مخرج</span>
                                 </div>
                             @endforeach
@@ -574,13 +575,13 @@
                             @foreach ($actors as $actor)
                                 <div class="transition-transform duration-300 group hover:scale-105">
                                     <div class="overflow-hidden rounded-lg shadow-md">
-                                        <img src="{{ $actor->person->photo_full_url ?: 'https://via.placeholder.com/150x200?text=No+Image' }}"
-                                            alt="{{ $actor->person->name }}"
+                                        <img src="{{ $actor->photo_full_url ?: 'https://via.placeholder.com/150x200?text=No+Image' }}"
+                                            alt="{{ $actor->$name }}"
                                             class="object-cover w-full h-52 rounded-lg group-hover:opacity-90" />
                                     </div>
-                                    <a href="{{ route('site.actor', $actor->person->id) }}"
+                                    <a href="{{ route('site.cast', $actor->id) }}"
                                         class="block mt-2 text-sm font-semibold text-gray-300 group-hover:text-white">
-                                        {{ $actor->person->name }}
+                                        {{ $actor->$name }}
                                     </a>
                                     @if ($actor->character_name)
                                         <span class="block text-xs text-gray-500">{{ $actor->character_name }}</span>

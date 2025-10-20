@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
 use App\Models\Movie;
+use App\Models\Person;
+use App\Models\Short;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -16,10 +18,16 @@ class FrontController extends Controller
         return view('site.index');
     }
 
-    public function movie($id)
+    public function shorts()
     {
-        $movie = Movie::findOrFail($id);
-        return view('site.movie', compact('movie'));
+        $shorts = Short::get();
+        return view('site.shorts', compact('shorts'));
+    }
+
+    public function cast($id)
+    {
+        $cast = Person::findOrFail($id);
+        return view('site.cast', compact('cast'));
     }
 
 

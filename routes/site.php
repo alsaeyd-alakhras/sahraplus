@@ -26,7 +26,9 @@ Route::group([
         Route::get('/live',[FrontController::class,'live'])->name('live');
         Route::get('/categories',[FrontController::class,'categories'])->name('categories');
         Route::get('/actors',[FrontController::class,'actors'])->name('actors');
-
+        Route::get('/shorts',[FrontController::class,'shorts'])->name('shorts');
+        
+        Route::get('/cast/{id}',[FrontController::class,'cast'])->name('cast');
 
         // Movie routes
         Route::get('/movies',[MovieController::class,'index'])->name('movies');

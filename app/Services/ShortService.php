@@ -10,10 +10,49 @@ use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use App\Repositories\ShortRepository;
+use Yajra\DataTables\Facades\DataTables;
 
 class ShortService
 {
     public function __construct(private ShortRepository $repo) {}
+
+    public function datatableIndex(Request $request)
+    {
+        $query = $this->repo->getQuery();
+
+        if ($request->column_filters) {
+            foreach ($request->column_filters as $fieldName => $values) {
+                if (!empty($values)) {
+                    $filteredValues = array_filter($values, fn($v)=>!in_array($v,['الكل','all','All']));
+                    if (!empty($filteredValues)) $query->whereIn($fieldName, $filteredValues);
+                }
+            }
+        }
+
+        return DataTables::of($query)
+            ->addIndexColumn()
+            ->addColumn('edit', fn($m)=> $m->id)
+            ->make(true);
+    }
+
+    public function getFilterOptions(Request $request, string $column)
+    {
+        $query = $this->repo->getQuery();
+
+        if ($request->active_filters) {
+            foreach ($request->active_filters as $fieldName => $values) {
+                if (!empty($values) && $fieldName !== $column) {
+                    $filteredValues = array_filter($values, fn($v)=>!in_array($v,['الكل','all','All']));
+                    if (!empty($filteredValues)) $query->whereIn($fieldName, $filteredValues);
+                }
+            }
+        }
+
+        $uniqueValues = $query->whereNotNull($column)
+            ->where($column,'!=','')->distinct()->pluck($column)->filter()->values()->toArray();
+
+        return response()->json($uniqueValues);
+    }
 
     public function save(array $data)
     {

@@ -70,7 +70,7 @@ class CreateNewUser implements CreatesNewUsers
             'gender' => $input['gender'] ?? null,
             'country_code' => $input['country_code'] ?? null,
             'language' => $input['language'] ?? 'ar',
-            'avatar_url' => $input['avatar_url'] ?? null,
+            'avatar' => $input['avatar_url'] ?? null,
             'is_active' => $input['is_active'] ?? true,
             'is_banned' => $input['is_banned'] ?? false,
             'email_notifications' => $input['email_notifications'] ?? true,
