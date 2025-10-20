@@ -16,7 +16,7 @@
                     $i = (object) $i;
 
                     // لو فيه categories حوّلها لـ Collection of Objects
-                    if (isset($i->categories)) {
+                    if (isset($i->categories) && !empty($i->categories)) {
                         $i->categories = collect($i->categories)->map(fn($c) => (object) $c);
                     }
 
@@ -38,12 +38,15 @@
                                 <span>{{ $item->language }}</span>
                             </div>
                             <div class="movie-slider-line">
-                                @foreach ($item->categories as $category)
-                                    <span>{{ $category->$name }}</span>
-                                    @if (!$loop->last)
-                                        <span class="text-green-400" >•</span>
-                                    @endif
-                                @endforeach
+                                @if (isset($item->categories) && !empty($item->categories))
+                                    @foreach ($item->categories as $category)
+                                        <span>{{ $category->$name }}</span>
+                                        @if (!$loop->last)
+                                            <span class="text-green-400" >•</span>
+                                        @endif
+                                    @endforeach
+                                @endif
+
                             </div>
                             <div class="pr-2 text-xs font-bold text-teal-400 border-r-4 border-teal-500">
                                 {{ $item->title }}

@@ -32,6 +32,11 @@ class Short extends Model
         'is_featured' => 'boolean',
     ];
 
+    protected $appends = [
+        'poster_full_path',
+        'video_full_url',
+    ];
+
     // العلاقات
     public function creator()
     {
@@ -91,11 +96,11 @@ class Short extends Model
     }
 
 
- 
 
-    
 
-    
+
+
+
 
     // Methods
     public function incrementLikes()

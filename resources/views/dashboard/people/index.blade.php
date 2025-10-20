@@ -123,6 +123,7 @@
 
             const urlIndex   = `{{ route('dashboard.people.index') }}`;
             const urlFilters = `{{ route('dashboard.people.filters', ':column') }}`; // ✅ اسم الراوت الصحيح
+            const urlShow  = '{{ route("site.cast", ":id") }}';
             const urlCreate  = '{{ route("dashboard.people.create") }}';
             const urlEdit    = '{{ route("dashboard.people.edit", ":id") }}';
             const urlDelete  = '{{ route("dashboard.people.destroy", ":id") }}';
@@ -146,10 +147,11 @@
                     return `<span class="badge ${active ? 'bg-success' : 'bg-secondary'}">${active ? 'نشط' : 'غير نشط'}</span>`;
                 }},
                 { data: 'edit', name: 'edit', orderable:false, searchable:false, render: function (id) {
-                    let linkedit = '', linkdelete = '';
+                    let linkedit = '', linkdelete = '', linkShow ='';
+                    linkShow  = `<a href="${urlShow.replace(':id', id)}" class="action-btn btn-show" target="_blank" title="عرض"><i class="fas fa-eye"></i></a>`;
                     if (abilityEdit)  linkedit  = `<a href="${urlEdit.replace(':id', id)}" class="action-btn btn-edit" title="تعديل"><i class="fas fa-edit"></i></a>`;
                     if (abilityDelete)linkdelete= `<button class="action-btn btn-delete delete_row" data-id="${id}" title="حذف"><i class="fas fa-trash"></i></button>`;
-                    return `<div class="d-flex align-items-center justify-content-evenly">${linkedit}${linkdelete}</div>`;
+                    return `<div class="d-flex align-items-center justify-content-evenly">${linkShow}${linkedit}${linkdelete}</div>`;
                 }},
             ];
         </script>

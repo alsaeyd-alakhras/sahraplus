@@ -192,7 +192,9 @@ $(function () {
   let timer;
 
   function updateContent(index) {
+    if (typeof contents === 'undefined' || !Array.isArray(contents)) return;
     const data = contents[index];
+    if (!data) return;
     heroContent.find(".logo-wrapper img").attr("src", data.logo);
     heroContent.find(".description").text(data.title);
     const tags = data.tags

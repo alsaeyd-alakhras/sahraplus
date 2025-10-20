@@ -28,7 +28,7 @@
                 <div
                     class="max-w-[25rem] opacity-80 transition-all duration-500 ease-in-out transform translate-x-0 hero-content hover:opacity-100 hover:-translate-x-10">
                     <div class="mb-8 h-[80px] logo-wrapper transition-all duration-500 ease-in-out">
-                        <img src="{{ $movie->poster_full_url }}" alt="logo"
+                        <img src="" alt="logo"
                             class="object-contain h-full transition-all duration-300 hover:scale-125" />
                     </div>
                     <div class="text-base text-gray-400 transition-all duration-300 episode animate-slide-up">
