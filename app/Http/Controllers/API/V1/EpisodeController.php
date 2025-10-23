@@ -12,7 +12,7 @@ class EpisodeController extends Controller
     // GET /api/v1/seasons/{season}/episodes
     public function bySeason(Season $season)
     {
-        $episodes = $season->episodes()->orderBy('number')->get();
+        $episodes = $season->episodes()->orderBy('episode_number')->get();
         return EpisodeResource::collection($episodes);
     }
 

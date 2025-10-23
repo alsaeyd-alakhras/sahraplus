@@ -41,7 +41,8 @@ class SearchController extends Controller
                 ->orWhere('title_en','like',"%$q%")->limit(20)->get()),
             'series'   => SeriesResource::collection(Series::where('title_ar','like',"%$q%")
                 ->orWhere('title_en','like',"%$q%")->limit(20)->get()),
-            'episodes' => EpisodeResource::collection(Episode::where('title','like',"%$q%")->limit(20)->get()),
+            'episodes'   => EpisodeResource::collection(Episode::where('title_ar','like',"%$q%")
+                ->orWhere('title_en','like',"%$q%")->limit(20)->get()),
         ]);
     }
 }

@@ -20,8 +20,15 @@ class CategoryController extends Controller
     }
 
     // GET /api/v1/categories/{id}
-    public function show(MovieCategory $category)
+    public function show($id)
     {
+        $category = MovieCategory::find($id);
+
+        if (!$category) {
+            return response()->json([
+                'message' => 'Category not found'
+            ], 404);
+        }
         return new MovieCategoryResource($category);
     }
 }

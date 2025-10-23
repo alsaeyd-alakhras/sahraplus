@@ -45,12 +45,8 @@ class DatabaseSeeder extends Seeder
         ]);
 
 
-        // settings
-        // $settings = [
-        //     'site_name_ar' => '',
-        //     'site_name_en' => '',
-        //     'site_description_ar' => '',
-        //     'site_description_en' => '',
-        // ];
+        if (app()->environment('local')) {
+            $this->call(ContentSeeder::class);
+        }
     }
 }

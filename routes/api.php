@@ -32,6 +32,7 @@ use App\Http\Controllers\API\V1\HistoryController;
 use App\Http\Controllers\API\V1\RatingsController;
 use App\Http\Controllers\API\V1\FavoritesController;
 use App\Http\Controllers\API\V1\DownloadsController;
+use App\Http\Controllers\API\V1\ShortController;
 
 /*
 |--------------------------------------------------------------------------
@@ -82,6 +83,9 @@ Route::prefix('v1')->name('api.v1.')->group(function () {
 
     // 🎬 Movies
     Route::apiResource('movies', MoviesController::class)->only(['index','show']);
+    
+    // 🎬 Shorts
+    Route::apiResource('shorts', ShortController::class)->only(['index','show']);
 
     // 📺 Series
     Route::apiResource('series', SeriesController::class)->only(['index','show']);
@@ -97,13 +101,13 @@ Route::prefix('v1')->name('api.v1.')->group(function () {
     Route::apiResource('episodes', EpisodeController::class)->only(['show']);
 
     // 👥 People
-    Route::apiResource('people', PeopleController::class)->only(['show']);
+    Route::apiResource('people', PeopleController::class)->only(['index','show']);
 
     // 💬 Comments (حسب النوع movie|series|episode|short)
     Route::get('{type}/{id}/comments', [CommentController::class, 'index']);
 
     // 🔎 Search & Filter
-    Route::get('search', [SearchController::class, 'index']);
+    Route::get('search', [SearchController::class, 'index'])->name('search');
 
 
     // ================================

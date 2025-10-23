@@ -27,7 +27,7 @@ class CommentController extends Controller
         $model = $map[$type];
         $item  = $model::findOrFail($id);
 
-        $comments = $item->comments()->with('user')->latest()->paginate(20);
+        $comments = $item->comments()->with('user')->latest()->get();
 
         return CommentResource::collection($comments);
     }
