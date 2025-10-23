@@ -31,6 +31,7 @@ class EpisodeRequest extends FormRequest
             'status'          => ['required', Rule::in(['draft','published','archived'])],
             'view_count'      => ['nullable','integer','min:0'],
             'tmdb_id'         => ['nullable','string','max:20'],
+            'intro_skip_time'  => ['required'],
 
             // الفيديوهات
             'video_files'                  => ['sometimes','array'],

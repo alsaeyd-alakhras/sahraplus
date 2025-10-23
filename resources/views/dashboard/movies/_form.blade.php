@@ -100,6 +100,21 @@
                         </div>
 
                     </div>
+
+
+                    
+                    <div class="mb-4 col-md-4">
+                        <x-form.input type="number" label="وقت تخطي المقدمة " :value="$movie->intro_skip_time" name="intro_skip_time"
+                             min="0" />
+
+                    </div>
+
+                    <div class="col-md-6">
+                        <x-form.input label="Logo Url" :value="$movie->logo_url" name="logo_url"
+                            placeholder="https://example.com" />
+                    </div>
+
+
                 </div>
             </div>
         </div>

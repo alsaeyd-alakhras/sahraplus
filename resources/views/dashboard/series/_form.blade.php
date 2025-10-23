@@ -16,6 +16,11 @@
                         <x-form.input label="{{ __('admin.title_en') }}" name="title_en" :value="$series->title_en"
                             placeholder="{{ __('admin.title_en_placeholder') }}" />
                     </div>
+
+                     <div class="col-md-6">
+                        <x-form.input label="Logo Url" :value="$series->logo_url" name="logo_url"
+                            placeholder="https://example.com" />
+                    </div>
                 </div>
             </div>
         </div>

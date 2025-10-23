@@ -32,6 +32,7 @@ class ShortRequest extends FormRequest
         'aspect_ratio' => ['required', Rule::in(['vertical', 'horizontal'])],
         'status'       => ['required', Rule::in(['active', 'inactive'])],
         'is_featured'  => ['sometimes', 'boolean'],
+        'video_basic_url'=> ['required'],
 
         // إجبار وجود الفيديو
         'video_path'   => ['required_without:video_files', 'string', 'max:2000'],

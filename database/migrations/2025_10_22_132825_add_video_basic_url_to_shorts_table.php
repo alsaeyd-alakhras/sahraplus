@@ -11,9 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('video_files', function (Blueprint $table) {
-            $table->id();
-            $table->timestamps();
+        Schema::table('shorts', function (Blueprint $table) {
+            $table->string('video_basic_url');
         });
     }
 
@@ -22,6 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('video_files');
+        Schema::table('shorts', function (Blueprint $table) {
+             $table->dropColumn(['video_basic_url']);
+        });
     }
 };

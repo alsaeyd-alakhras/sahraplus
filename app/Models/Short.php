@@ -22,7 +22,8 @@ class Short extends Model
         'share_url',
         'is_featured',
         'status',
-        'created_by'
+        'created_by',
+        'video_basic_url'
     ];
 
     protected $casts = [

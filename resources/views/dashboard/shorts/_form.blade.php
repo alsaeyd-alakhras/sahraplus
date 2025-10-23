@@ -27,6 +27,11 @@
                         <input type="url" name="share_url" class="form-control"
                             value="{{ old('share_url', $short->share_url) }}">
                     </div>
+                    <div class="mb-4 col-md-6">
+                        <label class="form-label">{{__('admin.video_basic_url')}}</label>
+                        <input type="text" name="video_basic_url" class="form-control" required
+                            value="{{ old('video_basic_url', $short->video_basic_url) }}">
+                    </div>
                 </div>
             </div>
         </div>

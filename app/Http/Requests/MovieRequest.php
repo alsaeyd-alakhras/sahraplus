@@ -51,6 +51,8 @@ class MovieRequest extends FormRequest
             // الأفضل ما يجي من الفورم بل من الكود
             'view_count'       => ['nullable','integer','min:0'],
             'tmdb_id'          => ['nullable','string','max:20'],
+             'intro_skip_time'         => ['required'],
+             'logo_url'         => ['required'],
 
 
             // التصنيفات

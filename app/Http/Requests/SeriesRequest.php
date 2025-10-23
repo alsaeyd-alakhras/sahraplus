@@ -49,6 +49,7 @@ class SeriesRequest extends FormRequest
         'view_count'  => ['sometimes','integer','min:0'],
         'tmdb_id'     => ['nullable','string','max:20'],
         'created_by'  => ['nullable','exists:admins,id'],
+         'logo_url'         => ['required'],
 
         // NEW: التصنيفات
         'category_ids'   => ['nullable','array'],
