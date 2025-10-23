@@ -11,12 +11,19 @@ class ShortController extends Controller
 {
     public function index()
     {
-        $shorts = Short::active()->paginate(20);
+        $shorts = Short::active()->get();
         return ShortResource::collection($shorts);
     }
 
-    public function show(Short $short)
+    public function show($id)
     {
+        $short = Short::find($id);
+
+        if (!$short) {
+            return response()->json([
+                'message' => 'short not found'
+            ], 404);
+        }
         return new ShortResource($short);
     }
 }

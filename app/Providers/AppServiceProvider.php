@@ -61,6 +61,7 @@ class AppServiceProvider extends ServiceProvider
 
         // مهم: خليه يكتب 'movie' و 'short' بدل App\Models\Movie/Short
         Relation::enforceMorphMap([
+            'user' => 'App\Models\User',
             'movie' => Movie::class,
             'short' => Short::class,
             'episode' => Episode::class,
@@ -86,5 +87,9 @@ class AppServiceProvider extends ServiceProvider
                 'settings'   => SystemSetting::get()->pluck('value', 'key')->toArray(),
             ]);
         });
+
+
+
+        
     }
 }

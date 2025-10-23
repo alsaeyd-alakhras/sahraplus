@@ -12,7 +12,7 @@ class SeasonController extends Controller
     // GET /api/v1/series/{series}/seasons
     public function bySeries(Series $series)
     {
-        $seasons = $series->seasons()->orderBy('number')->get();
+        $seasons = $series->seasons()->orderBy('season_number')->get();
         return SeasonResource::collection($seasons);
     }
 
