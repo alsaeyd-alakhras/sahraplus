@@ -112,4 +112,26 @@ class ShortController extends Controller
         $row = [];
         return view('dashboard.shorts.partials._video_row', compact('i', 'row'));
     }
+
+    public function like($id)
+    {
+        $short = Short::findOrFail($id);
+
+        $short->increment('likes_count'); // زيادة واحد
+        return response()->json([
+            'message' => 'Like added successfully',
+            'likes_count' => $short->likes_count
+        ]);
+    }
+
+    public function share($id)
+    {
+        $short = Short::findOrFail($id);
+
+        $short->increment('shares_count'); // زيادة واحد
+        return response()->json([
+            'message' => 'Share count increased successfully',
+            'shares_count' => $short->shares_count
+        ]);
+    }
 }

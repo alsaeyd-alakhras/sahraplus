@@ -65,4 +65,7 @@ class FrontController extends Controller
         return back()->with('success', __('site.password_changed_successfully'));
     }
 
+
+    
+
 }
