@@ -53,7 +53,7 @@ class Series extends Model
     /** التصنيفات: نفس الأفلام لكن عبر category_series_pivot */
     public function categories()
     {
-        return $this->belongsToMany(MovieCategory::class, 'category_series_pivot', 'series_id', 'category_id')
+        return $this->belongsToMany(Category::class, 'category_series_pivot', 'series_id', 'category_id')
             ->withTimestamps();
     }
 
@@ -161,4 +161,11 @@ class Series extends Model
         $this->episodes_count = $this->seasons()->withCount('episodes')->get()->sum('episodes_count');
         $this->save();
     }
+
+
+    public function watchlists()
+    {
+        return $this->morphMany(Watchlist::class, 'content');
+    }
+
 }

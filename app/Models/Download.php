@@ -145,4 +145,12 @@ class Download extends Model
                           ->orWhere('expires_at', '>', now());
                     });
     }
+    // دالة لحساب مدة التحميل (من الإنشاء إلى الإكمال)
+    public function getDurationAttribute()
+    {
+        if ($this->completed_at) {
+            return $this->created_at->diffForHumans($this->completed_at, true);
+        }
+        return null;
+    }
 }

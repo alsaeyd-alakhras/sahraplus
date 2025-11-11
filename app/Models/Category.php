@@ -6,12 +6,12 @@ use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
-class MovieCategory extends Model
+class Category extends Model
 {
     use HasFactory;
 
     // اسم الجدول صراحة (احتياطيًا)
-    protected $table = 'movie_categories';
+    protected $table = 'categories';
 
     /**
      * الحقول المسموح تعبئتها جماعيًا
@@ -46,10 +46,10 @@ class MovieCategory extends Model
     }
 
     public function series()
-{
-    return $this->belongsToMany(Series::class, 'category_series_pivot', 'category_id', 'series_id')
-        ->withTimestamps();
-}
+    {
+        return $this->belongsToMany(Series::class, 'category_series_pivot', 'category_id', 'series_id')
+            ->withTimestamps();
+    }
 
     /**
      * سكوب للتصنيفات النشطة فقط
@@ -72,7 +72,7 @@ class MovieCategory extends Model
      */
     protected static function booted(): void
     {
-        static::saving(function (MovieCategory $category) {
+        static::saving(function (Category $category) {
             if (empty($category->slug)) {
                 // حاول من الإنجليزية، وإلا استخدم العربية
                 $base = $category->name_en ?: $category->name_ar;

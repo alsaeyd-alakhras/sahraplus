@@ -2,57 +2,91 @@
 
 namespace App\Http\Controllers\Dashboard;
 
-use App\Models\UserRating;
 use Illuminate\Http\Request;
+use App\Services\UserRatingService;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\UserRatingRequest;
+use App\Models\UserRating;
 
 class UserRatingController extends Controller
 {
-    public function __construct()
+    protected UserRatingService $userRatingService;
+
+    public function __construct(UserRatingService $userRatingService)
     {
-        $this->middleware('auth'); // توثيق الويب
+        $this->userRatingService = $userRatingService;
     }
 
+    /**
+     * Display a listing of the resource.
+     */
     public function index()
     {
-        $ratings = UserRating::where('user_id', auth()->id())
-                    ->latest()->paginate(12);
-        return view('user_ratings.index', compact('ratings'));
+        $this->authorize('view', UserRating::class);
+
+        if (request()->ajax()) {
+            return $this->userRatingService->datatableIndex(request());
+        }
+
+        return view('dashboard.user_ratings.index');
     }
 
-    public function create()
+    /**
+     * Return distinct values for column filters (for Datatable for example).
+     */
+    public function getFilterOptions(Request $request, $column)
     {
-        return view('user_ratings.create');
+        return $this->userRatingService->getFilterOptions($request, $column);
     }
 
-    public function store(UserRatingRequest $request)
+    /**
+     * Display the specified resource.
+     */
+    public function show(UserRating $userRating)
     {
-        $data = $request->validated();
-        $data['user_id'] = auth()->id();
-        $data['status']  = $data['status'] ?? 'approved';
-
-        UserRating::create($data);
-        return redirect()->route('user-ratings.index')->with('success', 'تمت الإضافة بنجاح');
+        $this->authorize('show', UserRating::class);
+        return view('dashboard.user_ratings.show', compact('userRating'));
     }
 
-    public function edit(UserRating $user_rating)
+    /**
+     * Show the form for editing the specified resource.
+     */
+    public function edit(Request $request, UserRating $userRating)
     {
-        abort_unless($user_rating->user_id === auth()->id(), 403);
-        return view('user_ratings.edit', compact('user_rating'));
+        $this->authorize('update', UserRating::class);
+
+        $btn_label = "تعديل";
+        return view('dashboard.user_ratings.edit', compact('userRating', 'btn_label'));
     }
 
-    public function update(UserRatingRequest $request, UserRating $user_rating)
+    /**
+     * Update the specified resource in storage.
+     */
+    public function update(Request $request, UserRating $userRating)
     {
-        abort_unless($user_rating->user_id === auth()->id(), 403);
-        $user_rating->update($request->validated());
-        return redirect()->route('user-ratings.index')->with('success', 'تم التعديل بنجاح');
+        $request->validate([
+            'status' => 'in:pending,approved,rejected'
+        ]);
+        $this->authorize('update', UserRating::class);
+
+        $this->userRatingService->update(['status'=>$request->status , 'reviewed_at' => now(),],$userRating->id);
+
+        return redirect()
+            ->route('dashboard.userRatings.index')
+            ->with('success', __('controller.Updated_item_successfully'));
     }
 
-    public function destroy(UserRating $user_rating)
+    /**
+     * Remove the specified resource from storage.
+     */
+    public function destroy(UserRating $userRating)
     {
-        abort_unless($user_rating->user_id === auth()->id(), 403);
-        $user_rating->delete();
-        return redirect()->route('user-ratings.index')->with('success', 'تم الحذف بنجاح');
+        $this->authorize('delete', UserRating::class);
+
+        $this->userRatingService->deleteById($userRating->id);
+
+        return request()->ajax()
+            ? response()->json(['status' => true, 'message' => __('controller.Deleted_item_successfully')])
+            : redirect()->route('dashboard.userRatings.index')->with('success', __('controller.Deleted_item_successfully'));
     }
 }

@@ -16,9 +16,11 @@ class UserRating extends Model
         'rating', 'review', 'is_spoiler', 'helpful_count',
         'status', 'reviewed_at'
     ];
+    protected $appends = ['stars', 'created'];
+
 
     protected $casts = [
-        'rating' => 'decimal:1',
+        'rating' => 'decimal:1  ',
         'is_spoiler' => 'boolean',
         'helpful_count' => 'integer',
         'reviewed_at' => 'datetime',
@@ -75,6 +77,16 @@ class UserRating extends Model
     public function getStarsAttribute()
     {
         return str_repeat('★', floor($this->rating)) . str_repeat('☆', 5 - floor($this->rating));
+    }
+    public function getUserNameAttribute()
+    {
+        return $this->user
+            ? trim($this->user->first_name . ' ' . $this->user->last_name)
+            : 'غير معروف';
+    }
+    public function getCreatedAttribute()
+    {
+        return $this->created_at ? $this->created_at->format('Y-m-d') : null;
     }
 
     // Scopes

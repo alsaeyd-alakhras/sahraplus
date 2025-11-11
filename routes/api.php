@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\API\V1\AnalyticsController;
 use Illuminate\Support\Facades\Route;
 
 // ================================
@@ -83,7 +84,7 @@ Route::prefix('v1')->name('api.v1.')->group(function () {
 
     // 🎬 Movies
     Route::apiResource('movies', MoviesController::class)->only(['index','show']);
-    
+
     // 🎬 Shorts
     Route::apiResource('shorts', ShortController::class)->only(['index','show']);
 
@@ -118,22 +119,33 @@ Route::prefix('v1')->name('api.v1.')->group(function () {
         // 📌 Watchlists
         Route::get('watchlists', [WatchlistsController::class, 'index']);
         Route::get('{type}/{id}/watchlist/status', [WatchlistsController::class, 'status']);
+        Route::post('watchlist/store', [WatchlistsController::class, 'store']);
+        Route::delete('{id}/watchlist/delete', [WatchlistsController::class, 'destroy']);
 
         // 📌 Progress
         Route::get('progress/{type}/{id}', [ProgressController::class, 'show']);
+        Route::put('watch-progress-update/{type}/{id}', [ProgressController::class, 'updateProgress']);
+        Route::get('watch-progress-profiles/{profileId}/continue-watching', [ProgressController::class, 'continueWatching']);
 
         // 📌 History
         Route::get('history', [HistoryController::class, 'index']);
+        Route::get('profiles/{id}/history/stats', [HistoryController::class, 'analytic_history']);
 
         // 📌 Ratings
         Route::get('ratings/{type}/{id}', [RatingsController::class, 'show']);
+        Route::post('rating-store/{type}/{id}', [RatingsController::class, 'store_rating']);
 
         // 📌 Favorites
         Route::get('favorites', [FavoritesController::class, 'index']);
         Route::get('{type}/{id}/favorite/status', [FavoritesController::class, 'status']);
+        Route::post('favorite/toggle/{type}/{id}', [FavoritesController::class, 'toggle']);
 
         // 📌 Downloads
         Route::get('downloads', [DownloadsController::class, 'index']);
-        Route::get('downloads/{download}', [DownloadsController::class, 'show']);
+        Route::get('download/{download}', [DownloadsController::class, 'show']);
+        Route::post('download-store/{type}/{id}', [DownloadsController::class, 'store']);
+
+        //analytics
+        Route::get('admin/analytics', [AnalyticsController::class, 'index']);
     });
 });

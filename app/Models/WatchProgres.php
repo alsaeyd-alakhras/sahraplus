@@ -42,24 +42,34 @@ class WatchProgres extends Model
     }
 
     // Methods
-    public static function updateProgress($profileId, $contentType, $contentId, $watchedSeconds, $totalSeconds)
+    public static function updateProgress($profileId, $contentType, $contentId, $watchedSeconds, $totalSeconds, $user_id)
     {
-        $progressPercentage = ($watchedSeconds / $totalSeconds) * 100;
-        $isCompleted = $progressPercentage >= 85; // يعتبر مكتمل عند 85%
+        $profile = UserProfile::find($profileId);
 
-        return self::updateOrCreate([
-            'profile_id' => $profileId,
-            'content_type' => $contentType,
-            'content_id' => $contentId
-        ], [
-            'user_id' => UserProfile::find($profileId)->user_id,
-            'watched_seconds' => $watchedSeconds,
-            'total_seconds' => $totalSeconds,
-            'progress_percentage' => $progressPercentage,
-            'is_completed' => $isCompleted,
-            'last_watched_at' => now()
-        ]);
+        if (!$profile) {
+            return null; // Handle missing profile
+        }
+
+        $progressPercentage = ($totalSeconds > 0) ? ($watchedSeconds / $totalSeconds) * 100 : 0;
+        $isCompleted = $progressPercentage >= 85;
+
+        return self::updateOrCreate(
+            [
+                'profile_id' => $profileId,
+                'content_type' => $contentType,
+                'content_id' => $contentId,
+            ],
+            [
+                'user_id' => $user_id,
+                'watched_seconds' => $watchedSeconds,
+                'total_seconds' => $totalSeconds,
+                'progress_percentage' => $progressPercentage,
+                'is_completed' => $isCompleted,
+                'last_watched_at' => now(),
+            ]
+        );
     }
+
 
     public function markAsCompleted()
     {

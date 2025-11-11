@@ -3,18 +3,18 @@
 namespace App\Http\Controllers\Dashboard;
 
 use Illuminate\Http\Request;
-use App\Models\MovieCategory;
+use App\Models\Category;
 use App\Http\Controllers\Controller;
 use App\Services\MovieCategoryService;
 use App\Http\Requests\MovieCategoryRequest;
 
-class MovieCategoryController extends Controller
+class CategoryController extends Controller
 {
     public function __construct(private MovieCategoryService $service) {}
 
     public function index()
     {
-        $this->authorize('view', MovieCategory::class);
+        $this->authorize('view', Category::class);
         if (request()->ajax()) return $this->service->datatableIndex(request());
         return view('dashboard.movie_categories.index');
     }
@@ -26,42 +26,42 @@ class MovieCategoryController extends Controller
 
     public function create()
     {
-        $this->authorize('create', MovieCategory::class);
-        $movie_category = new MovieCategory();
+        $this->authorize('create', Category::class);
+        $movie_category = new Category();
         return view('dashboard.movie_categories.create', compact('movie_category'));
     }
 
     public function store(MovieCategoryRequest $request)
     {
-        $this->authorize('create', MovieCategory::class);
+        $this->authorize('create', Category::class);
         $this->service->save($request->validated());
         return redirect()->route('dashboard.movie-categories.index')->with('success','تم إضافة تصنيف');
     }
 
-    public function show(MovieCategory $movie_category)
+    public function show(Category $movie_category)
     {
-        $this->authorize('show', MovieCategory::class);
+        $this->authorize('show', Category::class);
         return view('dashboard.movie_categories.show', compact('movie_category'));
     }
 
     public function edit($id)
     {
-        $this->authorize('update', MovieCategory::class);
-        $movie_category = MovieCategory::findOrFail($id);
+        $this->authorize('update', Category::class);
+        $movie_category = Category::findOrFail($id);
         $btn_label = "تعديل";
         return view('dashboard.movie_categories.edit', compact('movie_category','btn_label'));
     }
 
-    public function update(MovieCategoryRequest $request, MovieCategory $movie_category)
+    public function update(MovieCategoryRequest $request, Category $movie_category)
     {
-        $this->authorize('update', MovieCategory::class);
+        $this->authorize('update', Category::class);
         $this->service->update($request->validated(), $movie_category->id);
         return redirect()->route('dashboard.movie-categories.index')->with('success','تم تعديل التصنيف');
     }
 
-    public function destroy(MovieCategory $movie_category)
+    public function destroy(Category $movie_category)
     {
-        $this->authorize('delete', MovieCategory::class);
+        $this->authorize('delete', Category::class);
         $this->service->deleteById($movie_category->id);
 
         return request()->ajax()

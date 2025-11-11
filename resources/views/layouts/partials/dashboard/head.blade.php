@@ -46,6 +46,7 @@
 
     <link rel="stylesheet" href="{{ asset('assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.css') }}" />
 
+
     <!-- Page CSS -->
 
     <!-- Helpers -->

@@ -21,9 +21,7 @@ class CommentController extends Controller
             'episode' => Episode::class,
             'short'   => Short::class,
         ];
-
         abort_unless(isset($map[$type]), 404);
-
         $model = $map[$type];
         $item  = $model::findOrFail($id);
 

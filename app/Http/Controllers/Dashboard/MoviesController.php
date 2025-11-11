@@ -6,7 +6,7 @@ use App\Models\Movie;
 use App\Models\Person;
 use App\Models\Country;
 use Illuminate\Http\Request;
-use App\Models\MovieCategory;
+use App\Models\Category;
 use App\Services\MovieService;
 use App\Http\Requests\MovieRequest;
 use App\Http\Controllers\Controller;
@@ -70,7 +70,7 @@ class MoviesController extends Controller
     {
         $this->authorize('create', Movie::class);
         $movie = new Movie();
-        $allCategories = MovieCategory::select('id','name_ar','name_en')->orderBy('name_ar')->get();
+        $allCategories = Category::select('id','name_ar','name_en')->orderBy('name_ar')->get();
         $allPeople     = Person::select('id','name_ar','name_en')->orderBy('name_ar')->get();
         $contentRatingOptions = $this->contentRatingOptions;
         $languageOptions = $this->languageOptions;
@@ -125,7 +125,7 @@ class MoviesController extends Controller
                 $country->code => app()->getLocale() == 'ar' ? $country->name_ar : $country->name_en,
             ];
         });
-        $allCategories = MovieCategory::select('id','name_ar','name_en')->orderBy('name_ar')->get();
+        $allCategories = Category::select('id','name_ar','name_en')->orderBy('name_ar')->get();
         $allPeople     = Person::select('id','name_ar','name_en')->orderBy('name_ar')->get();
         $statusOptions = $this->statusOptions;
         return view('dashboard.movies.edit', compact('movie', 'btn_label', 'contentRatingOptions', 'languageOptions', 'countries', 'statusOptions','allCategories','allPeople'));
@@ -139,7 +139,7 @@ class MoviesController extends Controller
         $this->authorize('update', Movie::class);
 
         $this->movieService->update($request->validated(), $movie->id);
-        
+
         return redirect()
             ->route('dashboard.movies.index')
             ->with('success', __('controller.Updated_item_successfully'));

@@ -12,6 +12,7 @@ use App\Models\Season;
 use App\Models\TmdbSyncLog;
 use App\Models\Notification;
 use App\Models\Movie;
+use App\Models\Series;
 use Illuminate\Http\Request;
 use App\Observers\UserObserver;
 use App\Observers\AdminObserver;
@@ -65,7 +66,8 @@ class AppServiceProvider extends ServiceProvider
             'movie' => Movie::class,
             'short' => Short::class,
             'episode' => Episode::class,
-            
+            'series' => Series::class,
+
         ]);
 
         // Observers
@@ -90,6 +92,6 @@ class AppServiceProvider extends ServiceProvider
 
 
 
-        
+
     }
 }

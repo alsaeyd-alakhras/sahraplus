@@ -23,7 +23,7 @@ class ShortService
         if ($request->column_filters) {
             foreach ($request->column_filters as $fieldName => $values) {
                 if (!empty($values)) {
-                    $filteredValues = array_filter($values, fn($v)=>!in_array($v,['الكل','all','All']));
+                    $filteredValues = array_filter($values, fn($v) => !in_array($v, ['الكل', 'all', 'All']));
                     if (!empty($filteredValues)) $query->whereIn($fieldName, $filteredValues);
                 }
             }
@@ -31,7 +31,7 @@ class ShortService
 
         return DataTables::of($query)
             ->addIndexColumn()
-            ->addColumn('edit', fn($m)=> $m->id)
+            ->addColumn('edit', fn($m) => $m->id)
             ->make(true);
     }
 
@@ -42,14 +42,14 @@ class ShortService
         if ($request->active_filters) {
             foreach ($request->active_filters as $fieldName => $values) {
                 if (!empty($values) && $fieldName !== $column) {
-                    $filteredValues = array_filter($values, fn($v)=>!in_array($v,['الكل','all','All']));
+                    $filteredValues = array_filter($values, fn($v) => !in_array($v, ['الكل', 'all', 'All']));
                     if (!empty($filteredValues)) $query->whereIn($fieldName, $filteredValues);
                 }
             }
         }
 
         $uniqueValues = $query->whereNotNull($column)
-            ->where($column,'!=','')->distinct()->pluck($column)->filter()->values()->toArray();
+            ->where($column, '!=', '')->distinct()->pluck($column)->filter()->values()->toArray();
 
         return response()->json($uniqueValues);
     }
@@ -199,6 +199,19 @@ class ShortService
 
             DB::commit();
             return $short;
+        } catch (\Throwable $e) {
+            DB::rollBack();
+            throw $e;
+        }
+    }
+
+    public function deleteById($id)
+    {
+        DB::beginTransaction();
+        try {
+            $deleted = $this->repo->delete($id);
+            DB::commit();
+            return $deleted;
         } catch (\Throwable $e) {
             DB::rollBack();
             throw $e;

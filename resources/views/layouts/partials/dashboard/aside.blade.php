@@ -17,7 +17,8 @@
             <span class="menu-header-text" data-i18n="Apps &amp; Pages">العامة</span>
         </li>
         <!-- Page -->
-        <li class="menu-item {{ request()->is('dashboard/home') || request()->is('dashboard/home/*') ? 'active' : '' }}">
+        <li
+            class="menu-item {{ request()->is('dashboard/home') || request()->is('dashboard/home/*') ? 'active' : '' }}">
             <a href="{{ route('dashboard.home') }}" class="menu-link">
                 <i class="ph ph-house me-2"></i>
                 <div data-i18n="home">الرئيسية</div>
@@ -62,7 +63,7 @@
                 </a>
             </li>
         @endcan
-         @can('view', 'App\\Models\MovieCategory')
+        @can('view', 'App\\Models\MovieCategory')
             <li
                 class="menu-item {{ request()->is('dashboard/movie-categories') || request()->is('dashboard/movie-categories/*') ? 'active' : '' }}">
                 <a href="{{ route('dashboard.movie-categories.index') }}" class="menu-link">
@@ -72,7 +73,7 @@
             </li>
         @endcan
 
-         @can('view', 'App\\Models\Short')
+        @can('view', 'App\\Models\Short')
             <li
                 class="menu-item {{ request()->is('dashboard/shorts') || request()->is('dashboard/shorts/*') ? 'active' : '' }}">
                 <a href="{{ route('dashboard.shorts.index') }}" class="menu-link">
@@ -88,6 +89,26 @@
                 <a href="{{ route('dashboard.people.index') }}" class="menu-link">
                     <i class="ph ph-user me-2"></i>
                     <div data-i18n="people"> {{ __('admin.Person') }}</div>
+                </a>
+            </li>
+        @endcan
+
+        @can('view', 'App\\Models\UserRating')
+            <li
+                class="menu-item {{ request()->is('dashboard/userRatings') || request()->is('dashboard/userRatings/*') ? 'active' : '' }}">
+                <a href="{{ route('dashboard.userRatings.index') }}" class="menu-link">
+                    <i class="ph ph-user me-2"></i>
+                    <div data-i18n="userRatings"> {{ __('admin.userRatings') }}</div>
+                </a>
+            </li>
+        @endcan
+
+        @can('view', 'App\\Models\Download')
+            <li
+                class="menu-item {{ request()->is('dashboard/downloads') || request()->is('dashboard/userRatings/*') ? 'active' : '' }}">
+                <a href="{{ route('dashboard.downloads.index') }}" class="menu-link">
+                    <i class="ph ph-user me-2"></i>
+                    <div data-i18n="downloads"> {{ __('admin.downloads') }}</div>
                 </a>
             </li>
         @endcan
