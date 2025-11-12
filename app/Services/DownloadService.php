@@ -30,7 +30,7 @@ class DownloadService
      */
     public function datatableIndex(Request $request)
     {
-        $countries = $this->downloadRepository->getQuery();
+        $downloads = $this->downloadRepository->getQuery();
 
         // فلترة حسب أعمدة محددة
         if ($request->column_filters) {
@@ -44,18 +44,14 @@ class DownloadService
                     if (empty($filteredValues)) {
                         continue;
                     }
-
                     // الفلاتر العامة
-                    $countries->whereIn($fieldName, $filteredValues);
+                    $downloads->whereIn($fieldName, $filteredValues);
                 }
             }
         }
 
-        return DataTables::of($countries)
+        return DataTables::of($downloads)
             ->addIndexColumn() // رقم تسلسلي
-            ->addColumn('edit', function ($country) {
-                return $country->id;
-            })
             ->make(true);
     }
 
@@ -115,14 +111,14 @@ class DownloadService
             $data['sort_order'] = $data['sort_order'] ?? 0;
 
             // إنشاء السجل
-            $country = $this->downloadRepository->save($data);
+            $download = $this->downloadRepository->save($data);
 
             DB::commit();
         } catch (Exception $e) {
             DB::rollBack();
             return redirect()->back()->with('error', $e->getMessage());
         }
-        return $country;
+        return $download;
     }
 
 
@@ -130,13 +126,13 @@ class DownloadService
     {
         DB::beginTransaction();
         try {
-            $country = $this->downloadRepository->getById($id);
+            $download = $this->downloadRepository->getById($id);
 
             // تحديث السجل
-            $country = $this->downloadRepository->update($data, $id);
+            $download = $this->downloadRepository->update($data, $id);
 
             // لو عندك ActivityLogService ممكن تضيفه هنا
-            // ActivityLogService::log('Updated','Country',"تم تحديث الدولة: {$country->name_ar}.", $countryOld, $country->getChanges());
+            // ActivityLogService::log('Updated','download',"تم تحديث الدولة: {$download->name_ar}.", $downloadOld, $download->getChanges());
 
             DB::commit();
         } catch (Exception $e) {
@@ -144,7 +140,7 @@ class DownloadService
             report($e);
             return redirect()->back()->with('error', $e->getMessage());
         }
-        return $country;
+        return $download;
     }
 
     public function deleteById(int $id)

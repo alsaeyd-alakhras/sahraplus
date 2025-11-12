@@ -12,11 +12,18 @@ class UserRating extends Model
     use HasFactory;
 
     protected $fillable = [
-        'user_id', 'profile_id', 'content_type', 'content_id',
-        'rating', 'review', 'is_spoiler', 'helpful_count',
-        'status', 'reviewed_at'
+        'user_id',
+        'profile_id',
+        'content_type',
+        'content_id',
+        'rating',
+        'review',
+        'is_spoiler',
+        'helpful_count',
+        'status',
+        'reviewed_at'
     ];
-    protected $appends = ['stars', 'created'];
+    protected $appends = ['stars', 'status_trans', 'created',  'content_type_trans','user_name'];
 
 
     protected $casts = [
@@ -113,5 +120,28 @@ class UserRating extends Model
     public function scopeRecent($query)
     {
         return $query->orderBy('reviewed_at', 'desc');
+    }
+
+    public function getContentTypeTransAttribute()
+    {
+        //'pending','downloading','completed','failed','expired'
+        if ($this->content_type == 'movie') {
+            return __('admin.movie');
+        } elseif ($this->content_type == 'series') {
+            return __('admin.series');
+        } elseif ($this->content_type == 'episode') {
+            return __('admin.episode');
+        }
+    }
+    public function getStatusTransAttribute()
+    {
+        //'pending','downloading','completed','failed','expired'
+        if ($this->status == 'pending') {
+            return __('admin.pending');
+        } elseif ($this->status == 'approved') {
+            return __('admin.approved');
+        } elseif ($this->status == 'rejected') {
+            return __('admin.rejected');
+        }
     }
 }

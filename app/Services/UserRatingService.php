@@ -38,24 +38,8 @@ class UserRatingService
 
                     if (empty($filteredValues)) continue;
 
-                    if ($fieldName === 'user_name') {
-                        $users_rating->whereHas('user', function ($q) use ($filteredValues) {
-                            $q->where(function ($query) use ($filteredValues) {
-                                foreach ($filteredValues as $name) {
-                                    // نقسم الاسم المرسل إلى جزئين إذا فيه مسافة
-                                    $parts = explode(' ', $name, 2);
-                                    $first = $parts[0] ?? '';
-                                    $last = $parts[1] ?? '';
-                                    $query->orWhere(function ($q2) use ($first, $last) {
-                                        $q2->where('first_name', 'LIKE', "%{$first}%");
-                                        if ($last) $q2->where('last_name', 'LIKE', "%{$last}%");
-                                    });
-                                }
-                            });
-                        });
-                    } else {
-                        $users_rating->whereIn($fieldName, $filteredValues);
-                    }
+                    $users_rating->whereIn($fieldName, $filteredValues);
+
                 }
             }
         }
@@ -65,8 +49,6 @@ class UserRatingService
         return DataTables::of($users_rating)
             ->addIndexColumn() // رقم تسلسلي
             ->addColumn('edit', fn($user_rating) => $user_rating->id)
-            ->addColumn('user_name', fn($row) => $row->user_name) // accessor
-
             ->make(true);
     }
 
@@ -90,20 +72,6 @@ class UserRatingService
                     }
                 }
             }
-        }
-        if ($column === 'user_name') {
-            $users = DB::table('user_ratings')
-                ->join('users', 'user_ratings.user_id', '=', 'users.id')
-                ->whereNotNull('users.first_name')
-                ->where('users.first_name', '!=', '')
-                ->distinct()
-                ->select(DB::raw("CONCAT(users.first_name, ' ', users.last_name) as user_name"))
-                ->pluck('user_name')
-                ->filter()
-                ->values()
-                ->toArray();
-
-            return response()->json($users);
         }
 
             // جلب القيم الفريدة للعمود المطلوب

@@ -10,13 +10,24 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Download extends Model
 {
-     use HasFactory;
+    use HasFactory;
 
     protected $fillable = [
-        'user_id', 'profile_id', 'content_type', 'content_id',
-        'quality', 'format', 'file_size', 'status', 'progress_percentage',
-        'device_id', 'download_token', 'expires_at', 'completed_at'
+        'user_id',
+        'profile_id',
+        'content_type',
+        'content_id',
+        'quality',
+        'format',
+        'file_size',
+        'status',
+        'progress_percentage',
+        'device_id',
+        'download_token',
+        'expires_at',
+        'completed_at'
     ];
+    protected $appends = ['created', 'duration', 'status_trans', 'user_name', 'expired', 'content_type_trans'];
 
     protected $casts = [
         'file_size' => 'integer',
@@ -75,6 +86,12 @@ class Download extends Model
     public function updateProgress($percentage)
     {
         $this->update(['progress_percentage' => $percentage]);
+    }
+    public function getUserNameAttribute()
+    {
+        return $this->user
+            ? trim($this->user->first_name . ' ' . $this->user->last_name)
+            : 'غير معروف';
     }
 
     public function markAsCompleted()
@@ -140,17 +157,54 @@ class Download extends Model
     public function scopeActive($query)
     {
         return $query->whereIn('status', ['pending', 'downloading', 'completed'])
-                    ->where(function($q) {
-                        $q->whereNull('expires_at')
-                          ->orWhere('expires_at', '>', now());
-                    });
+            ->where(function ($q) {
+                $q->whereNull('expires_at')
+                    ->orWhere('expires_at', '>', now());
+            });
     }
+
     // دالة لحساب مدة التحميل (من الإنشاء إلى الإكمال)
     public function getDurationAttribute()
     {
-        if ($this->completed_at) {
+        if ($this->completed_at && $this->created_at) {
             return $this->created_at->diffForHumans($this->completed_at, true);
         }
         return null;
+    }
+
+    public function getCreatedAttribute()
+    {
+        return $this->created_at ? $this->created_at->format('Y-m-d') : null;
+    }
+    public function getExpiredAttribute()
+    {
+        return $this->expires_at ? $this->expires_at->format('Y-m-d') : null;
+    }
+
+    public function getStatusTransAttribute()
+    {
+        //'pending','downloading','completed','failed','expired'
+        if ($this->status == 'pending') {
+            return __('admin.pending');
+        } elseif ($this->status == 'downloading') {
+            return __('admin.downloading');
+        } elseif ($this->status == 'completed') {
+            return __('admin.completed');
+        } elseif ($this->status == 'failed') {
+            return __('admin.failed');
+        } elseif ($this->status == 'expired') {
+            return __('admin.expired');
+        }
+    }
+    public function getContentTypeTransAttribute()
+    {
+        //'pending','downloading','completed','failed','expired'
+        if ($this->content_type == 'movie') {
+            return __('admin.movie');
+        } elseif ($this->content_type == 'series') {
+            return __('admin.series');
+        } elseif ($this->content_type == 'episode') {
+            return __('admin.episode');
+        }
     }
 }

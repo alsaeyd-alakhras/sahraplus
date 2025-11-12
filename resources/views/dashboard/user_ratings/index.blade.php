@@ -61,10 +61,10 @@
         $fields = [
             'user_name' => __('admin.user'),
             'rating' => __('admin.rating'),
-            'status' => __('admin.status'),
+            'status_trans' => __('admin.status'),
             'stars' => __('admin.stars'),
             'created' => __('admin.created'),
-            'content_type' => __('admin.content_type'),
+            'content_type_trans' => __('admin.content_type'),
         ];
     @endphp
     <div class="shadow-lg enhanced-card">
@@ -203,10 +203,10 @@
                 '#',
                 'user_name',
                 'rating',
-                'status',
+                'status_trans',
                 'stars',
                 'created_at',
-                'content_type',
+                'content_type_trans',
             ];
             const columnsTable = [{
                     data: 'DT_RowIndex',
@@ -219,7 +219,7 @@
                     name: 'user_name',
                     orderable: false,
                     render: function(data, type, row) {
-                        return data?? '';
+                        return data   ?? '';
                     }
                 },
                 {
@@ -230,8 +230,8 @@
                         return data ?? '';
                     }
                 }, {
-                    data: 'status',
-                    name: 'status',
+                    data: 'status_trans',
+                    name: 'status_trans',
                     orderable: false,
                     render: function(data, type, row) {
                         return data ?? '';
@@ -252,8 +252,8 @@
                         return data ?? '';
                     }
                 }, {
-                    data: 'content_type',
-                    name: 'content_type',
+                    data: 'content_type_trans',
+                    name: 'content_type_trans',
                     orderable: false,
                     render: function(data, type, row) {
                         return data ?? '';

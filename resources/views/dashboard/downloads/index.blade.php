@@ -60,12 +60,13 @@
     @php
         $fields = [
             'user_name' => __('admin.user'),
-            'content_type' => __('admin.content_type'),
-            'expires_at' => __('admin.expires_at'),
-            'completed_at' => __('admin.completed_at'),
-            'status' => __('admin.status'),
+            'content_type_trans' => __('admin.content_type'),
+            'expired' => __('admin.expired'),
+            'duration' => __('admin.duration'),
+            'status_trans' => __('admin.status'),
             'quality' => __('admin.quality'),
-            'format' => __('admin.format'),
+            'file_size' => __('admin.file_size'),
+            'device_id' => __('admin.device_id'),
             'created' => __('admin.created_at'),
         ];
     @endphp
@@ -85,45 +86,10 @@
                                     <th>
                                         <div class="d-flex align-items-center justify-content-between">
                                             <span>{{ $label }}</span>
-                                            <div class="enhanced-filter-dropdown">
-                                                <div class="dropdown">
-                                                    <button class="enhanced-btn-filter btn-filter" type="button"
-                                                        data-bs-toggle="dropdown"
-                                                        id="btn-filter-{{ $loop->index + 1 }}">
-                                                        <i class="fas fa-filter"></i>
-                                                    </button>
-                                                    <div class="dropdown-menu enhanced-filter-menu filterDropdownMenu"
-                                                        aria-labelledby="{{ $index }}_filter">
-                                                        <div
-                                                            class="mb-3 d-flex justify-content-between align-items-center">
-                                                            <input type="search" class="form-control search-checkbox"
-                                                                placeholder="ابحث..."
-                                                                data-index="{{ $loop->index + 1 }}">
-                                                            <button
-                                                                class="enhanced-apply-btn ms-2 filter-apply-btn-checkbox"
-                                                                data-target="{{ $loop->index + 1 }}"
-                                                                data-field="{{ $index }}">
-                                                                <i class="fas fa-check"></i>
-                                                            </button>
-                                                        </div>
-                                                        <div class="enhanced-checkbox-list checkbox-list-box">
-                                                            <label style="display: block;">
-                                                                <input type="checkbox" value="all"
-                                                                    class="all-checkbox"
-                                                                    data-index="{{ $loop->index + 1 }}">
-                                                                {{ __('admin.All') }}
-                                                            </label>
-                                                            <div
-                                                                class="checkbox-list checkbox-list-{{ $loop->index + 1 }}">
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
+
                                         </div>
                                     </th>
                                 @endforeach
-                                <th class="enhanced-sticky">{{ __('admin.Action') }}</th>
                             </tr>
                         </thead>
                     </table>
@@ -189,27 +155,23 @@
             const _token = "{{ csrf_token() }}";
             const urlIndex = `{{ route('dashboard.downloads.index') }}`;
             const urlFilters = `{{ route('dashboard.downloads.filters', ':column') }}`;
-            const urlCreate = '{{ route('dashboard.downloads.create') }}';
             const urlShow = '{{ route('dashboard.downloads.show', ':id') }}';
-            const urlEdit = '{{ route('dashboard.downloads.edit', ':id') }}';
-            const urlDelete = '{{ route('dashboard.downloads.destroy', ':id') }}';
 
 
             // ability
-            const abilityCreate = "{{ Auth::guard('admin')->user()->can('create', 'App\\Models\\UserRating') }}";
             const abilityShow = "{{ Auth::guard('admin')->user()->can('show', 'App\\Models\\UserRating') }}";
-            const abilityEdit = "{{ Auth::guard('admin')->user()->can('update', 'App\\Models\\UserRating') }}";
             const abilityDelete = "{{ Auth::guard('admin')->user()->can('delete', 'App\\Models\\UserRating') }}";
 
             const fields = [
                 '#',
                 'user_name',
-                'content_type',
-                'expires_at',
-                'completed_at',
-                'status',
+                'content_type_trans',
+                'expired',
+                'duration',
+                'status_trans',
                 'quality',
-                'format',
+                'file_size',
+                'device_id',
                 'created',
             ];
             const columnsTable = [{
@@ -228,31 +190,31 @@
                     }
                 },
                 {
-                    data: 'content_type',
-                    name: 'content_type',
+                    data: 'content_type_trans',
+                    name: 'content_type_trans',
                     orderable: false,
                     render: function(data, type, row) {
                         return data ?? '';
                     }
                 },
                 {
-                    data: 'expires_at',
-                    name: 'expires_at',
+                    data: 'expired',
+                    name: 'expired',
                     orderable: false,
                     render: function(data, type, row) {
                         return data ?? '';
                     }
                 }, {
-                    data: 'completed_at',
-                    name: 'completed_at',
+                    data: 'duration',
+                    name: 'duration',
                     orderable: false,
                     render: function(data, type, row) {
-                        return data ?? '';
+                        return data ?? "{{ __('admin.notComplete') }}";
                     }
                 },
                 {
-                    data: 'status',
-                    name: 'status',
+                    data: 'status_trans',
+                    name: 'status_trans',
                     orderable: false,
                     render: function(data, type, row) {
                         return data ?? '';
@@ -265,8 +227,15 @@
                         return data ?? '';
                     }
                 }, {
-                    data: 'format',
-                    name: 'format',
+                    data: 'file_size',
+                    name: 'file_size',
+                    orderable: false,
+                    render: function(data, type, row) {
+                        return data ?? '';
+                    }
+                }, {
+                    data: 'device_id',
+                    name: 'device_id',
                     orderable: false,
                     render: function(data, type, row) {
                         return data ?? '';
@@ -279,35 +248,7 @@
                         return data ?? '';
                     }
                 },
-                {
-                    data: 'edit',
-                    name: 'edit',
-                    orderable: false,
-                    searchable: false,
-                    render: function(data, type, row) {
-                        let linkshow = ``;
-                        let linkedit = ``;
-                        let linkdelete = ``;
 
-                        if (abilityEdit) {
-                            linkedit = `
-          <a href="${urlEdit.replace(':id', data)}"
-             class="action-btn btn-edit" title="تعديل">
-            <i class="fas fa-edit"></i>
-          </a>`;
-                        }
-                        if (abilityDelete) {
-                            linkdelete = `
-          <button class="action-btn btn-delete delete_row"
-                  data-id="${data}" title="حذف">
-            <i class="fas fa-trash"></i>
-          </button>`;
-                        }
-                        return `<div class="d-flex align-items-center justify-content-evenly">
-              ${linkedit}${linkdelete}
-              </div>`;
-                    }
-                },
             ];
         </script>
 

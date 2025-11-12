@@ -44,12 +44,13 @@ class DownloadRepository
 
     /**
      * Base query builder for countries.
-     *
+     *dashboard
      * @return \Illuminate\Database\Eloquent\Builder
      */
     public function getQuery()
     {
-        return $this->download->query()->inProgress()->expired();
+        return $this->download->query()
+            ->whereIn('status', ['downloading', 'completed']);
     }
 
     /**

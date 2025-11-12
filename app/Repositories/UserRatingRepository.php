@@ -51,7 +51,7 @@ class UserRatingRepository
     public function getQuery()
     {
         return $this->userRating
-               ->query();
+               ->query()->with('user');
     }
 
     /**
