@@ -2,41 +2,14 @@
     <!-- Hero Section -->
     <section id="hero" class="overflow-hidden relative h-screen">
         <!-- Slides -->
-        <div class="absolute inset-0 opacity-100 hero-slide">
-            <img src="{{asset('assets-site/images/slider/slider1.avif')}}" alt="Hero Background"
+        @foreach(($heroItems ?? collect()) as $item)
+        <div class="absolute inset-0 {{ $loop->first ? 'opacity-100' : 'opacity-0' }} hero-slide">
+            <img src="{{ $item['backdrop'] ?? $item['poster'] ?? asset('assets-site/images/slider/slider1.avif') }}" alt="Hero Background"
                 class="object-cover absolute inset-0 w-full h-full" />
-            <video src="{{asset('assets-site/videos/mov_bbb.mp4')}}" class="hidden object-cover absolute inset-0 w-full h-full"
-                playsinline></video>
+            <video src="{{asset('assets-site/videos/mov_bbb.mp4')}}" class="hidden object-cover absolute inset-0 w-full h-full" playsinline></video>
             <div class="absolute inset-0 hero-gradient"></div>
         </div>
-        <div class="absolute inset-0 opacity-0 hero-slide">
-            <img src="{{asset('assets-site/images/slider/slider2.avif')}}" alt="Hero Background"
-                class="object-cover absolute inset-0 w-full h-full" />
-            <video src="{{asset('assets-site/videos/mov_bbb.mp4')}}" class="hidden object-cover absolute inset-0 w-full h-full"
-                playsinline></video>
-            <div class="absolute inset-0 hero-gradient"></div>
-        </div>
-        <div class="absolute inset-0 opacity-0 hero-slide">
-            <img src="{{asset('assets-site/images/slider/slider3.avif')}}" alt="Hero Background"
-                class="object-cover absolute inset-0 w-full h-full" />
-            <video src="./assets/videos/mov_bbb.mp4" class="hidden object-cover absolute inset-0 w-full h-full"
-                playsinline></video>
-            <div class="absolute inset-0 hero-gradient"></div>
-        </div>
-        <div class="absolute inset-0 opacity-0 hero-slide">
-            <img src="{{asset('assets-site/images/slider/slider4.avif')}}" alt="Hero Background"
-                class="object-cover absolute inset-0 w-full h-full" />
-            <video src="{{asset('assets-site/videos/mov_bbb.mp4')}}" class="hidden object-cover absolute inset-0 w-full h-full"
-                playsinline></video>
-            <div class="absolute inset-0 hero-gradient"></div>
-        </div>
-        <div class="absolute inset-0 opacity-0 hero-slide">
-            <img src="{{asset('assets-site/images/slider/slider5.avif')}}" alt="Hero Background"
-                class="object-cover absolute inset-0 w-full h-full" />
-            <video src="{{asset('assets-site/videos/mov_bbb.mp4')}}" class="hidden object-cover absolute inset-0 w-full h-full"
-                playsinline></video>
-            <div class="absolute inset-0 hero-gradient"></div>
-        </div>
+        @endforeach
 
 
         <!-- Mute/Unmute Button -->
@@ -55,11 +28,12 @@
                 <div
                     class="max-w-[25rem] opacity-80 transition-all duration-500 ease-in-out transform translate-x-0 hero-content hover:opacity-100 hover:-translate-x-10">
                     <div class="mb-8 h-[80px] logo-wrapper transition-all duration-500 ease-in-out">
-                        <img src="{{asset('assets-site/images/logos/logo1.avif')}}" alt="logo"
+                        @php $currentHero = ($heroItems ?? collect())->first(); @endphp
+                        <img src="{{ $currentHero['logo'] ?? asset('assets-site/images/logos/logo1.avif') }}" alt="logo"
                             class="object-contain h-full transition-all duration-300 hover:scale-125" />
                     </div>
                     <div class="text-base text-gray-400 transition-all duration-300 episode animate-slide-up">
-                        الموسم 1، الحلقة 1
+                        {{ $currentHero['title'] ?? '' }}
                     </div>
                     <div class="flex items-center my-4 space-x-2 rtl:space-x-reverse animate-slide-up">
                         <button
@@ -69,7 +43,7 @@
                                     d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
                             </svg>
                         </button>
-                        <a href="#"
+                        <a href="{{ $currentHero['url'] ?? '#' }}"
                             class="flex items-center px-8 py-2 space-x-2 text-lg font-bold text-white rounded-lg transition-all duration-300 bg-fire-red hover:bg-red-700 btn-glow rtl:space-x-reverse">
                             <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
                                 <path d="M8 5v14l11-7z" />
@@ -79,11 +53,15 @@
                     </div>
                     <p
                         class="mb-6 max-w-xl text-xl leading-relaxed text-gray-200 transition-all duration-300 md:text-lg animate-slide-up description">
-                        بعد خيانة أصدقائه والمرأة التي أحبها...
+                        {{ $currentHero['description'] ?? '' }}
                     </p>
                     <div
                         class="flex flex-wrap items-center mb-6 space-x-3 text-sm text-gray-400 rtl:space-x-reverse tags animate-slide-up">
-                        <!-- يتم توليدها ديناميكيًا -->
+                        @if(!empty($currentHero['tags']))
+                            @foreach($currentHero['tags'] as $tag)
+                                <span class="px-2 py-1 rounded bg-white/10">{{ $tag }}</span>
+                            @endforeach
+                        @endif
                     </div>
 
                 </div>
@@ -94,92 +72,63 @@
 
         <!-- Hero Navigation Dots -->
         <div class="flex absolute bottom-8 left-1/2 z-20 space-x-3 transform -translate-x-1/2 rtl:space-x-reverse">
-            <button
-                class="w-full h-[72px] hero-dot opacity-75 hover:opacity-100 hover:scale-110 transition-all duration-300"><img
-                    src="{{asset('assets-site/images/logos/logo1.avif')}}" alt="logo1"
-                    class="object-contain w-full h-full" /></button>
-            <button
-                class="w-full h-[72px] hero-dot opacity-75 hover:opacity-100 hover:scale-110 transition-all duration-300"><img
-                    src="{{asset('assets-site/images/logos/logo2.avif')}}" alt="logo2"
-                    class="object-contain w-full h-full" /></button>
-            <button
-                class="w-full h-[72px] hero-dot opacity-75 hover:opacity-100 hover:scale-110 transition-all duration-300"><img
-                    src="{{asset('assets-site/images/logos/logo3.avif')}}" alt="logo3"
-                    class="object-contain w-full h-full" /></button>
-            <button
-                class="w-full h-[72px] hero-dot opacity-75 hover:opacity-100 hover:scale-110 transition-all duration-300"><img
-                    src="{{asset('assets-site/images/logos/logo4.avif')}}" alt="logo4"
-                    class="object-contain w-full h-full" /></button>
-            <button
-                class="w-full h-[72px] hero-dot opacity-75 hover:opacity-100 hover:scale-110 transition-all duration-300"><img
-                    src="{{asset('assets-site/images/logos/logo5.avif')}}" alt="logo5"
-                    class="object-contain w-full h-full" /></button>
+            @foreach(($heroItems ?? collect()) as $item)
+                <button class="w-full h-[72px] hero-dot opacity-75 hover:opacity-100 hover:scale-110 transition-all duration-300">
+                    <img src="{{ $item['logo'] ?? $item['poster'] ?? asset('assets-site/images/logos/logo1.avif') }}" alt="logo{{ $loop->iteration }}" class="object-contain w-full h-full" />
+                </button>
+            @endforeach
         </div>
     </section>
 
     <!-- horizontal slider -->
     <div class="overflow-visible mb-6 px-4 py-6 mx-auto max-w-[95%]">
         <!-- عنوان القسم -->
-        <h2 class="mb-4 text-2xl font-bold text-right">إصدارات جديدة</h2>
+        <h2 class="mb-4 text-2xl font-bold text-right">{{ optional($categoryMovies['category'] ?? null)->name ?? 'إصدارات جديدة' }}</h2>
 
         <!-- سلايدر Swiper -->
         <div class="isolate overflow-visible relative pb-44 swiper mySwiper-horizontal">
             <div class="swiper-wrapper">
-                <script>
-                    const movies2 = [
-                        "Hello+World",
-                        "Movie+1",
-                        "Guardians",
-                        "Lost+City",
-                        "Action+Show",
-                        "Romance+Story",
-                        "The+Heist",
-                        "Last+Stand",
-                        "Arab+Drama",
-                        "Old+Legends",
-                    ];
-                    for (let title of movies2) {
-                        document.write(`
-              <div class="swiper-slide">
-                <div class="movie-slider-card">
-                  <img src="https://placehold.co/320x190?text=${title}" alt="${title}" class="object-cover w-full rounded-md aspect-video">
-                  <div class="movie-slider-details">
-                    <h3 class="text-lg font-bold">${title.replace(
-                        "+",
-                        " "
-                    )}</h3>
-                    <div class="movie-slider-line">
-                      <span>01:46:34</span>
-                      <span class="text-green-400">•</span>
-                      <span>كوميدي</span>
-                      <span class="text-green-400">•</span>
-                      <span>رومانسي</span>
+                @if(!empty($categoryMovies['items']))
+                    @foreach($categoryMovies['items'] as $m)
+                    <div class="swiper-slide">
+                        <div class="movie-slider-card">
+                            <img src="{{ $m['poster'] ?? 'https://placehold.co/320x190' }}" alt="{{ $m['title'] }}" class="object-cover w-full rounded-md aspect-video">
+                            <div class="movie-slider-details">
+                                <h3 class="text-lg font-bold">{{ $m['title'] }}</h3>
+                                <div class="movie-slider-line">
+                                    @php $tags = $m['tags'] ?? []; @endphp
+                                    @if(count($tags) >= 1)
+                                        <span>{{ $tags[0] }}</span>
+                                    @endif
+                                    @if(count($tags) >= 2)
+                                        <span class="text-green-400">•</span>
+                                        <span>{{ $tags[1] }}</span>
+                                    @endif
+                                </div>
+                                <div class="pr-2 text-xs font-bold text-teal-400 border-r-4 border-teal-500">
+                                    {{ $m['title'] }}
+                                </div>
+                                <div class="flex items-center space-x-4 rtl:space-x-reverse animate-scale-in">
+                                    <button
+                                        class="flex items-center px-1 py-1 text-lg font-bold text-white bg-gray-800 bg-opacity-80 rounded-full transition-all duration-300 hover:bg-red-700 btn-glow rtl:space-x-reverse">
+                                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                                        </svg>
+                                    </button>
+                                    <a href="{{ $m['url'] ?? '#' }}"
+                                        class="flex items-center px-4 py-1 space-x-2 font-bold text-white rounded-lg transition-all duration-300 text-[10px] bg-fire-red hover:bg-red-700 btn-glow rtl:space-x-reverse">
+                                        <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                                            <path d="M8 5v14l11-7z" />
+                                        </svg>
+                                        <span>شاهد الآن</span>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <div class="pr-2 text-xs font-bold text-teal-400 border-r-4 border-teal-500">
-                      البطل الذي لا يريد القوة
-                    </div>
-                    <div class="flex items-center space-x-4 rtl:space-x-reverse animate-scale-in">
-                        <button
-                            class="flex items-center px-1 py-1 text-lg font-bold text-white bg-gray-800 bg-opacity-80 rounded-full transition-all duration-300 hover:bg-red-700 btn-glow rtl:space-x-reverse">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
-                            </svg>
-                        </button>
-                        <a href="#"
-                            class="flex items-center px-4 py-1 space-x-2 font-bold text-white rounded-lg transition-all duration-300 text-[10px] bg-fire-red hover:bg-red-700 btn-glow rtl:space-x-reverse">
-                            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M8 5v14l11-7z" />
-                            </svg>
-                            <span>شاهد الآن</span>
-                        </a>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            `);
-                    }
-                </script>
+                    @endforeach
+                @endif
             </div>
 
             <!-- الأسهم -->
@@ -189,66 +138,52 @@
     </div>
     <div class="overflow-visible mb-6 px-4 py-6 mx-auto max-w-[95%]">
         <!-- عنوان القسم -->
-        <h2 class="mb-4 text-2xl font-bold text-right">أفلام كورية</h2>
+        <h2 class="mb-4 text-2xl font-bold text-right">{{ optional($categorySeries['category'] ?? null)->name ?? 'أفلام كورية' }}</h2>
 
         <!-- سلايدر Swiper -->
         <div class="isolate overflow-visible relative pb-44 swiper mySwiper-horizontal">
             <div class="swiper-wrapper">
-                <script>
-                    const movies3 = [
-                        "Hello+World",
-                        "Movie+1",
-                        "Guardians",
-                        "Lost+City",
-                        "Action+Show",
-                        "Romance+Story",
-                        "The+Heist",
-                        "Last+Stand",
-                        "Arab+Drama",
-                        "Old+Legends",
-                    ];
-                    for (let title of movies3) {
-                        document.write(`
-              <div class="swiper-slide">
-                <div class="movie-slider-card">
-                  <img src="https://placehold.co/320x190?text=${title}" alt="${title}" class="object-cover w-full rounded-md aspect-video">
-                  <div class="movie-slider-details">
-                    <h3 class="text-lg font-bold">${title.replace(
-                        "+",
-                        " "
-                    )}</h3>
-                    <div class="movie-slider-line">
-                      <span>01:46:34</span>
-                      <span class="text-green-400">•</span>
-                      <span>كوميدي</span>
-                      <span class="text-green-400">•</span>
-                      <span>رومانسي</span>
+                @if(!empty($categorySeries['items']))
+                    @foreach($categorySeries['items'] as $s)
+                    <div class="swiper-slide">
+                        <div class="movie-slider-card">
+                            <img src="{{ $s['poster'] ?? 'https://placehold.co/320x190' }}" alt="{{ $s['title'] }}" class="object-cover w-full rounded-md aspect-video">
+                            <div class="movie-slider-details">
+                                <h3 class="text-lg font-bold">{{ $s['title'] }}</h3>
+                                <div class="movie-slider-line">
+                                    @php $tags = $s['tags'] ?? []; @endphp
+                                    @if(count($tags) >= 1)
+                                        <span>{{ $tags[0] }}</span>
+                                    @endif
+                                    @if(count($tags) >= 2)
+                                        <span class="text-green-400">•</span>
+                                        <span>{{ $tags[1] }}</span>
+                                    @endif
+                                </div>
+                                <div class="pr-2 text-xs font-bold text-teal-400 border-r-4 border-teal-500">
+                                    {{ $s['title'] }}
+                                </div>
+                                <div class="flex items-center space-x-4 rtl:space-x-reverse animate-scale-in">
+                                    <button
+                                        class="flex items-center px-1 py-1 text-lg font-bold text-white bg-gray-800 bg-opacity-80 rounded-full transition-all duration-300 hover:bg-red-700 btn-glow rtl:space-x-reverse">
+                                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                                        </svg>
+                                    </button>
+                                    <a href="{{ $s['url'] ?? '#' }}"
+                                        class="flex items-center px-4 py-1 space-x-2 font-bold text-white rounded-lg transition-all duration-300 text-[10px] bg-fire-red hover:bg-red-700 btn-glow rtl:space-x-reverse">
+                                        <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                                            <path d="M8 5v14l11-7z" />
+                                        </svg>
+                                        <span>شاهد الآن</span>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <div class="pr-2 text-xs font-bold text-teal-400 border-r-4 border-teal-500">
-                      البطل الذي لا يريد القوة
-                    </div>
-                    <div class="flex items-center space-x-4 rtl:space-x-reverse animate-scale-in">
-                        <button
-                            class="flex items-center px-1 py-1 text-lg font-bold text-white bg-gray-800 bg-opacity-80 rounded-full transition-all duration-300 hover:bg-red-700 btn-glow rtl:space-x-reverse">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
-                            </svg>
-                        </button>
-                        <a href="#"
-                            class="flex items-center px-4 py-1 space-x-2 font-bold text-white rounded-lg transition-all duration-300 text-[10px] bg-fire-red hover:bg-red-700 btn-glow rtl:space-x-reverse">
-                            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M8 5v14l11-7z" />
-                            </svg>
-                            <span>شاهد الآن</span>
-                        </a>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            `);
-                    }
-                </script>
+                    @endforeach
+                @endif
             </div>
 
             <!-- الأسهم -->
@@ -265,120 +200,67 @@
         <!-- سلايدر Swiper -->
         <div class="isolate overflow-visible relative pb-44 swiper mySwiper-horizontal">
             <div class="swiper-wrapper">
-                <script>
-                    const movies5 = [{
-                            'title': 'Hello World',
-                            'time': '01:46:34',
-                            'progress': '50%',
-                        },
-                        {
-                            'title': 'Movie 1',
-                            'time': '01:46:34',
-                            'progress': '50%',
-                        },
-                        {
-                            'title': 'Guardians',
-                            'time': '01:46:34',
-                            'progress': '50%',
-                        },
-                        {
-                            'title': 'Lost City',
-                            'time': '01:46:34',
-                            'progress': '50%',
-                        },
-                        {
-                            'title': 'Action Show',
-                            'time': '01:46:34',
-                            'progress': '50%',
-                        },
-                        {
-                            'title': 'Romance Story',
-                            'time': '01:46:34',
-                            'progress': '50%',
-                        },
-                        {
-                            'title': 'The Heist',
-                            'time': '01:46:34',
-                            'progress': '50%',
-                        },
-                        {
-                            'title': 'Last Stand',
-                            'time': '01:46:34',
-                            'progress': '50%',
-                        },
-                        {
-                            'title': 'Arab Drama',
-                            'time': '01:46:34',
-                            'progress': '50%',
-                        },
-                        {
-                            'title': 'Old Legends',
-                            'time': '01:46:34',
-                            'progress': '50%',
-                        },
-                    ];
-                    for (let movie of movies5) {
-                        document.write(`
-                <div class="swiper-slide">
-                <div class="movie-slider-card">
-                    <div class="relative">
-                        <img src="https://placehold.co/320x190?text=${movie.title}" alt="${movie.title}" class="object-cover w-full rounded-md aspect-video">
-                        <!-- شريط المدة -->
-                        <div class="absolute bottom-0 left-0 w-[${movie.progress}] h-1 bg-teal-400"></div>
-                        <!-- زر التشغيل فوق الصورة -->
-                        <button class="flex absolute inset-0 justify-end items-end p-4 gap-[8px]">
-                            <span class="text-white md:vw-text-[10] text-[10px]">${movie.time}</span>
-                            <span class="relative flex shrink-0 items-center justify-center text-shahidGray h-[24px] w-[24px] md:vw-h-[24] md:vw-w-[24]">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32" class="absolute inset-0 w-full h-full group-hover/media-btn:hidden">
-                                    <defs>
-                                        <linearGradient id="linearGradient-0.5315750833316147" x1="0%" x2="100%" y1="50%" y2="50%">
-                                            <stop offset="0%" stop-color="#0C9"></stop>
-                                            <stop offset="100%" stop-color="#09F"></stop>
-                                        </linearGradient>
-                                    </defs>
-                                    <g fill="none" fill-opacity="0.4" fill-rule="evenodd" stroke="none" stroke-width="1">
-                                        <rect width="31" height="31" x="0.5" y="0.5" fill="#181D25" stroke="url(#linearGradient-0.5315750833316147)" rx="15.5"></rect>
-                                    </g>
-                                </svg>
-                                <span class="hidden absolute inset-0 w-full h-full rounded-full bg-primary group-hover/media-btn:inline-block"></span>
-                                <img alt="playIcon" title="لعب" class="relative h-[16px] w-[16px] 2xl:vw-h-[14] 2xl:vw-w-[14]" src="https://shahid.mbc.net/staticFiles/production/static/images/shdicons-24-2-px-player-play-filled.svg">
-                            </span>
-                        </button>
-                    </div>
-                    <div class="movie-slider-details">
-                        <div class="pr-2 text-xs font-bold text-teal-400 border-r-4 border-teal-500">
-                            تابع المسلسل الحلقة 29
-                        </div>
-                        <div class="flex items-center space-x-4 rtl:space-x-reverse animate-scale-in">
-                            <div class="flex gap-x-4">
-                                <!-- زر: المزيد من المعلومات -->
-                                <button class="flex gap-1 items-center transition-all duration-200 group hover:text-white">
-                                <span class="flex relative justify-center items-center w-6 h-6 rounded-full transition-transform duration-300 shrink-0 text-shahidGray bg-white/5 group-hover:rotate-12 group-hover:scale-110">
-                                    <i class="fa-solid fa-info"></i>
-                                </span>
-                                <span class="text-xs truncate transition-colors duration-200 text-shahidGray group-hover:text-white">
-                                    المزيد من المعلومات
-                                </span>
-                                </button>
-
-                                <!-- زر: إزالة -->
-                                <button class="flex gap-1 items-center transition-all duration-200 group hover:text-white">
-                                <span class="relative flex shrink-0 items-center justify-center text-shahidGray h-6 w-6 rounded-full bg-white/5 group-hover:rotate-[18deg] group-hover:scale-110 transition-transform duration-300">
-                                    <i class="fa-solid fa-trash"></i>
-                                </span>
-                                <span class="text-xs truncate transition-colors duration-200 text-shahidGray group-hover:text-white">
-                                    إزالة
-                                </span>
-                                </button>
-
+                @auth
+                    @if(($continueWatching ?? collect())->count())
+                        @foreach($continueWatching as $cw)
+                        <div class="swiper-slide">
+                            <div class="movie-slider-card">
+                                <div class="relative">
+                                    <img src="{{ $cw['poster'] ?? 'https://placehold.co/320x190' }}" alt="{{ $cw['title'] }}" class="object-cover w-full rounded-md aspect-video">
+                                    <!-- شريط المدة -->
+                                    <div class="absolute bottom-0 left-0 h-1 bg-teal-400" style="width: {{ $cw['progress_pct'] ?? 0 }}%"></div>
+                                    <!-- زر التشغيل فوق الصورة -->
+                                    <button class="flex absolute inset-0 justify-end items-end p-4 gap-[8px]">
+                                        <span class="text-white md:vw-text-[10] text-[10px]">{{ $cw['time'] ?? '00:00:00' }}</span>
+                                        <span class="relative flex shrink-0 items-center justify-center text-shahidGray h-[24px] w-[24px] md:vw-h-[24] md:vw-w-[24]">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32" class="absolute inset-0 w-full h-full group-hover/media-btn:hidden">
+                                                <defs>
+                                                    <linearGradient id="linearGradient-0.5315750833316147" x1="0%" x2="100%" y1="50%" y2="50%">
+                                                        <stop offset="0%" stop-color="#0C9"></stop>
+                                                        <stop offset="100%" stop-color="#09F"></stop>
+                                                    </linearGradient>
+                                                </defs>
+                                                <g fill="none" fill-opacity="0.4" fill-rule="evenodd" stroke="none" stroke-width="1">
+                                                    <rect width="31" height="31" x="0.5" y="0.5" fill="#181D25" stroke="url(#linearGradient-0.5315750833316147)" rx="15.5"></rect>
+                                                </g>
+                                            </svg>
+                                            <span class="hidden absolute inset-0 w-full h-full rounded-full bg-primary group-hover/media-btn:inline-block"></span>
+                                            <img alt="playIcon" title="لعب" class="relative h-[16px] w-[16px] 2xl:vw-h-[14] 2xl:vw-w-[14]" src="https://shahid.mbc.net/staticFiles/production/static/images/shdicons-24-2-px-player-play-filled.svg">
+                                        </span>
+                                    </button>
+                                </div>
+                                <div class="movie-slider-details">
+                                    <div class="pr-2 text-xs font-bold text-teal-400 border-r-4 border-teal-500">
+                                        {{ $cw['title'] }}
+                                    </div>
+                                    <div class="flex items-center space-x-4 rtl:space-x-reverse animate-scale-in">
+                                        <div class="flex gap-x-4">
+                                            <!-- زر: المزيد من المعلومات -->
+                                            <a href="{{ $cw['url'] ?? '#' }}" class="flex gap-1 items-center transition-all duration-200 group hover:text-white">
+                                                <span class="flex relative justify-center items-center w-6 h-6 rounded-full transition-transform duration-300 shrink-0 text-shahidGray bg-white/5 group-hover:rotate-12 group-hover:scale-110">
+                                                    <i class="fa-solid fa-info"></i>
+                                                </span>
+                                                <span class="text-xs truncate transition-colors duration-200 text-shahidGray group-hover:text-white">
+                                                    المزيد من المعلومات
+                                                </span>
+                                            </a>
+                                            <!-- زر: إزالة -->
+                                            <button class="flex gap-1 items-center transition-all duration-200 group hover:text-white">
+                                                <span class="relative flex shrink-0 items-center justify-center text-shahidGray h-6 w-6 rounded-full bg-white/5 group-hover:rotate-[18deg] group-hover:scale-110 transition-transform duration-300">
+                                                    <i class="fa-solid fa-trash"></i>
+                                                </span>
+                                                <span class="text-xs truncate transition-colors duration-200 text-shahidGray group-hover:text-white">
+                                                    إزالة
+                                                </span>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                </div>
-                </div>
-            `);
-                    }
-                </script>
+                        @endforeach
+                    @endif
+                @endauth
             </div>
 
             <!-- الأسهم -->
@@ -395,36 +277,17 @@
 
         <div class="overflow-visible relative swiper mySwiper-vertical">
             <div class="swiper-wrapper">
-                <script>
-                    const movies = [
-                        "مسلسل+1",
-                        "مسلسل+2",
-                        "مسلسل+3",
-                        "مسلسل+4",
-                        "مسلسل+5",
-                        "مسلسل+6",
-                        "مسلسل+7",
-                        "مسلسل+8",
-                        "مسلسل+9",
-                        "مسلسل+10",
-                    ];
-                    for (let title of movies) {
-                        document.write(`
-              <div class="swiper-slide w-[140px]">
-                <div class="movie-vertical-card">
-                  <img src="https://placehold.co/270x400?text=${title}" alt="${title}" class="object-cover w-full rounded-md">
-                  <div class="text-xs text-center movie-vertical-details">
-                    <span class="block font-bold text-white">${title.replace(
-                        "+",
-                        " "
-                    )}</span>
-                    <span class="block mt-1 text-blue-400">حلقة متوفرة مجاناً</span>
-                  </div>
+                @foreach(($topViewed ?? collect()) as $tv)
+                <div class="swiper-slide w-[140px]">
+                    <div class="movie-vertical-card">
+                        <img src="{{ $tv['poster'] ?? 'https://placehold.co/270x400' }}" alt="{{ $tv['title'] }}" class="object-cover w-full rounded-md">
+                        <div class="text-xs text-center movie-vertical-details">
+                            <span class="block font-bold text-white">{{ $tv['title'] }}</span>
+                            <span class="block mt-1 text-blue-400">حلقة متوفرة مجاناً</span>
+                        </div>
+                    </div>
                 </div>
-              </div>
-            `);
-                    }
-                </script>
+                @endforeach
             </div>
 
             <div class="text-white swiper-button-next"></div>
@@ -438,19 +301,13 @@
         <!-- Swiper container -->
         <div class="overflow-visible pb-8 swiper mySwiper-categories">
             <div class="swiper-wrapper">
-                <script>
-                    const categories = 14;
-
-                    for (let i = 0; i < categories; i++) {
-                        document.write(`
-                        <div class="swiper-slide">
-                            <a href="./categories.html" class="overflow-hidden relative w-64 h-64 rounded-lg transition-transform duration-300 transform cursor-pointer hover:scale-125 group">
-                                <img src="{{asset('assets-site/images/categories/${i + 1}.png')}}" alt="${i + 1}" class="object-cover w-full h-full transition-all duration-300 group-hover:brightness-75">
-                            </a>
-                        </div>
-                    `);
-                    }
-                </script>
+                @foreach(($categoriesList ?? collect()) as $cat)
+                <div class="swiper-slide">
+                    <a href="{{ route('site.categories.show', $cat) }}" class="overflow-hidden relative w-64 h-64 rounded-lg transition-transform duration-300 transform cursor-pointer hover:scale-125 group">
+                        <img src="{{ $cat->image_full_url }}" alt="{{ $cat->name ?? $cat->name_ar ?? '' }}" class="object-cover w-full h-full transition-all duration-300 group-hover:brightness-75">
+                    </a>
+                </div>
+                @endforeach
             </div>
 
             <!-- Navigation arrows -->
@@ -463,33 +320,17 @@
 
         <div class="overflow-visible relative swiper best10Swiper">
             <div class="swiper-wrapper">
-                <script>
-                    const top10 = [
-                        "https://placehold.co/400x600?text=1",
-                        "https://placehold.co/400x600?text=2",
-                        "https://placehold.co/400x600?text=3",
-                        "https://placehold.co/400x600?text=4",
-                        "https://placehold.co/400x600?text=5",
-                        "https://placehold.co/400x600?text=6",
-                        "https://placehold.co/400x600?text=7",
-                        "https://placehold.co/400x600?text=8",
-                        "https://placehold.co/400x600?text=9",
-                        "https://placehold.co/400x600?text=10",
-                    ];
-                    top10.forEach((url, index) => {
-                        document.write(`
-              <div class="swiper-slide">
-                <div class="overflow-hidden relative rounded-md group">
-                  <img src="${url}" alt="Top ${index + 1}" class="object-cover w-full h-auto rounded-md transition-transform duration-300 group-hover:scale-105">
-                  <div class="absolute top-0 right-0 z-10 px-3 py-1 text-xs font-bold text-white bg-pink-600 rounded-bl-md">
-                    TOP<br>${index + 1}
-                  </div>
-                  <div class="py-2 text-sm text-center text-white bg-gray-900">حلقات متوفرة مجانًا</div>
+                @foreach(($top10 ?? collect()) as $index => $item)
+                <div class="swiper-slide">
+                    <div class="overflow-hidden relative rounded-md group">
+                        <img src="{{ $item['poster'] ?? 'https://placehold.co/400x600' }}" alt="Top {{ $index + 1 }}" class="object-cover w-full h-auto rounded-md transition-transform duration-300 group-hover:scale-105">
+                        <div class="absolute top-0 right-0 z-10 px-3 py-1 text-xs font-bold text-white bg-pink-600 rounded-bl-md">
+                            TOP<br>{{ $index + 1 }}
+                        </div>
+                        <div class="py-2 text-sm text-center text-white bg-gray-900">حلقات متوفرة مجانًا</div>
+                    </div>
                 </div>
-              </div>
-            `);
-                    });
-                </script>
+                @endforeach
             </div>
 
             <!-- الأسهم -->

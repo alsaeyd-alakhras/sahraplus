@@ -358,7 +358,7 @@
                                                 - {{ $series->pivot->character_name }}
                                             @endif
                                         </p>
-                                        <a href="{{ route('site.series.show', $movie->slug) }}"
+                                        <a href="{{ route('site.series.show', $series->slug) }}"
                                             class="py-2 w-full text-white bg-sky-500 rounded-lg transition-all duration-300 hover:bg-sky-600">
                                             <i class="mr-2 fas fa-play"></i>
                                             <span>مشاهدة</span>

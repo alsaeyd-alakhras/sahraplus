@@ -25,6 +25,7 @@ Route::group([
         Route::get('/',[FrontController::class,'index'])->name('home');
         Route::get('/live',[FrontController::class,'live'])->name('live');
         Route::get('/categories',[FrontController::class,'categories'])->name('categories');
+        Route::get('/categories/{category}',[FrontController::class,'categoryShow'])->name('categories.show');
         Route::get('/actors',[FrontController::class,'actors'])->name('actors');
         Route::get('/shorts',[FrontController::class,'shorts'])->name('shorts');
         

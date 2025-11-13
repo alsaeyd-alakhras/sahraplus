@@ -27,7 +27,7 @@ class EpisodeFactory extends Factory
             'title_en'         => $titleEn,
             'description_ar'   => 'وصف للحلقة ' . $this->faker->sentence(8),
             'description_en'   => $this->faker->paragraph(),
-            'thumbnail_url'    => $this->faker->imageUrl(800, 450, 'episode'),
+            'thumbnail_url'    => 'https://placehold.co/600x400?text=movie+molestiae',
             'duration_minutes' => $this->faker->numberBetween(20, 60),
             'air_date'         => $this->faker->date(),
             'imdb_rating'      => $this->faker->randomFloat(1, 5, 9),

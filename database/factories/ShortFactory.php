@@ -24,7 +24,7 @@ class ShortFactory extends Factory
             'title'          => $title,
             'description'    => $this->faker->sentence(12),
             'video_path'     => $this->faker->url(),
-            'poster_path'    => $this->faker->imageUrl(720, 1280, 'short'),
+            'poster_path'    => 'https://placehold.co/720x1280?text=movie+molestiae',
             'aspect_ratio'   => $this->faker->randomElement(['vertical', 'horizontal']),
             'likes_count'    => $this->faker->numberBetween(0, 5000),
             'comments_count' => $this->faker->numberBetween(0, 500),

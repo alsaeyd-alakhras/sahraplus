@@ -86,6 +86,12 @@ Route::prefix('v1')->name('api.v1.')->group(function () {
     
     // 🎬 Shorts
     Route::apiResource('shorts', ShortController::class)->only(['index','show']);
+    
+    // Shorts interactions (like/save/share)
+    Route::post('shorts/{id}/like', [ShortController::class, 'like']);
+    Route::post('shorts/{id}/save', [ShortController::class, 'save']);
+    Route::post('shorts/{id}/share', [ShortController::class, 'share']);
+    Route::post('shorts/{id}/view', [ShortController::class, 'view']);
 
     // 📺 Series
     Route::apiResource('series', SeriesController::class)->only(['index','show']);
