@@ -2,12 +2,15 @@
 
 namespace App\Policies;
 
+use App\Models\Download;
 use App\Models\User;
-use App\Models\Watchlist;
 use Illuminate\Auth\Access\Response;
+use App\Policies\Traits\OwnsProfileTrait;
 
-class WatchlistPolicy
+
+class DownloadPolicy
 {
+
     use OwnsProfileTrait;
 
     // المستخدم يقدر يشوف فقط السجلات اللي تخص أحد بروفايلاته
@@ -21,23 +24,19 @@ class WatchlistPolicy
     {
         return $this->ownsProfile($user, $profileId);
     }
-    public function view(User $user, Watchlist $watchlist): bool
+    public function view(User $user, Download $download): bool
     {
-        return $this->ownsProfile($user, $favorite->profile_id);
+        return $this->ownsProfile($user, $download->profile_id);
     }
 
-
-    public function update(User $user, Watchlist $watchlist): bool
+    public function update(User $user, Download $download): bool
     {
-        return $this->ownsProfile($user, $favorite->profile_id);
+        return $this->ownsProfile($user, $download->profile_id);
     }
 
-    /**
-     * Determine whether the user can delete the model.
-     */
-    public function delete(User $user, Watchlist $watchlist): bool
+    public function delete(User $user, Download $download): bool
     {
-        return $this->ownsProfile($user, $favorite->profile_id);
+        return $this->ownsProfile($user, $download->profile_id);
     }
 
 

@@ -3,10 +3,10 @@
 namespace App\Policies;
 
 use App\Models\User;
-use App\Models\Watchlist;
-use Illuminate\Auth\Access\Response;
+use App\Models\Favorite;
+use App\Policies\Traits\OwnsProfileTrait;
 
-class WatchlistPolicy
+class FavoritePolicy
 {
     use OwnsProfileTrait;
 
@@ -21,24 +21,18 @@ class WatchlistPolicy
     {
         return $this->ownsProfile($user, $profileId);
     }
-    public function view(User $user, Watchlist $watchlist): bool
+    public function view(User $user, Favorite $favorite)
     {
         return $this->ownsProfile($user, $favorite->profile_id);
     }
 
-
-    public function update(User $user, Watchlist $watchlist): bool
+    public function update(User $user, Favorite $favorite)
     {
         return $this->ownsProfile($user, $favorite->profile_id);
     }
 
-    /**
-     * Determine whether the user can delete the model.
-     */
-    public function delete(User $user, Watchlist $watchlist): bool
+    public function delete(User $user, Favorite $favorite)
     {
         return $this->ownsProfile($user, $favorite->profile_id);
     }
-
-
 }

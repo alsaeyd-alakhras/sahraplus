@@ -3,13 +3,11 @@
 namespace App\Policies;
 
 use App\Models\User;
-use App\Models\Watchlist;
+use App\Models\ViewingHistory;
 use Illuminate\Auth\Access\Response;
 
-class WatchlistPolicy
+class ViewingHistoryPolicy
 {
-    use OwnsProfileTrait;
-
     // المستخدم يقدر يشوف فقط السجلات اللي تخص أحد بروفايلاته
     public function viewAny(User $user)
     {
@@ -21,24 +19,21 @@ class WatchlistPolicy
     {
         return $this->ownsProfile($user, $profileId);
     }
-    public function view(User $user, Watchlist $watchlist): bool
+    public function view(User $user, ViewingHistory $viewingHistory): bool
     {
         return $this->ownsProfile($user, $favorite->profile_id);
     }
 
 
-    public function update(User $user, Watchlist $watchlist): bool
+    public function update(User $user, ViewingHistory $viewingHistory): bool
     {
         return $this->ownsProfile($user, $favorite->profile_id);
     }
 
-    /**
-     * Determine whether the user can delete the model.
-     */
-    public function delete(User $user, Watchlist $watchlist): bool
+
+    public function delete(User $user, ViewingHistory $viewingHistory): bool
     {
         return $this->ownsProfile($user, $favorite->profile_id);
     }
-
 
 }

@@ -39,53 +39,53 @@ class UserProfile extends Model
         return $this->belongsTo(User::class);
     }
     public function watchlist()
-{
-    return $this->hasMany(Watchlist::class, 'profile_id');
-}
+    {
+        return $this->hasMany(Watchlist::class, 'profile_id');
+    }
 
-public function watchProgress()
-{
-    return $this->hasMany(WatchProgres::class, 'profile_id');
-}
+    public function watchProgress()
+    {
+        return $this->hasMany(WatchProgres::class, 'profile_id');
+    }
 
-public function viewingHistory()
-{
-    return $this->hasMany(ViewingHistory::class, 'profile_id');
-}
+    public function viewingHistory()
+    {
+        return $this->hasMany(ViewingHistory::class, 'profile_id');
+    }
 
-public function ratings()
-{
-    return $this->hasMany(UserRating::class, 'profile_id');
-}
+    public function ratings()
+    {
+        return $this->hasMany(UserRating::class, 'profile_id');
+    }
 
-public function favorites()
-{
-    return $this->hasMany(Favorite::class, 'profile_id');
-}
+    public function favorites()
+    {
+        return $this->hasMany(Favorite::class, 'profile_id');
+    }
 
-public function downloads()
-{
-    return $this->hasMany(Download::class, 'profile_id');
-}
+    public function downloads()
+    {
+        return $this->hasMany(Download::class, 'profile_id');
+    }
 
-public function getContinueWatching()
-{
-    return $this->watchProgress()
-                ->inProgress()
-                ->recent()
-                ->with('content')
-                ->limit(10)
-                ->get();
-}
+    public function getContinueWatching()
+    {
+        return $this->watchProgress()
+            ->inProgress()
+            ->recent()
+            ->with('content')
+            ->limit(10)
+            ->get();
+    }
 
-public function getRecentlyWatched()
-{
-    return $this->viewingHistory()
-                ->recent(7)
-                ->with('content')
-                ->limit(20)
-                ->get();
-}
+    public function getRecentlyWatched()
+    {
+        return $this->viewingHistory()
+            ->recent(7)
+            ->with('content')
+            ->limit(20)
+            ->get();
+    }
 
     // Methods
     public function verifyPin($pin)

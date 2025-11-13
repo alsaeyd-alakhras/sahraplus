@@ -3,13 +3,11 @@
 namespace App\Policies;
 
 use App\Models\User;
-use App\Models\Watchlist;
+use App\Models\WatchProgress;
 use Illuminate\Auth\Access\Response;
 
-class WatchlistPolicy
+class WatchProgressPolicy
 {
-    use OwnsProfileTrait;
-
     // المستخدم يقدر يشوف فقط السجلات اللي تخص أحد بروفايلاته
     public function viewAny(User $user)
     {
@@ -21,13 +19,12 @@ class WatchlistPolicy
     {
         return $this->ownsProfile($user, $profileId);
     }
-    public function view(User $user, Watchlist $watchlist): bool
+    public function view(User $user, WatchProgress $watchProgress): bool
     {
         return $this->ownsProfile($user, $favorite->profile_id);
     }
 
-
-    public function update(User $user, Watchlist $watchlist): bool
+    public function update(User $user, WatchProgress $watchProgress): bool
     {
         return $this->ownsProfile($user, $favorite->profile_id);
     }
@@ -35,7 +32,7 @@ class WatchlistPolicy
     /**
      * Determine whether the user can delete the model.
      */
-    public function delete(User $user, Watchlist $watchlist): bool
+    public function delete(User $user, WatchProgress $watchProgress): bool
     {
         return $this->ownsProfile($user, $favorite->profile_id);
     }

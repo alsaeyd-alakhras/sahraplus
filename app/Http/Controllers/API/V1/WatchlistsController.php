@@ -13,6 +13,7 @@ class WatchlistsController extends Controller
     // GET /api/v1/watchlists
     public function index(Request $request)
     {
+
         $perPage=$request->get('per_page', 20);
         $profile_id=$request->get('profile_id');
         if ($profile_id === null) {
@@ -95,6 +96,7 @@ class WatchlistsController extends Controller
         }
 
         $watch = Watchlist::create(array_merge($data, ['user_id' => $request->user()->id, 'added_at' => now()]));
+
         // store View History Watchlist
         return $this->success($watch, 'Added Successfully', 200);
     }

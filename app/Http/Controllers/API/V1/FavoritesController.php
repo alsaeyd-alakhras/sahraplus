@@ -14,6 +14,9 @@ class FavoritesController extends Controller
     public function index(Request $request)
     {
         $profile_id = $request->get('profile_id');
+        if ($profile_id === null) {
+            return $this->error('Profile Required', 409);
+        }
         $items = Favorite::where('profile_id', $profile_id)
             ->where('user_id', $request->user()->id)
             ->with('content')
@@ -42,6 +45,9 @@ class FavoritesController extends Controller
     public function status(Request $request, string $type, int $id)
     {
         $profile_id = $request->get('profile_id');
+        if ($profile_id === null) {
+            return $this->error('Profile Required', 409);
+        }
         $map = [
             'movie'   => 'movie',
             'series'  => 'series',
