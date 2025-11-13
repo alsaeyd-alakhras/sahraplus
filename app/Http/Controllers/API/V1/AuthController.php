@@ -23,11 +23,11 @@ class AuthController extends Controller
             'password' => 'required|string',
         ]);
 
-        if (!Auth::guard('web')->attempt($credentials)) {
+        if (!Auth::guard('sanctum')->attempt($credentials)) {
             return response()->json(['error' => __('controller.Invalid_credentials')], Response::HTTP_UNAUTHORIZED);
         }
 
-        $user = Auth::guard('web')->user();
+        $user = Auth::guard('sanctum')->user();
 
         $token = $user->createToken('auth_token')->plainTextToken;
 

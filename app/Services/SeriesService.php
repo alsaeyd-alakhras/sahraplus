@@ -2,6 +2,9 @@
 
 namespace App\Services;
 
+use App\Models\Category;
+use App\Models\Series;
+use App\Models\SeriesCast;
 use App\Repositories\SeriesRepository;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -21,7 +24,7 @@ class SeriesService
             foreach ($request->column_filters as $fieldName => $values) {
                 if (!empty($values)) {
                     // تجاهل القيم الخاصة
-                    $filteredValues = array_filter($values, function($value) {
+                    $filteredValues = array_filter($values, function ($value) {
                         return !in_array($value, ['الكل', 'all', 'All']);
                     });
 
@@ -35,7 +38,7 @@ class SeriesService
 
         return DataTables::of($query)
             ->addIndexColumn()
-            ->addColumn('edit', fn($m)=> $m->id)
+            ->addColumn('edit', fn($m) => $m->id)
             ->make(true);
     }
 
@@ -46,7 +49,7 @@ class SeriesService
         if ($request->active_filters) {
             foreach ($request->active_filters as $fieldName => $values) {
                 if (!empty($values) && $fieldName !== $column) {
-                    $filteredValues = array_filter($values, function($value) {
+                    $filteredValues = array_filter($values, function ($value) {
                         return !in_array($value, ['الكل', 'all', 'All']);
                     });
 
@@ -60,12 +63,12 @@ class SeriesService
 
         // جلب القيم الفريدة للعمود المطلوب
         $uniqueValues = $query->whereNotNull($column)
-                            ->where($column, '!=', '')
-                            ->distinct()
-                            ->pluck($column)
-                            ->filter()
-                            ->values()
-                            ->toArray();
+            ->where($column, '!=', '')
+            ->distinct()
+            ->pluck($column)
+            ->filter()
+            ->values()
+            ->toArray();
         return response()->json($uniqueValues);
     }
 
@@ -77,26 +80,33 @@ class SeriesService
             $data['created_by'] = $data['created_by'] ?? optional(Auth::guard('admin')->user())->id;
 
             // رفع الصور
-            if($data['poster_url_out'] && $data['poster_url_out'] == "" && $data['poster_url_out'] == null){
+            if ($data['poster_url_out'] && $data['poster_url_out'] == "" && $data['poster_url_out'] == null) {
                 $data['poster_url'] = $data['poster_url_out'];
-            }else{
+            } else {
                 $data['poster_url'] = $data['poster_url'] ?? null;
             }
-            if($data['backdrop_url_out'] && $data['backdrop_url_out'] == "" && $data['backdrop_url_out'] == null){
+            if ($data['backdrop_url_out'] && $data['backdrop_url_out'] == "" && $data['backdrop_url_out'] == null) {
                 $data['backdrop_url'] = $data['backdrop_url_out'];
-            }else{
+            } else {
                 $data['backdrop_url'] = $data['backdrop_url'] ?? null;
             }
 
             $data['slug'] = Str::slug($data['title_en'] ?? $data['title_ar']);
 
+            $categoryIds = $data['category_ids'] ?? [];
+            $cast   = $data['cast']   ?? [];
+
             $series = $this->repo->save($data);
+            $this->syncCategories($series, $categoryIds ?? []);
+            $this->syncCast($series, $cast ?? []);
+
+
             DB::commit();
             return $series;
         } catch (\Throwable $e) {
             DB::rollBack();
             throw $e;
-            return back()->with('danger',$e->getMessage());
+            return back()->with('danger', $e->getMessage());
         }
     }
 
@@ -107,25 +117,25 @@ class SeriesService
             $series = $this->repo->getById($id);
 
             // رفع الصور
-            if($data['poster_url_out'] && $data['poster_url_out'] == "" && $data['poster_url_out'] == null){
+            if ($data['poster_url_out'] && $data['poster_url_out'] == "" && $data['poster_url_out'] == null) {
                 $data['poster_url'] = $data['poster_url_out'];
-            }else{
+            } else {
                 $data['poster_url'] = $data['poster_url'] ?? $series->poster_url;
             }
-            if($data['backdrop_url_out'] && $data['backdrop_url_out'] == "" && $data['backdrop_url_out'] == null){
+            if ($data['backdrop_url_out'] && $data['backdrop_url_out'] == "" && $data['backdrop_url_out'] == null) {
                 $data['backdrop_url'] = $data['backdrop_url_out'];
-            }else{
+            } else {
                 $data['backdrop_url'] = $data['backdrop_url'] ?? $series->backdrop_url;
             }
             $data['slug'] = Str::slug($data['title_en'] ?? $data['title_ar']);
 
-            $series = $this->repo->update($data,$id);
+            $series = $this->repo->update($data, $id);
             DB::commit();
             return $series;
         } catch (\Throwable $e) {
             DB::rollBack();
             throw $e;
-            return back()->with('error',$e->getMessage());
+            return back()->with('error', $e->getMessage());
         }
     }
 
@@ -140,5 +150,26 @@ class SeriesService
             DB::rollBack();
             throw $e;
         }
+    }
+
+
+    private function syncCategories(Series $series, array $categoryIds): void
+    {
+        $ids = array_filter(array_map('intval', $categoryIds));
+        $series->categories()->sync($ids);
+    }
+    private function syncCast(Series $series, array $castRows): void
+    {
+        // castRows: [ ['person_id'=>..,'role_type'=>..,'character_name'=>..,'sort_order'=>..], ... ]
+        $pivotData = [];
+        foreach ($castRows as $row) {
+            if (!isset($row['person_id'])) continue;
+            $pivotData[$row['person_id']] = [
+                'role_type'           => $row['role_type'] ?? 'actor',
+                'character_name' => $row['character_name'] ?? null,
+                'sort_order'       => $row['sort_order']   ?? 0,
+            ];
+        }
+        $series->people()->sync($pivotData);
     }
 }

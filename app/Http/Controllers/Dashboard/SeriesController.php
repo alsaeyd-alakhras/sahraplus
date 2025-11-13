@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Dashboard;
 use App\Models\Series;
 use App\Models\Country;
 use Illuminate\Http\Request;
-use App\Models\MovieCategory;
+use App\Models\Category;
 use App\Models\Person;
 use App\Services\SeriesService;
 use App\Http\Controllers\Controller;
@@ -90,7 +90,7 @@ class SeriesController extends Controller
         // جديد: خيارات حالة المسلسل
         $seriesStatusOptions = $this->seriesStatusOptions;
 
-        $allCategories = MovieCategory::select('id','name_ar','name_en')->orderBy('name_ar')->get();
+        $allCategories = Category::select('id','name_ar','name_en')->orderBy('name_ar')->get();
         $allPeople = Person::select('id','name_ar','name_en')->orderBy('name_ar')->get();
 
         return view('dashboard.series.create', compact( 'series', 'contentRatingOptions', 'languageOptions', 'countries', 'statusOptions', 'seriesStatusOptions','allCategories','allPeople'));
@@ -137,7 +137,7 @@ class SeriesController extends Controller
 
         $series->load(['categories:id','people']);
 
-       $allCategories = MovieCategory::select('id','name_ar','name_en')->orderBy('name_ar')->get();
+       $allCategories = Category::select('id','name_ar','name_en')->orderBy('name_ar')->get();
        $allPeople     = Person::select('id','name_ar','name_en')->orderBy('name_ar')->get();
 
         return view('dashboard.series.edit', compact('series', 'btn_label', 'contentRatingOptions', 'languageOptions', 'countries', 'statusOptions', 'seriesStatusOptions','allCategories','allPeople',));

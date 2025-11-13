@@ -61,7 +61,7 @@ class Short extends Model
 
     public function categories()
     {
-        return $this->belongsToMany(MovieCategory::class, 'category_short_pivot', 'short_id', 'category_id')
+        return $this->belongsToMany(Category::class, 'category_short_pivot', 'short_id', 'category_id')
             ->withTimestamps();
     }
 

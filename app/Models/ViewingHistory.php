@@ -7,12 +7,13 @@ use App\Models\User;
 use App\Models\UserProfile;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class ViewingHistory extends Model
 {
-    use HasFactory;
+    use HasFactory,SoftDeletes;
 
-  
+
 
     protected $fillable = [
         'user_id', 'profile_id', 'content_type', 'content_id',

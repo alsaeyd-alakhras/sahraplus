@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Dashboard;
 
 use App\Models\Short;
 use Illuminate\Http\Request;
-use App\Models\MovieCategory;
+use App\Models\Category;
 use App\Services\ShortService;
 use App\Http\Requests\ShortRequest;
 use App\Http\Controllers\Controller;
@@ -26,11 +26,9 @@ class ShortController extends Controller
     public function index()
     {
         $this->authorize('view', Short::class);
-
         if (request()->ajax()) {
             return $this->shortService->datatableIndex(request());
         }
-
         return view('dashboard.shorts.index');
     }
 
@@ -42,10 +40,8 @@ class ShortController extends Controller
     public function create(Request $request)
     {
         $this->authorize('create', Short::class);
-
-       
         $short = new Short();
-        $allCategories = MovieCategory::select('id','name_ar','name_en')->orderBy('name_ar')->get();
+        $allCategories = Category::select('id','name_ar','name_en')->orderBy('name_ar')->get();
         $statusOptions = $this->statusOptions;
         $aspectOptions = ['vertical' => 'عمودي', 'horizontal' => 'أفقي'];
 
@@ -79,7 +75,7 @@ class ShortController extends Controller
         $btn_label = "تعديل";
         $statusOptions = $this->statusOptions;
         $aspectOptions = ['vertical' => 'عمودي', 'horizontal' => 'أفقي'];
-        $allCategories = MovieCategory::select('id','name_ar','name_en')->orderBy('name_ar')->get();
+        $allCategories = Category::select('id','name_ar','name_en')->orderBy('name_ar')->get();
 
         return view('dashboard.shorts.edit', compact('short','btn_label','statusOptions','aspectOptions','allCategories'));
     }

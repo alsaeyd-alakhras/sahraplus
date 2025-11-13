@@ -12,13 +12,22 @@ class UserRating extends Model
     use HasFactory;
 
     protected $fillable = [
-        'user_id', 'profile_id', 'content_type', 'content_id',
-        'rating', 'review', 'is_spoiler', 'helpful_count',
-        'status', 'reviewed_at'
+        'user_id',
+        'profile_id',
+        'content_type',
+        'content_id',
+        'rating',
+        'review',
+        'is_spoiler',
+        'helpful_count',
+        'status',
+        'reviewed_at'
     ];
+    protected $appends = ['stars', 'status_trans', 'created',  'content_type_trans','user_name'];
+
 
     protected $casts = [
-        'rating' => 'decimal:1',
+        'rating' => 'decimal:1  ',
         'is_spoiler' => 'boolean',
         'helpful_count' => 'integer',
         'reviewed_at' => 'datetime',
@@ -76,6 +85,16 @@ class UserRating extends Model
     {
         return str_repeat('★', floor($this->rating)) . str_repeat('☆', 5 - floor($this->rating));
     }
+    public function getUserNameAttribute()
+    {
+        return $this->user
+            ? trim($this->user->first_name . ' ' . $this->user->last_name)
+            : 'غير معروف';
+    }
+    public function getCreatedAttribute()
+    {
+        return $this->created_at ? $this->created_at->format('Y-m-d') : null;
+    }
 
     // Scopes
     public function scopeApproved($query)
@@ -101,5 +120,28 @@ class UserRating extends Model
     public function scopeRecent($query)
     {
         return $query->orderBy('reviewed_at', 'desc');
+    }
+
+    public function getContentTypeTransAttribute()
+    {
+        //'pending','downloading','completed','failed','expired'
+        if ($this->content_type == 'movie') {
+            return __('admin.movie');
+        } elseif ($this->content_type == 'series') {
+            return __('admin.series');
+        } elseif ($this->content_type == 'episode') {
+            return __('admin.episode');
+        }
+    }
+    public function getStatusTransAttribute()
+    {
+        //'pending','downloading','completed','failed','expired'
+        if ($this->status == 'pending') {
+            return __('admin.pending');
+        } elseif ($this->status == 'approved') {
+            return __('admin.approved');
+        } elseif ($this->status == 'rejected') {
+            return __('admin.rejected');
+        }
     }
 }

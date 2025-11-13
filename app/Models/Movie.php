@@ -43,12 +43,19 @@ class Movie extends Model
         'intro_skip_time' => 'integer'
     ];
 
-    protected $appends = ['poster_full_url', 'backdrop_full_url','trailer_full_url'];
+    protected $appends = ['poster_full_url', 'backdrop_full_url','trailer_full_url', 'is_favorite'];
 
+    public function getIsFavoriteAttribute()
+    {
+        return Favorite::where([
+            'content_type' => 'movie',
+            'content_id' => $this->id,
+        ])->exists();
+    }
     // العلاقات
     public function categories()
     {
-        return $this->belongsToMany(MovieCategory::class, 'category_movie_pivot', 'movie_id', 'category_id')
+        return $this->belongsToMany(Category::class, 'category_movie_pivot', 'movie_id', 'category_id')
         ->withTimestamps();
     }
 
@@ -58,8 +65,8 @@ class Movie extends Model
         // pivot يحتوي حقول إضافية اختيارية: role, character_name, job, ordering
         return $this->belongsToMany(Person::class, 'movie_cast', 'movie_id', 'person_id')
             ->withPivot([
-                'role_type', 
-                'character_name', 
+                'role_type',
+                'character_name',
                 'sort_order',
                 ])
             ->withTimestamps();

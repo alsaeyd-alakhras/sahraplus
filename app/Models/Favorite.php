@@ -35,42 +35,53 @@ class Favorite extends Model
     }
 
     // Methods
-    public static function addToFavorites($profileId, $contentType, $contentId)
+    public static function addToFavorites($profileId, $contentType, $contentId , $user_id)
     {
         return self::firstOrCreate([
             'profile_id' => $profileId,
             'content_type' => $contentType,
             'content_id' => $contentId
         ], [
-            'user_id' => UserProfile::find($profileId)->user_id,
+            'user_id' => $user_id,
             'added_at' => now()
         ]);
     }
 
-    public static function removeFromFavorites($profileId, $contentType, $contentId)
+    public static function removeFromFavorites($profileId, $contentType, $contentId, $user_id)
     {
         return self::where([
             'profile_id' => $profileId,
             'content_type' => $contentType,
-            'content_id' => $contentId
+            'content_id' => $contentId,
+            'user_id' => $user_id
         ])->delete();
     }
 
-    public static function isFavorite($profileId, $contentType, $contentId)
+    public function getIsFavoriteAttribute()
+    {
+        return self::where([
+            'profile_id' => $this->profile_id,
+            'content_type' => $this->content_type,
+            'content_id' => $this->content_id,
+            'user_id' => $this->user_id
+        ])->exists();
+    }
+    public static function IsFavorite($profileId, $contentType, $contentId, $user_id)
     {
         return self::where([
             'profile_id' => $profileId,
             'content_type' => $contentType,
-            'content_id' => $contentId
+            'content_id' => $contentId,
+            'user_id' => $user_id
         ])->exists();
     }
 
-    public static function toggleFavorite($profileId, $contentType, $contentId)
+    public static function toggleFavorite($profileId, $contentType, $contentId,$user_id)
     {
-        if (self::isFavorite($profileId, $contentType, $contentId)) {
-            return self::removeFromFavorites($profileId, $contentType, $contentId);
+        if (self::isFavorite($profileId, $contentType, $contentId,$user_id)) {
+            return self::removeFromFavorites($profileId, $contentType, $contentId, $user_id);
         } else {
-            return self::addToFavorites($profileId, $contentType, $contentId);
+            return self::addToFavorites($profileId, $contentType, $contentId, $user_id);
         }
     }
 

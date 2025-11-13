@@ -12,7 +12,7 @@
         "laravel/fortify": "^1.29",
         "laravel/framework": "^11.31",
         "laravel/reverb": "^1.0",
-        "laravel/sanctum": "^4.2",
+        "laravel/sanctum": "^4.0",
         "laravel/tinker": "^2.9",
         "maatwebsite/excel": "^3.1",
         "mcamara/laravel-localization": "^2.3",

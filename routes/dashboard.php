@@ -15,10 +15,12 @@ use App\Http\Controllers\Dashboard\UserAvatarController;
 use App\Http\Controllers\Dashboard\ActivityLogController;
 use App\Http\Controllers\Dashboard\EpisodeController;
 use App\Http\Controllers\Dashboard\NotificationController;
-use App\Http\Controllers\Dashboard\MovieCategoryController;
+use App\Http\Controllers\Dashboard\CategoryController;
 use App\Http\Controllers\Dashboard\SeasonController;
 use App\Http\Controllers\Dashboard\SeriesController;
 use App\Http\Controllers\Dashboard\SystemSettingsController;
+use App\Http\Controllers\Dashboard\UserRatingController;
+use App\Http\Controllers\Dashboard\DownloadController;
 use Mcamara\LaravelLocalization\Facades\LaravelLocalization;
 
 Route::group([
@@ -71,7 +73,7 @@ Route::group([
         Route::get('movies/subtitleRowPartial', [MoviesController::class, 'subtitleRowPartial'])->name('movies.subtitleRowPartial');
         Route::get('people/search', [PeopleController::class, 'search'])->name('people.search');
 
-       
+
         Route::get('shorts/videoRowPartial', [ShortController::class, 'videoRowPartial'])->name('shorts.videoRowPartial');
 
         Route::get('series/castRowPartial', [SeriesController::class, 'castRowPartial'])
@@ -87,10 +89,12 @@ Route::group([
         Route::get('users-filters/{column}', [UserController::class, 'getFilterOptions'])->name('users.filters');
         Route::get('admins-filters/{column}', [AdminController::class, 'getFilterOptions'])->name('admins.filters');
         Route::get('countries-filters/{column}', [CountryController::class, 'getFilterOptions'])->name('countries.filters');
+        Route::get('userRatings-filters/{column}', [UserRatingController::class, 'getFilterOptions'])->name('userRatings.filters');
+        Route::get('downloads-filters/{column}', [DownloadController::class, 'getFilterOptions'])->name('downloads.filters');
         Route::get('movies-filters/{column}', [ MoviesController::class, 'getFilterOptions'])->name('movies.filters');
         Route::get('people-filters/{column}', [ PeopleController::class, 'getFilterOptions'])->name('people.filters');
         Route::get('short-filters/{column}', [ ShortController::class, 'getFilterOptions'])->name('short.filters');
-        Route::get('movie-categories-filters/{column}', [ MovieCategoryController::class, 'getFilterOptions'])->name('movie-categories.filters');
+        Route::get('movie-categories-filters/{column}', [CategoryController::class, 'getFilterOptions'])->name('movie-categories.filters');
         Route::get('series-filters/{column}', [ SeriesController::class, 'getFilterOptions'])->name('series.filters');
 
 
@@ -106,10 +110,12 @@ Route::group([
             'media' => MediaController::class,
             'user_avatars' => UserAvatarController::class,
             'countries' => CountryController::class,
+            'userRatings' => UserRatingController::class,
+            'downloads' => DownloadController::class,
             'movies'    => MoviesController::class,
             'people'    => PeopleController::class,
             // 'shorts'    => ShortController::class,
-            'movie-categories'    => MovieCategoryController::class,
+            'movie-categories'    => CategoryController::class,
             'series'    => SeriesController::class,
         ]);
     });
