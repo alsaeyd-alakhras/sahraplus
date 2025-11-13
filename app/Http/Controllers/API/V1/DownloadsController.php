@@ -16,6 +16,7 @@ class DownloadsController extends Controller
     public function index(Request $request)
     {
         $data = Download::where('user_id', $request->user()->id)
+            ->whereIn('profile_id', $request->user()->profiles->pluck('id'))
             ->where(function ($q) {
                 $q->whereNull('expires_at')
                     ->orWhere('expires_at', '>', now());
@@ -42,7 +43,7 @@ class DownloadsController extends Controller
     // GET /api/v1/downloads/{id}
     public function show(Download $download)
     {
-        // حماية: ما يقدر يجيب تحميل غيره
+        $this->authorize('view', $download);
 
         if ($download && $download->user_id == auth()->id()) {
             return $this->success($download, 'Get Data Successfully', 201);
@@ -68,6 +69,8 @@ class DownloadsController extends Controller
         abort_unless(isset($map[$type]), 404);
 
         $maxDownloads = 10;
+        $this->authorize('create', [Download::class, $request->profile_id]);
+
         $activeDownloads = Download::where('user_id', $user->id)
             ->whereNull('completed_at')
             ->where(function ($q) {

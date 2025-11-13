@@ -5,7 +5,7 @@ namespace App\Policies;
 use App\Models\Download;
 use App\Models\User;
 use Illuminate\Auth\Access\Response;
-use App\Policies\Traits\OwnsProfileTrait;
+use App\Traits\OwnsProfileTrait;
 
 
 class DownloadPolicy
@@ -13,13 +13,11 @@ class DownloadPolicy
 
     use OwnsProfileTrait;
 
-    // المستخدم يقدر يشوف فقط السجلات اللي تخص أحد بروفايلاته
     public function viewAny(User $user)
     {
         return true;
     }
 
-    // المستخدم يقدر ينشئ فقط في بروفايل يخصه
     public function create(User $user, int $profileId)
     {
         return $this->ownsProfile($user, $profileId);

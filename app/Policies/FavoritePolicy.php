@@ -4,7 +4,7 @@ namespace App\Policies;
 
 use App\Models\User;
 use App\Models\Favorite;
-use App\Policies\Traits\OwnsProfileTrait;
+use App\Traits\OwnsProfileTrait;
 
 class FavoritePolicy
 {

@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\UserRating;
 use App\Traits\ApiResponse;
 
-class RatingsController extends Controller
+class UserRatingController extends Controller
 {
     use ApiResponse;
     // GET /api/v1/ratings/{type}/{id}
@@ -31,6 +31,7 @@ class RatingsController extends Controller
 
         // تقييم المستخدم الحالي
         $rating_current_user = UserRating::where('user_id', $request->user()->id)
+            ->whereIn('profile_id', $request->user()->profiles->pluck('id'))
             ->where('content_type', $class)
             ->where('content_id', $id)
             ->get();
@@ -59,12 +60,15 @@ class RatingsController extends Controller
     public function store_rating(Request $request, string $type, int $content_id)
     {
         $data = $request->validate([
+            'profile_id' => 'required|exists:user_profiles,id',
             'rating' => 'required|numeric|min:1|max:5',
             'review' => 'nullable|string',
             'is_spoiler' => 'nullable|boolean'
         ]);
 
         $user_id = $request->user()->id;
+
+        $this->authorize('create', [UserRating::class, $request->profile_id]);
 
         $rating_user = UserRating::updateOrCreate([
             'user_id' => $user_id,
@@ -92,6 +96,7 @@ class RatingsController extends Controller
     public function destroy(Request $request, int $id)
     {
         $user_rating = UserRating::findOrFail($id);
+        $this->authorize('delete', $user_rating);
         // soft delete
         if ($user_rating) $user_rating->delete();
 

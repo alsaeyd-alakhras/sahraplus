@@ -5,25 +5,24 @@ namespace App\Policies;
 use App\Models\User;
 use App\Models\UserRating;
 use Illuminate\Auth\Access\Response;
+use App\Traits\OwnsProfileTrait;
 
 class UserRatingPolicy
 {
     use OwnsProfileTrait;
 
-    // المستخدم يقدر يشوف فقط السجلات اللي تخص أحد بروفايلاته
     public function viewAny(User $user)
     {
         return true;
     }
 
-    // المستخدم يقدر ينشئ فقط في بروفايل يخصه
     public function create(User $user, int $profileId)
     {
         return $this->ownsProfile($user, $profileId);
     }
     public function view(User $user, UserRating $userRating): bool
     {
-        return $this->ownsProfile($user, $favorite->profile_id);
+        return $this->ownsProfile($user, $userRating->profile_id);
     }
 
     /**
@@ -31,7 +30,7 @@ class UserRatingPolicy
      */
     public function update(User $user, UserRating $userRating): bool
     {
-        return $this->ownsProfile($user, $favorite->profile_id);
+        return $this->ownsProfile($user, $userRating->profile_id);
     }
 
     /**
@@ -39,7 +38,7 @@ class UserRatingPolicy
      */
     public function delete(User $user, UserRating $userRating): bool
     {
-        return $this->ownsProfile($user, $favorite->profile_id);
+        return $this->ownsProfile($user, $userRating->profile_id);
     }
 
 

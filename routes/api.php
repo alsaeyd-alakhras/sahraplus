@@ -28,9 +28,9 @@ use App\Http\Controllers\API\V1\SearchController;
 // ⭐ User Interaction (المرحلة الثالثة)
 // ================================
 use App\Http\Controllers\API\V1\WatchlistsController;
-use App\Http\Controllers\API\V1\ProgressController;
-use App\Http\Controllers\API\V1\HistoryController;
-use App\Http\Controllers\API\V1\RatingsController;
+use App\Http\Controllers\API\V1\WatchProgresController;
+use App\Http\Controllers\API\V1\ViewingHistoryController;
+use App\Http\Controllers\API\V1\UserRatingController;
 use App\Http\Controllers\API\V1\FavoritesController;
 use App\Http\Controllers\API\V1\DownloadsController;
 use App\Http\Controllers\API\V1\ShortController;
@@ -123,18 +123,18 @@ Route::prefix('v1')->name('api.v1.')->group(function () {
         Route::delete('{id}/watchlist/delete', [WatchlistsController::class, 'destroy']);
 
         // 📌 Progress
-        Route::get('progress/{type}/{id}', [ProgressController::class, 'show']);
-        Route::put('watch-progress-update/{type}/{id}', [ProgressController::class, 'updateProgress']);
-        Route::get('watch-progress-profiles/{profileId}/continue-watching', [ProgressController::class, 'continueWatching']);
+        Route::get('progress/{type}/{id}', [WatchProgresController::class, 'show']);
+        Route::put('watch-progress-update/{type}/{id}', [WatchProgresController::class, 'updateProgress']);
+        Route::get('watch-progress-profiles/{profileId}/continue-watching', [WatchProgresController::class, 'continueWatching']);
 
         // 📌 History
-        Route::get('history', [HistoryController::class, 'index']);
-        Route::get('profiles/{id}/history/stats', [HistoryController::class, 'analytic_history']);
+        Route::get('history', [ViewingHistoryController::class, 'index']);
+        Route::get('profiles/{id}/history/stats', [ViewingHistoryController::class, 'analytic_history']);
 
         // 📌 Ratings
-        Route::get('ratings/{type}/{id}', [RatingsController::class, 'show']);
-        Route::post('rating-store/{type}/{id}', [RatingsController::class, 'store_rating'])->middleware('throttle:ratings');
-        Route::delete('{id}/rating/delete', [RatingsController::class, 'destroy']);
+        Route::get('ratings/{type}/{id}', [UserRatingController::class, 'show']);
+        Route::post('rating-store/{type}/{id}', [UserRatingController::class, 'store_rating'])->middleware('throttle:ratings');
+        Route::delete('{id}/rating/delete', [UserRatingController::class, 'destroy']);
 
 
         // 📌 Favorites
