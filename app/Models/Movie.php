@@ -43,8 +43,15 @@ class Movie extends Model
         'intro_skip_time' => 'integer'
     ];
 
-    protected $appends = ['poster_full_url', 'backdrop_full_url','trailer_full_url'];
+    protected $appends = ['poster_full_url', 'backdrop_full_url','trailer_full_url', 'is_favorite'];
 
+    public function getIsFavoriteAttribute()
+    {
+        return Favorite::where([
+            'content_type' => 'movie',
+            'content_id' => $this->id,
+        ])->exists();
+    }
     // العلاقات
     public function categories()
     {

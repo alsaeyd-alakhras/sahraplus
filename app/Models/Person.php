@@ -33,7 +33,7 @@ class Person extends Model
         'is_active' => 'boolean',
     ];
 
-    protected $appends = ['photo_full_url', 'age'];
+    protected $appends = ['photo_full_url', 'age', 'is_favorite'];
 
     //relationships
     public function movieRoles()
@@ -53,7 +53,13 @@ class Person extends Model
         return $this->hasMany(SeriesCast::class);
     }
 
-
+    public function getIsFavoriteAttribute()
+    {
+        return Favorite::where([
+            'content_type' => 'person',
+            'content_id' => $this->id,
+        ])->exists();
+    }
 
     public function series()
     {

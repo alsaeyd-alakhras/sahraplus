@@ -28,6 +28,8 @@ class Category extends Model
         'is_active',
     ];
 
+    protected $appends = ['is_favorite'];
+
     /**
      * تحويل الأنواع
      */
@@ -51,6 +53,13 @@ class Category extends Model
             ->withTimestamps();
     }
 
+    public function getIsFavoriteAttribute()
+    {
+        return Favorite::where([
+            'content_type' => 'movie',
+            'content_id' => $this->id,
+        ])->exists();
+    }
     /**
      * سكوب للتصنيفات النشطة فقط
      */

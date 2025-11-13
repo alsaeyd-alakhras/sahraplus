@@ -13,7 +13,9 @@ class FavoritesController extends Controller
     // GET /api/v1/favorites
     public function index(Request $request)
     {
-        $items = Favorite::where('user_id', $request->user()->id)
+        $profile_id = $request->get('profile_id');
+        $items = Favorite::where('profile_id', $profile_id)
+            ->where('user_id', $request->user()->id)
             ->with('content')
             ->latest()
             ->paginate(20);
@@ -39,22 +41,18 @@ class FavoritesController extends Controller
     // GET /api/v1/{type}/{id}/favorite/status
     public function status(Request $request, string $type, int $id)
     {
-        // $map = [
-        //     'movie'   => \App\Models\Movie::class,
-        //     'series'  => \App\Models\Series::class,
-        //     'episode' => \App\Models\Episode::class,
-        //     'short'   => \App\Models\Short::class,
-        // ];
-
+        $profile_id = $request->get('profile_id');
         $map = [
             'movie'   => 'movie',
             'series'  => 'series',
-            'episode' => 'episode',
-            'short'   => 'short',
+            'person' => 'person',
+            'category'   => 'category',
         ];
         abort_unless(isset($map[$type]), 404);
 
-        $exists = Favorite::where('user_id', $request->user()->id)
+
+        $exists = Favorite::where('profile_id', $profile_id)
+            ->where('user_id', $request->user()->id)
             ->where('content_type', $map[$type])
             ->where('content_id', $id)
             ->exists();
@@ -77,8 +75,8 @@ class FavoritesController extends Controller
         $map = [
             'movie'   => 'movie',
             'series'  => 'series',
-            'episode' => 'episode',
-            'short'   => 'short',
+            'person' => 'person',
+            'category'   => 'category',
         ];
         abort_unless(isset($map[$type]), 404);
         $user_id = $request->user()->id;

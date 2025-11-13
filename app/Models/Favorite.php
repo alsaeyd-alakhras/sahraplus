@@ -17,7 +17,6 @@ class Favorite extends Model
     protected $casts = [
         'added_at' => 'datetime',
     ];
-    protected $appends=['is_favorite'];
 
     // العلاقات
     public function user()

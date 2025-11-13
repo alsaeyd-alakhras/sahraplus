@@ -13,7 +13,13 @@ class HistoryController extends Controller
     // GET /api/v1/history
     public function index(Request $request)
     {
-        $items = ViewingHistory::where('user_id', $request->user()->id)
+        $profile_id = $request->get('profile_id');
+        if ($profile_id === null) {
+            return $this->error('Profile Required', 409);
+        }
+
+        $items = ViewingHistory::where('profile_id', $profile_id)
+            ->where('user_id', $request->user()->id)
             ->with('content')
             ->latest()
             ->paginate(20);

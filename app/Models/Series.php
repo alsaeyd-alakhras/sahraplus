@@ -48,13 +48,20 @@ class Series extends Model
         'logo_url'     => 'integer',
     ];
 
-    protected $appends = ['poster_full_url', 'backdrop_full_url'];
+    protected $appends = ['poster_full_url', 'backdrop_full_url', 'is_favorite'];
 
     /** التصنيفات: نفس الأفلام لكن عبر category_series_pivot */
     public function categories()
     {
         return $this->belongsToMany(Category::class, 'category_series_pivot', 'series_id', 'category_id')
             ->withTimestamps();
+    }
+    public function getIsFavoriteAttribute()
+    {
+        return Favorite::where([
+            'content_type' => 'series',
+            'content_id' => $this->id,
+        ])->exists();
     }
 
     /** الأشخاص عبر pivot: series_cast */

@@ -87,4 +87,14 @@ class RatingsController extends Controller
             'rating_user' => $rating_user,
         ], 'Successfully stored', 201);
     }
+
+    // DELETE /api/v1/{id}/rating/delete
+    public function destroy(Request $request, int $id)
+    {
+        $user_rating = UserRating::findOrFail($id);
+        // soft delete
+        if ($user_rating) $user_rating->delete();
+
+        return $this->success(null, 'Removed Successfully', 200);
+    }
 }

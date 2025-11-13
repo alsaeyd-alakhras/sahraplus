@@ -133,7 +133,9 @@ Route::prefix('v1')->name('api.v1.')->group(function () {
 
         // 📌 Ratings
         Route::get('ratings/{type}/{id}', [RatingsController::class, 'show']);
-        Route::post('rating-store/{type}/{id}', [RatingsController::class, 'store_rating']);
+        Route::post('rating-store/{type}/{id}', [RatingsController::class, 'store_rating'])->middleware('throttle:ratings');
+        Route::delete('{id}/rating/delete', [RatingsController::class, 'destroy']);
+
 
         // 📌 Favorites
         Route::get('favorites', [FavoritesController::class, 'index']);
@@ -143,7 +145,8 @@ Route::prefix('v1')->name('api.v1.')->group(function () {
         // 📌 Downloads
         Route::get('downloads', [DownloadsController::class, 'index']);
         Route::get('download/{download}', [DownloadsController::class, 'show']);
-        Route::post('download-store/{type}/{id}', [DownloadsController::class, 'store']);
+
+        Route::post('download-store/{type}/{id}', [DownloadsController::class, 'store'])->middleware('throttle:downloads');
 
         //analytics
         Route::get('admin/analytics', [AnalyticsController::class, 'index']);

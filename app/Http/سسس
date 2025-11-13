@@ -1,0 +1,59 @@
+تمام خِتام 🌸
+خليني أشرحلك بطريقة بسيطة وواضحة شو المقصود بـ "تفعيل Events لتحديث view_count و average_rating أوتوماتيكيًا" و"تطبيق Rate Limiting لمسارات التحميل والتقييم":
+
+🔹 أولًا: Events لتحديث view_count و average_rating
+
+الفكرة إنك ما بدك كل مرة المستخدم يشاهد أو يقيم عمل (فيلم / مسلسل) تكتبي الكود يدويًا لتحديث عدد المشاهدات أو متوسط التقييم داخل الكنترولر.
+
+بدل هيك، بتخلي Laravel يعملها لحاله أوتوماتيكيًا من خلال الأحداث (Events) والمستمعين (Listeners) 👇
+
+🎬 مثال عملي:
+
+لنفترض عندك جدول movies فيه:
+
+view_count
+
+average_rating
+
+وكل مرة المستخدم يضيف مشاهدة جديدة في جدول viewing_histories، المفروض يزيد view_count للفيلم المعني.
+
+بدل ما تكتبي كود التحديث داخل كل Controller، بتعملي:
+// app/Events/ContentViewed.php
+namespace App\Events;
+
+use App\Models\ViewingHistory;
+use Illuminate\Foundation\Events\Dispatchable;
+use Illuminate\Queue\SerializesModels;
+
+class ContentViewed
+{
+    use Dispatchable, SerializesModels;
+
+    public $history;
+
+    public function __construct(ViewingHistory $history)
+    {
+        $this->history = $history;
+    }
+}
+// app/Listeners/UpdateViewCount.php
+namespace App\Listeners;
+
+use App\Events\ContentViewed;
+
+class UpdateViewCount
+{
+    public function handle(ContentViewed $event)
+    {
+        $content = $event->history->content; // الفيلم أو الحلقة
+        if ($content) {
+            $content->increment('view_count');
+        }
+    }
+}
+protected $listen = [
+    \App\Events\ContentViewed::class => [
+        \App\Listeners\UpdateViewCount::class,
+    ],
+];
+

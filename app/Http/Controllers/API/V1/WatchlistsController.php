@@ -13,13 +13,16 @@ class WatchlistsController extends Controller
     // GET /api/v1/watchlists
     public function index(Request $request)
     {
-
         $perPage=$request->get('per_page', 20);
-         $items = Watchlist::where('user_id', $request->user()->id)
+        $profile_id=$request->get('profile_id');
+        if ($profile_id === null) {
+            return $this->error('Profile Required', 409);
+        }
+         $items = Watchlist::where('profile_id', $profile_id)
+         ->where('user_id', $request->user()->id)
             ->with('content')
             ->latest()
             ->paginate($perPage);
-
         $data = $items->map(function ($item) {
             return [
                 'type'     => strtolower($item->content_type),
@@ -41,8 +44,13 @@ class WatchlistsController extends Controller
 
 
     // GET /api/v1/{type}/{id}/watchlist/status
-    public function status(Request $request, string $type, int $id)
+    public function status(Request $request, string $type, int $content_id)
     {
+        $profile_id = $request->get('profile_id');
+        if ($profile_id === null) {
+            return $this->error('Profile Required', 409);
+        }
+
         $map = [
             'movie'   => 'movie',
             'series'  => 'series',
@@ -55,7 +63,8 @@ class WatchlistsController extends Controller
         $data = Watchlist::where('user_id', $request->user()->id)
             // ->where('watchlistable_type', $map[$type])
             ->where('content_type', $map[$type])
-            ->where('content_id', $id)
+            ->where('content_id', $content_id)
+            ->where('profile_id', $profile_id)
             ->exists();
 
         if ($data) {
@@ -80,12 +89,13 @@ class WatchlistsController extends Controller
             ->withTrashed(false)
             ->exists();
 
+
         if ($exists) {
             return $this->error('Already in watchlist', 409);
         }
 
         $watch = Watchlist::create(array_merge($data, ['user_id' => $request->user()->id, 'added_at' => now()]));
-
+        // store View History Watchlist
         return $this->success($watch, 'Added Successfully', 200);
     }
 
