@@ -2,7 +2,7 @@
 
 namespace App\Helper\Series;
 
-use App\Models\MovieCategory;
+use App\Models\Category;
 use App\Models\Series;
 use Illuminate\Support\Facades\Cache;
 
@@ -161,7 +161,7 @@ class getSectionsSeries
      */
     public function getCategorySection($loadedSections)
     {
-        $categories = MovieCategory::active()
+        $categories = Category::active()
             ->orderBy('sort_order')
             ->get();
 

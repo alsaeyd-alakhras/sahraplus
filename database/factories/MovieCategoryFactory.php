@@ -2,16 +2,16 @@
 
 namespace Database\Factories;
 
-use App\Models\MovieCategory;
+use App\Models\Category;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\MovieCategory>
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Category>
  */
 class MovieCategoryFactory extends Factory
 {
-        protected $model = MovieCategory::class;
+        protected $model = Category::class;
     /**
      * Define the model's default state.
      *

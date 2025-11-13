@@ -2,7 +2,7 @@
 
 namespace App\Helper\Series;
 
-use App\Models\MovieCategory;
+use App\Models\Category;
 use App\Models\Series;
 use App\Models\UserProfile;
 use App\Models\WatchProgres;

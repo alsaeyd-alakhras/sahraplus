@@ -4,7 +4,7 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use App\Models\{
-    MovieCategory,
+    Category,
     Movie,
     Series,
     Season,
@@ -26,7 +26,7 @@ class ContentSeeder extends Seeder
     public function run(): void
     {
         // 🗂️ إنشاء تصنيفات
-        $categories = MovieCategory::factory(5)->create();
+        $categories = Category::factory(5)->create();
 
         // 🎬 إنشاء أفلام وربطها بالتصنيفات
         $movies = Movie::factory(15)->create()->each(function ($movie) use ($categories) {

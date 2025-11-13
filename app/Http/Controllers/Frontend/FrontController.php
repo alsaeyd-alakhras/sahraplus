@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
 use App\Models\Movie;
-use App\Models\MovieCategory;
+use App\Models\Category;
 use App\Models\Series;
 use App\Models\Person;
 use App\Models\Short;
@@ -77,13 +77,13 @@ class FrontController extends Controller
 
         // Categories (Discover more tiles)
         $categoriesList = Cache::remember('home_categories_list', 3600, function () {
-            return MovieCategory::active()->orderBy('sort_order')->limit(14)->get();
+            return Category::active()->orderBy('sort_order')->limit(14)->get();
         });
 
         // Category sliders: pick first active category that has movies and first that has series
         $categoryMovies = null;
         $categorySeries = null;
-        $activeCategories = MovieCategory::active()->orderBy('sort_order')->get();
+        $activeCategories = Category::active()->orderBy('sort_order')->get();
         foreach ($activeCategories as $cat) {
             if (!$categoryMovies) {
                 $movies = $cat->movies()
@@ -317,11 +317,11 @@ class FrontController extends Controller
 
     public function categories()
     {
-        $categories = MovieCategory::active()->orderBy('sort_order')->get();
+        $categories = Category::active()->orderBy('sort_order')->get();
         return view('site.categories.index', compact('categories'));
     }
     
-    public function categoryShow(MovieCategory $category)
+    public function categoryShow(Category $category)
     {
         $category->load([
             'movies' => fn($q) => $q->published()->with('categories')->latest()->limit(50),

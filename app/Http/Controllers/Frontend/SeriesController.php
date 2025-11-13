@@ -7,7 +7,7 @@ use App\Helper\Series\SeriesHelper;
 use App\Http\Controllers\Controller;
 use App\Models\Episode;
 use App\Models\Series;
-use App\Models\MovieCategory;
+use App\Models\Category;
 use App\Models\Season;
 use App\Models\UserProfile;
 use App\Models\WatchProgres;
