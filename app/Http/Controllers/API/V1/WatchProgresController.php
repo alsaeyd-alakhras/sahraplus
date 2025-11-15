@@ -7,7 +7,7 @@ use App\Models\WatchProgres;
 use App\Traits\ApiResponse;
 use Illuminate\Http\Request;
 
-class ProgressController extends Controller
+class WatchProgresController extends Controller
 {
     use ApiResponse;
     // GET /api/v1/progress/{type}/{id}
@@ -29,6 +29,7 @@ class ProgressController extends Controller
         abort_unless(isset($map[$type]), 404);
 
         $progress = WatchProgres::where('user_id', $request->user()->id)
+            ->whereIn('profile_id', $request->user()->profiles->pluck('id'))
             ->where('content_type', $map[$type])
             ->where('content_id', $id)
             ->latest('updated_at')
@@ -64,6 +65,7 @@ class ProgressController extends Controller
 
         abort_unless(isset($map[$type]), 404);
         $user_id = $request->user()->id;
+
 
         $progress = WatchProgres::updateProgress(
             $data['profile_id'],

@@ -13,9 +13,12 @@ class FavoritesController extends Controller
     // GET /api/v1/favorites
     public function index(Request $request)
     {
-        $profile_id = $request->get('profile_id');
-        $items = Favorite::where('profile_id', $profile_id)
-            ->where('user_id', $request->user()->id)
+        // $profile_id = $request->get('profile_id');
+        // if ($profile_id === null) {
+        //     return $this->error('Profile Required', 409);
+        // }
+        $items = Favorite::where('user_id', $request->user()->id)
+            ->whereIn('profile_id', $request->user()->profiles->pluck('id'))
             ->with('content')
             ->latest()
             ->paginate(20);
@@ -41,7 +44,10 @@ class FavoritesController extends Controller
     // GET /api/v1/{type}/{id}/favorite/status
     public function status(Request $request, string $type, int $id)
     {
-        $profile_id = $request->get('profile_id');
+        // $profile_id = $request->get('profile_id');
+        // if ($profile_id === null) {
+        //     return $this->error('Profile Required', 409);
+        // }
         $map = [
             'movie'   => 'movie',
             'series'  => 'series',
@@ -51,7 +57,7 @@ class FavoritesController extends Controller
         abort_unless(isset($map[$type]), 404);
 
 
-        $exists = Favorite::where('profile_id', $profile_id)
+        $exists = Favorite::whereIn('profile_id', $request->user()->profiles->pluck('id'))
             ->where('user_id', $request->user()->id)
             ->where('content_type', $map[$type])
             ->where('content_id', $id)
@@ -80,6 +86,8 @@ class FavoritesController extends Controller
         ];
         abort_unless(isset($map[$type]), 404);
         $user_id = $request->user()->id;
+
+        $this->authorize('create', [Favorite::class, $request->profile_id]);
 
         $favorite = Favorite::toggleFavorite(
             $data['profile_id'],

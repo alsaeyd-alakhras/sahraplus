@@ -13,13 +13,15 @@ class WatchlistsController extends Controller
     // GET /api/v1/watchlists
     public function index(Request $request)
     {
+
         $perPage=$request->get('per_page', 20);
         $profile_id=$request->get('profile_id');
-        if ($profile_id === null) {
-            return $this->error('Profile Required', 409);
-        }
-         $items = Watchlist::where('profile_id', $profile_id)
-         ->where('user_id', $request->user()->id)
+        // if ($profile_id === null) {
+        //     return $this->error('Profile Required', 409);
+        // }
+         $items = Watchlist::
+            whereIn('profile_id', $request->user()->profiles->pluck('id'))
+            ->where('user_id', $request->user()->id)
             ->with('content')
             ->latest()
             ->paginate($perPage);
@@ -46,10 +48,10 @@ class WatchlistsController extends Controller
     // GET /api/v1/{type}/{id}/watchlist/status
     public function status(Request $request, string $type, int $content_id)
     {
-        $profile_id = $request->get('profile_id');
-        if ($profile_id === null) {
-            return $this->error('Profile Required', 409);
-        }
+        // $profile_id = $request->get('profile_id');
+        // if ($profile_id === null) {
+        //     return $this->error('Profile Required', 409);
+        // }
 
         $map = [
             'movie'   => 'movie',
@@ -64,7 +66,7 @@ class WatchlistsController extends Controller
             // ->where('watchlistable_type', $map[$type])
             ->where('content_type', $map[$type])
             ->where('content_id', $content_id)
-            ->where('profile_id', $profile_id)
+            ->whereIn('profile_id', $request->user()->profiles->pluck('id'))
             ->exists();
 
         if ($data) {
@@ -82,6 +84,7 @@ class WatchlistsController extends Controller
             'content_type' => ['required', 'in:movie,series,season,episode'],
             'content_id' => 'required|integer',
         ]);
+        $this->authorize('create', [Watchlist::class, $request->profile_id]);
 
         $exists = Watchlist::where('profile_id', $data['profile_id'])
             ->where('content_type', $data['content_type'])
@@ -95,6 +98,7 @@ class WatchlistsController extends Controller
         }
 
         $watch = Watchlist::create(array_merge($data, ['user_id' => $request->user()->id, 'added_at' => now()]));
+
         // store View History Watchlist
         return $this->success($watch, 'Added Successfully', 200);
     }
@@ -103,6 +107,8 @@ class WatchlistsController extends Controller
     public function destroy(Request $request, int $id)
     {
         $watchlist =Watchlist::findOrFail($id);
+        $this->authorize('delete', $watchlist);
+
         // soft delete
         if ($watchlist) $watchlist->delete();
 

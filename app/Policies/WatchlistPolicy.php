@@ -4,43 +4,40 @@ namespace App\Policies;
 
 use App\Models\User;
 use App\Models\Watchlist;
-use Illuminate\Auth\Access\HandlesAuthorization;
+use Illuminate\Auth\Access\Response;
+use App\Traits\OwnsProfileTrait;
 
 class WatchlistPolicy
 {
-    use HandlesAuthorization;
+    use OwnsProfileTrait;
 
-    /**
-     * تحقق إذا يمكن للمستخدم عرض أي Watchlists لبروفايل معين
-     */
-    public function viewAny(User $user, $profileId)
+    public function viewAny(User $user)
     {
-        return $user->profiles()->where('id', $profileId)->exists();
+        return true;
+    }
+
+    public function create(User $user, int $profileId)
+    {
+        return $this->ownsProfile($user, $profileId);
+    }
+    public function view(User $user, Watchlist $watchlist): bool
+    {
+        return $this->ownsProfile($user, $watchlist->profile_id);
+    }
+
+
+    public function update(User $user, Watchlist $watchlist): bool
+    {
+        return $this->ownsProfile($user, $watchlist->profile_id);
     }
 
     /**
-     * تحقق إذا يمكن للمستخدم عرض Watchlist محدد
+     * Determine whether the user can delete the model.
      */
-    public function view(User $user, Watchlist $watchlist)
+    public function delete(User $user, Watchlist $watchlist): bool
     {
-        return $watchlist->user_id === $user->id
-            && $user->profiles()->where('id', $watchlist->profile_id)->exists();
+        return $this->ownsProfile($user, $watchlist->profile_id);
     }
 
-    /**
-     * تحقق إذا يمكن للمستخدم إنشاء Watchlist لبروفايل معين
-     */
-    public function create(User $user, $profileId)
-    {
-        return $user->profiles()->where('id', $profileId)->exists();
-    }
 
-    /**
-     * تحقق إذا يمكن للمستخدم حذف Watchlist
-     */
-    public function delete(User $user, Watchlist $watchlist)
-    {
-        return $watchlist->user_id === $user->id
-            && $user->profiles()->where('id', $watchlist->profile_id)->exists();
-    }
 }

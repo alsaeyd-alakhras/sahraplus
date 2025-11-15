@@ -7,19 +7,20 @@ use Illuminate\Http\Request;
 use App\Models\ViewingHistory;
 use App\Traits\ApiResponse;
 
-class HistoryController extends Controller
+class ViewingHistoryController extends Controller
 {
     use ApiResponse;
     // GET /api/v1/history
     public function index(Request $request)
     {
-        $profile_id = $request->get('profile_id');
-        if ($profile_id === null) {
-            return $this->error('Profile Required', 409);
-        }
+        // $profile_id = $request->get('profile_id');
+        // if ($profile_id === null) {
+        //     return $this->error('Profile Required', 409);
+        // }
 
-        $items = ViewingHistory::where('profile_id', $profile_id)
-            ->where('user_id', $request->user()->id)
+        $items = ViewingHistory::
+            where('user_id', $request->user()->id)
+            ->whereIn('profile_id', $request->user()->profiles->pluck('id'))
             ->with('content')
             ->latest()
             ->paginate(20);

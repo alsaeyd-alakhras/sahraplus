@@ -23,11 +23,14 @@ class AuthController extends Controller
             'password' => 'required|string',
         ]);
 
-        if (!Auth::guard('sanctum')->attempt($credentials)) {
-            return response()->json(['error' => __('controller.Invalid_credentials')], Response::HTTP_UNAUTHORIZED);
-        }
+        $user = User::where('email', $credentials['email'])->first();
 
-        $user = Auth::guard('sanctum')->user();
+        // التحقق من كلمة المرور
+        if (!$user || !Hash::check($credentials['password'], $user->password)) {
+            return response()->json([
+                'error' => __('controller.Invalid_credentials')
+            ], Response::HTTP_UNAUTHORIZED);
+        }
 
         $token = $user->createToken('auth_token')->plainTextToken;
 
