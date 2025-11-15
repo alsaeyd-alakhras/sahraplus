@@ -38,8 +38,8 @@
 
                 <div class="row">
                     <div class="mb-4 col-md-6">
-                        <x-form.select label="{{ __('admin.status') }}" id="status" :value="$userRating->status"
-                            name="status" placeholder="{{ __('admin.status') }}" :options="['pending', 'approved' , 'rejected' ]" />
+                        <x-form.selectTrans label="{{ __('admin.status') }}" id="status" :value="$userRating->status"
+                            name="status" placeholder="{{ __('admin.status') }}" :options="['pending' =>  __('admin.pending'), 'approved' =>  __('admin.approved') , 'rejected' =>  __('admin.rejected') ]" />
                     </div>
                 </div>
             </div>

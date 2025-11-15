@@ -13,13 +13,14 @@ class ViewingHistoryController extends Controller
     // GET /api/v1/history
     public function index(Request $request)
     {
-        // $profile_id = $request->get('profile_id');
-        // if ($profile_id === null) {
-        //     return $this->error('Profile Required', 409);
-        // }
+        $request->validate([
+            'content_type' => 'nullable|in:movie,episode,short,series'
+        ]);
 
-        $items = ViewingHistory::
-            where('user_id', $request->user()->id)
+        $items = ViewingHistory::where('user_id', $request->user()->id)
+            ->when($request->content_type, function ($q) use ($request) {
+                $q->where('content_type', $request->content_type);
+            })
             ->whereIn('profile_id', $request->user()->profiles->pluck('id'))
             ->with('content')
             ->latest()
@@ -27,13 +28,12 @@ class ViewingHistoryController extends Controller
 
         $data = $items->map(function ($h) {
             return [
-                'type'  => $h->content_type, // أو strtolower(class_basename($h->content_type)) حسب تخزينك
+                'type'  => $h->content_type,
                 'id'    => $h->content_id,
                 'at'    => $h->created_at->toIso8601String(),
                 'title' => optional($h->content)->title_ar
                     ?? optional($h->content)->title_en
-                    ?? optional($h->content)->title
-                    ?? null,
+                    ?? optional($h->content)->title,
             ];
         });
 
@@ -49,12 +49,29 @@ class ViewingHistoryController extends Controller
     //Get api/profiles/{id}/history/stats
     public function analytic_history($profileId)
     {
-        $total = ViewingHistory::where('profile_id', $profileId)->count();
-        $last30 = ViewingHistory::where('profile_id', $profileId)
-            ->where('created_at', '>=', now()->subDays(30))->count();
+        $user = auth('sanctum')->user();
+        if (!in_array($profileId, $user->profiles->pluck('id')->toArray())) {
+            return $this->error('Profile not found', 403);
+        }
 
-            $data=[ 'total' => $total,
-            'last_30_days' => $last30,];
-            return $this->success($data, 'Get Data Successfully',201);
+        $total = ViewingHistory::where('profile_id', $profileId)
+            ->where('user_id', $user->id)
+            ->count();
+
+        if ($total === 0) {
+            return $this->error('Not Exists in history', 404);
+        }
+
+        $last30 = ViewingHistory::where('profile_id', $profileId)
+            ->where('user_id', $user->id)
+            ->where('created_at', '>=', now()->subDays(30))
+            ->count();
+
+        $data = [
+            'total' => $total,
+            'last_30_days' => $last30,
+        ];
+
+        return $this->success($data, 'Get Data Successfully', 200);
     }
 }

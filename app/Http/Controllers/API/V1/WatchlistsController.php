@@ -13,23 +13,22 @@ class WatchlistsController extends Controller
     // GET /api/v1/watchlists
     public function index(Request $request)
     {
-
-        $perPage=$request->get('per_page', 20);
-        $profile_id=$request->get('profile_id');
+        $perPage = $request->get('per_page', 20);
+        //$profile_id=$request->get('profile_id');
         // if ($profile_id === null) {
         //     return $this->error('Profile Required', 409);
         // }
-         $items = Watchlist::
-            whereIn('profile_id', $request->user()->profiles->pluck('id'))
+        $items = Watchlist::whereIn('profile_id', $request->user()->profiles->pluck('id'))
             ->where('user_id', $request->user()->id)
             ->with('content')
             ->latest()
             ->paginate($perPage);
+
         $data = $items->map(function ($item) {
             return [
                 'type'     => strtolower($item->content_type),
                 'content_id'       => $item->content_id,
-                'added_at' => $item->created_at ? $item->created_at->format('d-m-Y') :' null',
+                'added_at' => $item->created_at ? $item->created_at->format('d-m-Y') : ' null',
                 'title'    => optional($item->content)->title_ar
                     ?? optional($item->content)->title_en
                     ?? optional($item->content)->title
@@ -70,7 +69,7 @@ class WatchlistsController extends Controller
             ->exists();
 
         if ($data) {
-            return $this->success($data,'Get Data Successfully', 201);
+            return $this->success($data, 'Get Data Successfully', 201);
         } else {
             return $this->error('Not Exists in watchlist', 409);
         }
@@ -106,7 +105,7 @@ class WatchlistsController extends Controller
     // DELETE /api/v1/{id}/watchlist/delete
     public function destroy(Request $request, int $id)
     {
-        $watchlist =Watchlist::findOrFail($id);
+        $watchlist = Watchlist::findOrFail($id);
         $this->authorize('delete', $watchlist);
 
         // soft delete

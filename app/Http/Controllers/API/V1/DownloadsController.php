@@ -24,6 +24,10 @@ class DownloadsController extends Controller
             ->latest()
             ->paginate(20);
 
+        $data->getCollection()->transform(function ($item) {
+            return $item->makeHidden(['user']);
+        });
+
 
         if ($data->count() > 0) {
             return $this->success([
@@ -45,7 +49,7 @@ class DownloadsController extends Controller
     {
         $this->authorize('view', $download);
 
-        if ($download && $download->user_id == auth()->id()) {
+        if ($download && $download->user_id == auth('sanctum')->id()) {
             return $this->success($download, 'Get Data Successfully', 201);
         } else {
             return $this->error('Not Found Download Or Not Unauthorized', 409);
@@ -109,5 +113,57 @@ class DownloadsController extends Controller
             'expires_at' => $expiresAt->format('d-m-Y'),
             'download_url' => $downloadUrl,
         ], 'Download created successfully', 201);
+    }
+
+    // GET /api/v1/completed-downloads
+    public function getCompletedDownloads(Request $request)
+    {
+        $data = Download::where('status', 'completed')
+            ->where('user_id', $request->user()->id)
+            ->whereIn('profile_id', $request->user()->profiles->pluck('id'))
+            ->latest()
+            ->paginate(20);
+
+        if ($data->isEmpty()) {
+            return $this->error('No completed downloads found', 404);
+        }
+        $data->getCollection()->transform(function ($item) {
+            return $item->makeHidden(['user']);
+        });
+
+        return $this->success([
+            'items' => $data->items(),
+            'meta' => [
+                'current_page' => $data->currentPage(),
+                'last_page' => $data->lastPage(),
+                'total' => $data->total(),
+                'per_page' => $data->perPage(),
+            ]
+        ], 'Get Data Successfully', 200);
+    }
+
+    // PUT /api/v1/Re-downloads/{id}
+    public function ReDownload($id)
+    {
+        $download = Download::find($id);
+        if (!$download) {
+            return $this->error('Download not found', 404);
+        }
+         $this->authorize('update', $download);
+
+        $allowed = ['completed', 'failed', 'expired'];
+
+        if (! in_array($download->status, $allowed)) {
+            return $this->error('This download cannot be restarted', 409);
+        }
+
+        $download->update([
+            'status' => 'downloading',
+            'progress_percentage' => 0,
+            'completed_at' => null,
+            'expires_at' => now()->addDays(7),
+        ]);
+
+        return $this->success($download->makeHidden(['user']), 'Re-download started successfully', 200);
     }
 }

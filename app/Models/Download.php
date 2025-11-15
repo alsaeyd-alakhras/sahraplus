@@ -27,7 +27,7 @@ class Download extends Model
         'expires_at',
         'completed_at'
     ];
-    protected $appends = ['created', 'duration', 'status_trans', 'user_name', 'expired', 'content_type_trans'];
+    protected $appends = ['created', 'duration', 'status_trans','user_name' , 'expired', 'content_type_trans'];
 
     protected $casts = [
         'file_size' => 'integer',
@@ -89,7 +89,7 @@ class Download extends Model
     }
     public function getUserNameAttribute()
     {
-        return $this->user
+        return $this->user_id
             ? trim($this->user->first_name . ' ' . $this->user->last_name)
             : 'غير معروف';
     }
