@@ -44,7 +44,6 @@ use App\Http\Controllers\API\V1\ShortController;
 */
 
 Route::prefix('v1')->name('api.v1.')->group(function () {
-
     // ================================
     // 🔐 Auth & User
     // ================================
@@ -120,7 +119,7 @@ Route::prefix('v1')->name('api.v1.')->group(function () {
     // ================================
     // ⭐ User Interaction (المرحلة الثالثة)
     // ================================
-    Route::middleware(['auth:sanctum','throttle:api'])->group(function () {
+    Route::middleware(['auth:sanctum'])->group(function () {
 
         // 📌 Watchlists
         Route::get('watchlists', [WatchlistsController::class, 'index']);
@@ -150,9 +149,11 @@ Route::prefix('v1')->name('api.v1.')->group(function () {
 
         // 📌 Downloads
         Route::get('downloads', [DownloadsController::class, 'index']);
+        Route::get('completed-downloads', [DownloadsController::class, 'getCompletedDownloads']);
         Route::get('download/{download}', [DownloadsController::class, 'show']);
 
         Route::post('download-store/{type}/{id}', [DownloadsController::class, 'store'])->middleware('throttle:downloads');
+        Route::put('Re-downloads/{id}', [DownloadsController::class, 'ReDownload']);
 
         //analytics
         Route::get('admin/analytics', [AnalyticsController::class, 'index']);

@@ -27,15 +27,20 @@ class DownloadPolicy
         return $this->ownsProfile($user, $download->profile_id);
     }
 
+
+
     public function update(User $user, Download $download): bool
     {
+        if (!$download->profile_id) {
+            return false;
+        }
         return $this->ownsProfile($user, $download->profile_id);
     }
-
     public function delete(User $user, Download $download): bool
     {
         return $this->ownsProfile($user, $download->profile_id);
     }
+
 
 
 }
