@@ -63,7 +63,7 @@
                 </a>
             </li>
         @endcan
-        @can('view', 'App\\Models\MovieCategory')
+        @can('view', 'App\\Models\Category')
             <li
                 class="menu-item {{ request()->is('dashboard/movie-categories') || request()->is('dashboard/movie-categories/*') ? 'active' : '' }}">
                 <a href="{{ route('dashboard.movie-categories.index') }}" class="menu-link">

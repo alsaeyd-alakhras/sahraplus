@@ -1,222 +1,222 @@
 <x-front-layout>
     @php
-        $title = 'title_' . app()->getLocale();
-        $description = 'description_' . app()->getLocale();
+    $title = 'title_' . app()->getLocale();
+    $description = 'description_' . app()->getLocale();
 
-        // متغيرات التحكم في الوصول
-        $requireLogin = $movie->require_login ?? false;
-        $requireSubscription = $movie->require_subscription ?? false;
-        $isAuthenticated = auth()->check();
-        $hasSubscription = $isAuthenticated ? auth()->user()->has_active_subscription ?? true : false;
+    // متغيرات التحكم في الوصول
+    $requireLogin = $movie->require_login ?? false;
+    $requireSubscription = $movie->require_subscription ?? false;
+    $isAuthenticated = auth()->check();
+    $hasSubscription = $isAuthenticated ? auth()->user()->has_active_subscription ?? true : false;
 
-        // جلب الأفلام ذات الصلة حسب التصنيفات
-        $relatedMovies = \App\Models\Movie::published()
-            ->where('id', '!=', $movie->id)
-            ->whereHas('categories', function ($q) use ($movie) {
-                $q->whereIn('movie_categories.id', $movie->categories->pluck('id'));
-            })
-            ->limit(10)
-            ->get();
+    // جلب الأفلام ذات الصلة حسب التصنيفات
+    $relatedMovies = \App\Models\Movie::published()
+    ->where('id', '!=', $movie->id)
+    ->whereHas('categories', function ($q) use ($movie) {
+    $q->whereIn('categories.id', $movie->categories->pluck('id'));
+    })
+    ->limit(10)
+    ->get();
 
-        // جلب الأفلام الأعلى مشاهدة
-        $topViewedMovies = \App\Models\Movie::published()
-            ->where('id', '!=', $movie->id)
-            ->orderBy('view_count', 'desc')
-            ->limit(10)
-            ->get();
+    // جلب الأفلام الأعلى مشاهدة
+    $topViewedMovies = \App\Models\Movie::published()
+    ->where('id', '!=', $movie->id)
+    ->orderBy('view_count', 'desc')
+    ->limit(10)
+    ->get();
 
-        // جلب التعليقات
-        $comments = $movie
-            ->comments()
-            ->approved()
-            ->topLevel()
-            ->with(['user', 'profile'])
-            ->orderBy('created_at', 'desc')
-            ->limit(20)
-            ->get();
+    // جلب التعليقات
+    $comments = $movie
+    ->comments()
+    ->approved()
+    ->topLevel()
+    ->with(['user', 'profile'])
+    ->orderBy('created_at', 'desc')
+    ->limit(20)
+    ->get();
 
-        // جلب الممثلين والمخرجين
-        $actors = $movie->cast()->actors()->with('person')->ordered()->get();
-        $directors = $movie->cast()->directors()->with('person')->ordered()->get();
-        $allCast = $movie->cast()->with('person')->ordered()->get();
+    // جلب الممثلين والمخرجين
+    $actors = $movie->cast()->actors()->with('person')->ordered()->get();
+    $directors = $movie->cast()->directors()->with('person')->ordered()->get();
+    $allCast = $movie->cast()->with('person')->ordered()->get();
     @endphp
 
     @push('styles')
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.css" />
-        <style>
-            #videoControls button {
-                background: rgba(255, 255, 255, 0.1);
-                padding: 10px;
-                border-radius: 50%;
-                color: white;
-                font-size: 18px;
-                transition: background 0.3s;
-            }
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.css" />
+    <style>
+    #videoControls button {
+        background: rgba(255, 255, 255, 0.1);
+        padding: 10px;
+        border-radius: 50%;
+        color: white;
+        font-size: 18px;
+        transition: background 0.3s;
+    }
 
-            #videoControls button:hover {
-                background: rgba(255, 255, 255, 0.3);
-            }
+    #videoControls button:hover {
+        background: rgba(255, 255, 255, 0.3);
+    }
 
-            .quality-selector {
-                position: absolute;
-                bottom: 60px;
-                right: 20px;
-                z-index: 25;
-            }
+    .quality-selector {
+        position: absolute;
+        bottom: 60px;
+        right: 20px;
+        z-index: 25;
+    }
 
-            .subtitle-controls {
-                position: absolute;
-                bottom: 60px;
-                right: 160px;
-                z-index: 25;
-            }
+    .subtitle-controls {
+        position: absolute;
+        bottom: 60px;
+        right: 160px;
+        z-index: 25;
+    }
 
-            .quality-dropdown {
-                background: rgba(0, 0, 0, 0.8);
-                border-radius: 4px;
-                padding: 8px;
-                min-width: 120px;
-            }
+    .quality-dropdown {
+        background: rgba(0, 0, 0, 0.8);
+        border-radius: 4px;
+        padding: 8px;
+        min-width: 120px;
+    }
 
-            .quality-option {
-                padding: 4px 8px;
-                cursor: pointer;
-                border-radius: 2px;
-                transition: background 0.2s;
-                color: white;
-                font-size: 14px;
-            }
+    .quality-option {
+        padding: 4px 8px;
+        cursor: pointer;
+        border-radius: 2px;
+        transition: background 0.2s;
+        color: white;
+        font-size: 14px;
+    }
 
-            .quality-option:hover {
-                background: rgba(255, 255, 255, 0.2);
-            }
+    .quality-option:hover {
+        background: rgba(255, 255, 255, 0.2);
+    }
 
-            .quality-option.active {
-                background: #ef4444;
-            }
+    .quality-option.active {
+        background: #ef4444;
+    }
 
-            .subtitle-text {
-                position: absolute;
-                bottom: 80px;
-                left: 50%;
-                transform: translateX(-50%);
-                background: rgba(0, 0, 0, 0.7);
-                color: white;
-                padding: 8px 16px;
-                border-radius: 4px;
-                text-align: center;
-                font-size: 16px;
-                max-width: 80%;
-                line-height: 1.4;
-                z-index: 20;
-            }
+    .subtitle-text {
+        position: absolute;
+        bottom: 80px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: rgba(0, 0, 0, 0.7);
+        color: white;
+        padding: 8px 16px;
+        border-radius: 4px;
+        text-align: center;
+        font-size: 16px;
+        max-width: 80%;
+        line-height: 1.4;
+        z-index: 20;
+    }
 
-            .hero-slide img,
-            .hero-slide video {
-                transition: opacity 0.8s ease-in-out;
-            }
+    .hero-slide img,
+    .hero-slide video {
+        transition: opacity 0.8s ease-in-out;
+    }
 
-            .tab {
-                transition: all 0.3s ease;
-            }
+    .tab {
+        transition: all 0.3s ease;
+    }
 
-            .tab.active {
-                background-color: #ef4444 !important;
-            }
+    .tab.active {
+        background-color: #ef4444 !important;
+    }
 
-            .tab-content {
-                display: none;
-                opacity: 0;
-                transform: translateY(10px);
-                transition: all 0.3s ease;
-            }
+    .tab-content {
+        display: none;
+        opacity: 0;
+        transform: translateY(10px);
+        transition: all 0.3s ease;
+    }
 
-            .tab-content.active {
-                display: block;
-                opacity: 1;
-                transform: translateY(0);
-            }
+    .tab-content.active {
+        display: block;
+        opacity: 1;
+        transform: translateY(0);
+    }
 
-            .movie-card {
-                transition: transform 0.3s ease, box-shadow 0.3s ease;
-            }
+    .movie-card {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
 
-            .movie-card:hover {
-                transform: scale(1.05);
-                box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
-            }
-        </style>
-        <style>
-            .subtitle-text {
-                position: absolute;
-                bottom: 100px;
-                left: 50%;
-                transform: translateX(-50%);
-                background: rgba(0, 0, 0, 0.8);
-                color: white;
-                padding: 8px 16px;
-                border-radius: 6px;
-                text-align: center;
-                font-size: 18px;
-                font-weight: 500;
-                max-width: 90%;
-                line-height: 1.4;
-                z-index: 25;
-                word-wrap: break-word;
-                white-space: pre-wrap;
-                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
-                border: 1px solid rgba(255, 255, 255, 0.1);
-            }
+    .movie-card:hover {
+        transform: scale(1.05);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+    }
+    </style>
+    <style>
+    .subtitle-text {
+        position: absolute;
+        bottom: 100px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: rgba(0, 0, 0, 0.8);
+        color: white;
+        padding: 8px 16px;
+        border-radius: 6px;
+        text-align: center;
+        font-size: 18px;
+        font-weight: 500;
+        max-width: 90%;
+        line-height: 1.4;
+        z-index: 25;
+        word-wrap: break-word;
+        white-space: pre-wrap;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
 
-            /* تحسين عرض الترجمات على الشاشات الصغيرة */
-            @media (max-width: 768px) {
-                .subtitle-text {
-                    font-size: 16px;
-                    bottom: 80px;
-                    max-width: 95%;
-                    padding: 6px 12px;
-                }
-            }
-        </style>
+    /* تحسين عرض الترجمات على الشاشات الصغيرة */
+    @media (max-width: 768px) {
+        .subtitle-text {
+            font-size: 16px;
+            bottom: 80px;
+            max-width: 95%;
+            padding: 6px 12px;
+        }
+    }
+    </style>
     @endpush
     @push('styles')
-        <!-- أضف CSS Plyr -->
-        <link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css" />
-        <style>
-            /* إصلاح اتجاه التحكم */
-            .plyr__controls {
-                direction: ltr !important;
-            }
+    <!-- أضف CSS Plyr -->
+    <link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css" />
+    <style>
+    /* إصلاح اتجاه التحكم */
+    .plyr__controls {
+        direction: ltr !important;
+    }
 
-            .plyr {
-                --plyr-color-main: #ef4444;
-                --plyr-video-background: #000;
-            }
+    .plyr {
+        --plyr-color-main: #ef4444;
+        --plyr-video-background: #000;
+    }
 
-            .plyr--fullscreen {
-                z-index: 9999;
-            }
+    .plyr--fullscreen {
+        z-index: 9999;
+    }
 
-            /* زر تخطي المقدمة */
-            #skipIntroBtn {
-                position: absolute;
-                right: 20px;
-                bottom: 100px;
-                z-index: 1000;
-                background: #ef4444;
-                color: white;
-                padding: 8px 16px;
-                border-radius: 4px;
-                font-size: 14px;
-                border: none;
-                cursor: pointer;
-                transition: background 0.3s;
-            }
+    /* زر تخطي المقدمة */
+    #skipIntroBtn {
+        position: absolute;
+        right: 20px;
+        bottom: 100px;
+        z-index: 1000;
+        background: #ef4444;
+        color: white;
+        padding: 8px 16px;
+        border-radius: 4px;
+        font-size: 14px;
+        border: none;
+        cursor: pointer;
+        transition: background 0.3s;
+    }
 
-            #skipIntroBtn:hover {
-                background: #dc2626;
-            }
-        </style>
+    #skipIntroBtn:hover {
+        background: #dc2626;
+    }
+    </style>
     @endpush
 
     <!-- Hero Section -->
@@ -225,21 +225,21 @@
             <img id="heroImage" src="{{ $movie->backdrop_full_url }}" alt="Hero Background"
                 class="object-cover absolute inset-0 w-full h-full" />
             @if ($movie->trailer_full_url)
-                <video id="heroVideo" src="{{ $movie->trailer_full_url }}"
-                    class="hidden object-cover absolute inset-0 w-full h-full" playsinline muted loop></video>
+            <video id="heroVideo" src="{{ $movie->trailer_full_url }}"
+                class="hidden object-cover absolute inset-0 w-full h-full" playsinline muted loop></video>
             @endif
             <div class="absolute inset-0 hero-gradient"></div>
         </div>
 
         @if ($movie->trailer_full_url)
-            <button id="muteBtn" class="absolute left-10 top-28 z-20 p-3 text-white rounded-full bg-black/60"
-                data-state="muted">
-                <svg class="w-6 h-6 mute-icon" fill="currentColor" viewBox="0 0 24 24">
-                    <path
-                        d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z">
-                    </path>
-                </svg>
-            </button>
+        <button id="muteBtn" class="absolute left-10 top-28 z-20 p-3 text-white rounded-full bg-black/60"
+            data-state="muted">
+            <svg class="w-6 h-6 mute-icon" fill="currentColor" viewBox="0 0 24 24">
+                <path
+                    d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z">
+                </path>
+            </svg>
+        </button>
         @endif
 
         <div class="flex relative z-10 items-end pb-20 h-full">
@@ -258,35 +258,35 @@
 
                     <div class="flex flex-wrap gap-4 items-center">
                         @if ($watchProgress && $watchProgress->progress_percentage > 5)
-                            <!-- زر متابعة المشاهدة -->
-                            <button id="continueWatching" data-progress="{{ $watchProgress->watched_seconds }}"
-                                class="flex items-center px-6 py-2 text-sm font-bold text-white bg-green-600 rounded-lg transition-all hover:bg-green-700">
-                                <svg class="ml-2 w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                                    <path d="M8 5v14l11-7z" />
-                                </svg>
-                                متابعة المشاهدة ({{ number_format($watchProgress->progress_percentage, 1) }}%)
-                            </button>
+                        <!-- زر متابعة المشاهدة -->
+                        <button id="continueWatching" data-progress="{{ $watchProgress->watched_seconds }}"
+                            class="flex items-center px-6 py-2 text-sm font-bold text-white bg-green-600 rounded-lg transition-all hover:bg-green-700">
+                            <svg class="ml-2 w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M8 5v14l11-7z" />
+                            </svg>
+                            متابعة المشاهدة ({{ number_format($watchProgress->progress_percentage, 1) }}%)
+                        </button>
 
-                            <!-- زر من البداية -->
-                            <button id="watchFromStart"
-                                class="flex items-center px-4 py-2 text-sm text-white bg-gray-700 rounded-lg hover:bg-gray-600">
-                                <svg class="ml-2 w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                                    <path d="M6 6h2v12H6zm3.5 6l8.5 6V6z" />
-                                </svg>
-                                من البداية
-                            </button>
+                        <!-- زر من البداية -->
+                        <button id="watchFromStart"
+                            class="flex items-center px-4 py-2 text-sm text-white bg-gray-700 rounded-lg hover:bg-gray-600">
+                            <svg class="ml-2 w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M6 6h2v12H6zm3.5 6l8.5 6V6z" />
+                            </svg>
+                            من البداية
+                        </button>
                         @else
-                            <!-- زر شاهد الآن العادي -->
-                            <button id="watchNow" data-require-login="{{ $requireLogin ? 'true' : 'false' }}"
-                                data-require-subscription="{{ $requireSubscription ? 'true' : 'false' }}"
-                                data-is-authenticated="{{ $isAuthenticated ? 'true' : 'false' }}"
-                                data-has-subscription="{{ $hasSubscription ? 'true' : 'false' }}"
-                                class="flex items-center px-6 py-2 text-sm font-bold text-white rounded-lg transition-all bg-fire-red hover:bg-red-700">
-                                <svg class="ml-2 w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                                    <path d="M8 5v14l11-7z" />
-                                </svg>
-                                {{ __('site.watch_now') }}
-                            </button>
+                        <!-- زر شاهد الآن العادي -->
+                        <button id="watchNow" data-require-login="{{ $requireLogin ? 'true' : 'false' }}"
+                            data-require-subscription="{{ $requireSubscription ? 'true' : 'false' }}"
+                            data-is-authenticated="{{ $isAuthenticated ? 'true' : 'false' }}"
+                            data-has-subscription="{{ $hasSubscription ? 'true' : 'false' }}"
+                            class="flex items-center px-6 py-2 text-sm font-bold text-white rounded-lg transition-all bg-fire-red hover:bg-red-700">
+                            <svg class="ml-2 w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M8 5v14l11-7z" />
+                            </svg>
+                            {{ __('site.watch_now') }}
+                        </button>
                         @endif
 
                         <button id="addToWatchlist" data-movie-id="{{ $movie->id }}"
@@ -320,29 +320,26 @@
 
                 <!-- مصادر الفيديو المتعددة -->
                 @if($movie->videoFiles && $movie->videoFiles->count() > 0)
-                    @foreach($movie->videoFiles->sortBy('quality') as $videoFile)
-                        <source
-                            src="{{ $videoFile->file_url }}"
-                            type="video/mp4"
-                            size="{{ str_replace('p', '', $videoFile->quality) }}"
-                        />
-                    @endforeach
+                @foreach($movie->videoFiles->sortBy('quality') as $videoFile)
+                <source src="{{ $videoFile->file_url }}" type="video/mp4"
+                    size="{{ str_replace('p', '', $videoFile->quality) }}" />
+                @endforeach
                 @endif
 
                 <!-- ملفات الترجمة -->
                 @if ($movie->subtitles && $movie->subtitles->count() > 0)
-                    @foreach ($movie->subtitles as $index => $subtitle)
-                        <track kind="captions" label="{{ $subtitle->label }}" srclang="{{ $subtitle->language }}"
-                            src="{{ $subtitle->file_url }}" @if ($index === 0) default @endif />
-                    @endforeach
+                @foreach ($movie->subtitles as $index => $subtitle)
+                <track kind="captions" label="{{ $subtitle->label }}" srclang="{{ $subtitle->language }}"
+                    src="{{ $subtitle->file_url }}" @if ($index===0) default @endif />
+                @endforeach
                 @endif
             </video>
 
             <!-- زر تخطي المقدمة -->
             @if ($movie->intro_skip_time && $movie->intro_skip_time > 0)
-                <button id="skipIntroBtn" class="hidden">
-                    ↩ تخطي المقدمة
-                </button>
+            <button id="skipIntroBtn" class="hidden">
+                ↩ تخطي المقدمة
+            </button>
             @endif
 
             <!-- زر الخروج -->
@@ -374,65 +371,64 @@
             <!-- Related Movies Tab -->
             <div id="episodes" class="tab-content active animate-fade-in">
                 @if ($relatedMovies->count() > 0)
-                    <div class="overflow-visible px-4 py-6 mx-auto mb-3">
-                        <h2 class="mb-4 text-2xl font-bold text-right">أفلام ذات صلة</h2>
-                        <div class="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
-                            @foreach ($relatedMovies as $relatedMovie)
-                                <div class="overflow-hidden bg-gray-800 rounded-lg movie-card">
-                                    <a href="{{ route('movie.show', $relatedMovie) }}">
-                                        <img src="{{ $relatedMovie->poster_full_url }}"
-                                            alt="{{ $relatedMovie->$title }}"
-                                            class="w-full aspect-[2/3] object-cover">
-                                        <div class="p-3">
-                                            <h3 class="mb-1 text-sm font-bold text-white line-clamp-2">
-                                                {{ $relatedMovie->$title }}</h3>
-                                            <div class="mb-2 text-xs text-gray-400">
-                                                <span>{{ $relatedMovie->release_date?->format('Y') }}</span>
-                                                <span class="mx-1">•</span>
-                                                <span>{{ $relatedMovie->duration_formatted }}</span>
-                                            </div>
-                                            <div class="text-xs text-yellow-400">
-                                                ⭐ {{ $relatedMovie->imdb_rating }}
-                                            </div>
-                                        </div>
-                                    </a>
+                <div class="overflow-visible px-4 py-6 mx-auto mb-3">
+                    <h2 class="mb-4 text-2xl font-bold text-right">أفلام ذات صلة</h2>
+                    <div class="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
+                        @foreach ($relatedMovies as $relatedMovie)
+                        <div class="overflow-hidden bg-gray-800 rounded-lg movie-card">
+                            <a href="{{ route('movie.show', $relatedMovie) }}">
+                                <img src="{{ $relatedMovie->poster_full_url }}" alt="{{ $relatedMovie->$title }}"
+                                    class="w-full aspect-[2/3] object-cover">
+                                <div class="p-3">
+                                    <h3 class="mb-1 text-sm font-bold text-white line-clamp-2">
+                                        {{ $relatedMovie->$title }}</h3>
+                                    <div class="mb-2 text-xs text-gray-400">
+                                        <span>{{ $relatedMovie->release_date?->format('Y') }}</span>
+                                        <span class="mx-1">•</span>
+                                        <span>{{ $relatedMovie->duration_formatted }}</span>
+                                    </div>
+                                    <div class="text-xs text-yellow-400">
+                                        ⭐ {{ $relatedMovie->imdb_rating }}
+                                    </div>
                                 </div>
-                            @endforeach
+                            </a>
                         </div>
+                        @endforeach
                     </div>
+                </div>
                 @endif
 
                 @if ($topViewedMovies->count() > 0)
-                    <div class="overflow-visible px-4 py-6 mx-auto mb-3">
-                        <h2 class="mb-4 text-2xl font-bold text-right">أعلى المشاهدة</h2>
-                        <div class="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
-                            @foreach ($topViewedMovies as $topMovie)
-                                <div class="overflow-hidden bg-gray-800 rounded-lg movie-card">
-                                    <a href="{{ route('movie.show', $topMovie) }}">
-                                        <img src="{{ $topMovie->poster_full_url }}" alt="{{ $topMovie->$title }}"
-                                            class="w-full aspect-[2/3] object-cover">
-                                        <div class="p-3">
-                                            <h3 class="mb-1 text-sm font-bold text-white line-clamp-2">
-                                                {{ $topMovie->$title }}</h3>
-                                            <div class="mb-2 text-xs text-gray-400">
-                                                <span>{{ $topMovie->release_date?->format('Y') }}</span>
-                                                <span class="mx-1">•</span>
-                                                <span>{{ $topMovie->duration_formatted }}</span>
-                                            </div>
-                                            <div class="flex justify-between items-center">
-                                                <div class="text-xs text-yellow-400">
-                                                    ⭐ {{ $topMovie->imdb_rating }}
-                                                </div>
-                                                <div class="text-xs text-green-400">
-                                                    👁 {{ number_format($topMovie->view_count) }}
-                                                </div>
-                                            </div>
+                <div class="overflow-visible px-4 py-6 mx-auto mb-3">
+                    <h2 class="mb-4 text-2xl font-bold text-right">أعلى المشاهدة</h2>
+                    <div class="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
+                        @foreach ($topViewedMovies as $topMovie)
+                        <div class="overflow-hidden bg-gray-800 rounded-lg movie-card">
+                            <a href="{{ route('movie.show', $topMovie) }}">
+                                <img src="{{ $topMovie->poster_full_url }}" alt="{{ $topMovie->$title }}"
+                                    class="w-full aspect-[2/3] object-cover">
+                                <div class="p-3">
+                                    <h3 class="mb-1 text-sm font-bold text-white line-clamp-2">
+                                        {{ $topMovie->$title }}</h3>
+                                    <div class="mb-2 text-xs text-gray-400">
+                                        <span>{{ $topMovie->release_date?->format('Y') }}</span>
+                                        <span class="mx-1">•</span>
+                                        <span>{{ $topMovie->duration_formatted }}</span>
+                                    </div>
+                                    <div class="flex justify-between items-center">
+                                        <div class="text-xs text-yellow-400">
+                                            ⭐ {{ $topMovie->imdb_rating }}
                                         </div>
-                                    </a>
+                                        <div class="text-xs text-green-400">
+                                            👁 {{ number_format($topMovie->view_count) }}
+                                        </div>
+                                    </div>
                                 </div>
-                            @endforeach
+                            </a>
                         </div>
+                        @endforeach
                     </div>
+                </div>
                 @endif
             </div>
 
@@ -445,13 +441,13 @@
                     </div>
 
                     @if ($movie->categories->count() > 0)
-                        <div class="flex gap-3 items-center">
-                            <i class="text-sky-400 fas fa-film"></i>
-                            <span>
-                                <span class="font-semibold text-white">التصنيف:</span>
-                                {{ $movie->categories->pluck(app()->getLocale() == 'ar' ? 'name_ar' : 'name_en')->implode('، ') }}
-                            </span>
-                        </div>
+                    <div class="flex gap-3 items-center">
+                        <i class="text-sky-400 fas fa-film"></i>
+                        <span>
+                            <span class="font-semibold text-white">التصنيف:</span>
+                            {{ $movie->categories->pluck(app()->getLocale() == 'ar' ? 'name_ar' : 'name_en')->implode('، ') }}
+                        </span>
+                    </div>
                     @endif
 
                     <div class="flex gap-3 items-center">
@@ -461,33 +457,33 @@
                     </div>
 
                     @if ($movie->release_date)
-                        <div class="flex gap-3 items-center">
-                            <i class="text-green-400 fas fa-calendar-alt"></i>
-                            <span><span class="font-semibold text-white">سنة الإنتاج:</span>
-                                {{ $movie->release_date->format('Y') }}</span>
-                        </div>
+                    <div class="flex gap-3 items-center">
+                        <i class="text-green-400 fas fa-calendar-alt"></i>
+                        <span><span class="font-semibold text-white">سنة الإنتاج:</span>
+                            {{ $movie->release_date->format('Y') }}</span>
+                    </div>
                     @endif
 
                     @if ($movie->language)
-                        <div class="flex gap-3 items-center">
-                            <i class="text-purple-400 fas fa-language"></i>
-                            <span><span class="font-semibold text-white">اللغة:</span> {{ $movie->language }}</span>
-                        </div>
+                    <div class="flex gap-3 items-center">
+                        <i class="text-purple-400 fas fa-language"></i>
+                        <span><span class="font-semibold text-white">اللغة:</span> {{ $movie->language }}</span>
+                    </div>
                     @endif
 
                     @if ($movie->country)
-                        <div class="flex gap-3 items-center">
-                            <i class="text-red-400 fas fa-globe"></i>
-                            <span><span class="font-semibold text-white">البلد:</span> {{ $movie->country }}</span>
-                        </div>
+                    <div class="flex gap-3 items-center">
+                        <i class="text-red-400 fas fa-globe"></i>
+                        <span><span class="font-semibold text-white">البلد:</span> {{ $movie->country }}</span>
+                    </div>
                     @endif
 
                     @if ($movie->imdb_rating)
-                        <div class="flex gap-3 items-center">
-                            <i class="text-yellow-400 fas fa-star"></i>
-                            <span><span class="font-semibold text-white">تقييم IMDb:</span>
-                                {{ $movie->imdb_rating }}/10</span>
-                        </div>
+                    <div class="flex gap-3 items-center">
+                        <i class="text-yellow-400 fas fa-star"></i>
+                        <span><span class="font-semibold text-white">تقييم IMDb:</span>
+                            {{ $movie->imdb_rating }}/10</span>
+                    </div>
                     @endif
                 </div>
             </div>
@@ -497,49 +493,47 @@
                 <h2 class="pb-2 mb-6 text-2xl font-bold text-white border-b border-gray-600">الممثلين والطاقم</h2>
 
                 @if ($directors->count() > 0)
-                    <div class="mb-8">
-                        <h3 class="mb-4 text-xl font-semibold text-white">المخرجون</h3>
-                        <div class="grid grid-cols-2 gap-6 text-center sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
-                            @foreach ($directors as $director)
-                                <div class="transition-transform duration-300 group hover:scale-105">
-                                    <div class="overflow-hidden rounded-lg shadow-md">
-                                        <img src="{{ $director->person->photo_full_url ?: 'https://via.placeholder.com/150x200?text=No+Image' }}"
-                                            alt="{{ $director->person->name }}"
-                                            class="object-cover w-full h-52 rounded-lg group-hover:opacity-90" />
-                                    </div>
-                                    <span
-                                        class="block mt-2 text-sm font-semibold text-gray-300 group-hover:text-white">
-                                        {{ $director->person->name }}
-                                    </span>
-                                    <span class="block text-xs text-gray-500">مخرج</span>
-                                </div>
-                            @endforeach
+                <div class="mb-8">
+                    <h3 class="mb-4 text-xl font-semibold text-white">المخرجون</h3>
+                    <div class="grid grid-cols-2 gap-6 text-center sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
+                        @foreach ($directors as $director)
+                        <div class="transition-transform duration-300 group hover:scale-105">
+                            <div class="overflow-hidden rounded-lg shadow-md">
+                                <img src="{{ $director->person->photo_full_url ?: 'https://via.placeholder.com/150x200?text=No+Image' }}"
+                                    alt="{{ $director->person->name }}"
+                                    class="object-cover w-full h-52 rounded-lg group-hover:opacity-90" />
+                            </div>
+                            <span class="block mt-2 text-sm font-semibold text-gray-300 group-hover:text-white">
+                                {{ $director->person->name }}
+                            </span>
+                            <span class="block text-xs text-gray-500">مخرج</span>
                         </div>
+                        @endforeach
                     </div>
+                </div>
                 @endif
 
                 @if ($actors->count() > 0)
-                    <div class="mb-8">
-                        <h3 class="mb-4 text-xl font-semibold text-white">الممثلون</h3>
-                        <div class="grid grid-cols-2 gap-6 text-center sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
-                            @foreach ($actors as $actor)
-                                <div class="transition-transform duration-300 group hover:scale-105">
-                                    <div class="overflow-hidden rounded-lg shadow-md">
-                                        <img src="{{ $actor->person->photo_full_url ?: 'https://via.placeholder.com/150x200?text=No+Image' }}"
-                                            alt="{{ $actor->person->name }}"
-                                            class="object-cover w-full h-52 rounded-lg group-hover:opacity-90" />
-                                    </div>
-                                    <span
-                                        class="block mt-2 text-sm font-semibold text-gray-300 group-hover:text-white">
-                                        {{ $actor->person->name }}
-                                    </span>
-                                    @if ($actor->character_name)
-                                        <span class="block text-xs text-gray-500">{{ $actor->character_name }}</span>
-                                    @endif
-                                </div>
-                            @endforeach
+                <div class="mb-8">
+                    <h3 class="mb-4 text-xl font-semibold text-white">الممثلون</h3>
+                    <div class="grid grid-cols-2 gap-6 text-center sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
+                        @foreach ($actors as $actor)
+                        <div class="transition-transform duration-300 group hover:scale-105">
+                            <div class="overflow-hidden rounded-lg shadow-md">
+                                <img src="{{ $actor->person->photo_full_url ?: 'https://via.placeholder.com/150x200?text=No+Image' }}"
+                                    alt="{{ $actor->person->name }}"
+                                    class="object-cover w-full h-52 rounded-lg group-hover:opacity-90" />
+                            </div>
+                            <span class="block mt-2 text-sm font-semibold text-gray-300 group-hover:text-white">
+                                {{ $actor->person->name }}
+                            </span>
+                            @if ($actor->character_name)
+                            <span class="block text-xs text-gray-500">{{ $actor->character_name }}</span>
+                            @endif
                         </div>
+                        @endforeach
                     </div>
+                </div>
                 @endif
             </div>
 
@@ -548,65 +542,65 @@
                 <div class="flex justify-between items-center mb-6">
                     <h2 class="text-2xl font-bold text-white">التعليقات ({{ $comments->count() }})</h2>
                     @auth
-                        <button id="openCommentModal"
-                            class="px-4 py-1 text-sm text-white rounded transition-all bg-fire-red hover:bg-red-700">+ أضف
-                            تعليق</button>
+                    <button id="openCommentModal"
+                        class="px-4 py-1 text-sm text-white rounded transition-all bg-fire-red hover:bg-red-700">+ أضف
+                        تعليق</button>
                     @else
-                        <a href="{{ route('login') }}"
-                            class="px-4 py-1 text-sm text-white bg-gray-600 rounded transition-all hover:bg-gray-700">سجل
-                            دخولك لإضافة تعليق</a>
+                    <a href="{{ route('login') }}"
+                        class="px-4 py-1 text-sm text-white bg-gray-600 rounded transition-all hover:bg-gray-700">سجل
+                        دخولك لإضافة تعليق</a>
                     @endauth
                 </div>
 
                 <div id="commentsList" class="space-y-4">
                     @forelse($comments as $comment)
-                        <div class="flex items-start p-4 bg-gray-800 bg-opacity-40 rounded-lg shadow-sm">
-                            <img src="{{ $comment->user->avatar ?? ($comment->profile?->avatar ?? './assets/images/avatar.jpg') }}"
-                                class="ml-3 w-10 h-10 rounded-full" alt="Avatar">
-                            <div class="flex-1">
-                                <div class="flex gap-2 items-center mb-1">
-                                    <p class="font-bold text-white">
-                                        {{ $comment->profile?->display_name ?? ($comment->user->name ?? 'مستخدم') }}
-                                    </p>
-                                    <span class="text-xs text-gray-400">
-                                        {{ $comment->created_at->diffForHumans() }}
-                                    </span>
-                                    @if ($comment->is_edited)
-                                        <span class="text-xs text-gray-500">(معدل)</span>
-                                    @endif
-                                </div>
-                                <p class="text-sm leading-relaxed text-gray-300">{{ $comment->content }}</p>
-
-                                @if ($comment->likes_count > 0)
-                                    <div class="flex gap-2 items-center mt-2">
-                                        <button class="text-xs text-gray-400 transition-colors hover:text-red-400">
-                                            ❤️ {{ $comment->likes_count }}
-                                        </button>
-                                    </div>
-                                @endif
-
-                                @if ($comment->replies_count > 0)
-                                    <button class="mt-2 text-xs text-sky-400 transition-colors hover:text-sky-300">
-                                        عرض {{ $comment->replies_count }} رد
-                                    </button>
+                    <div class="flex items-start p-4 bg-gray-800 bg-opacity-40 rounded-lg shadow-sm">
+                        <img src="{{ $comment->user->avatar ?? ($comment->profile?->avatar ?? './assets/images/avatar.jpg') }}"
+                            class="ml-3 w-10 h-10 rounded-full" alt="Avatar">
+                        <div class="flex-1">
+                            <div class="flex gap-2 items-center mb-1">
+                                <p class="font-bold text-white">
+                                    {{ $comment->profile?->display_name ?? ($comment->user->name ?? 'مستخدم') }}
+                                </p>
+                                <span class="text-xs text-gray-400">
+                                    {{ $comment->created_at->diffForHumans() }}
+                                </span>
+                                @if ($comment->is_edited)
+                                <span class="text-xs text-gray-500">(معدل)</span>
                                 @endif
                             </div>
+                            <p class="text-sm leading-relaxed text-gray-300">{{ $comment->content }}</p>
+
+                            @if ($comment->likes_count > 0)
+                            <div class="flex gap-2 items-center mt-2">
+                                <button class="text-xs text-gray-400 transition-colors hover:text-red-400">
+                                    ❤️ {{ $comment->likes_count }}
+                                </button>
+                            </div>
+                            @endif
+
+                            @if ($comment->replies_count > 0)
+                            <button class="mt-2 text-xs text-sky-400 transition-colors hover:text-sky-300">
+                                عرض {{ $comment->replies_count }} رد
+                            </button>
+                            @endif
                         </div>
+                    </div>
                     @empty
-                        <div class="py-8 text-center">
-                            <div class="mb-2 text-lg text-gray-400">📝</div>
-                            <p class="text-gray-400">لا توجد تعليقات بعد. كن أول من يعلق!</p>
-                        </div>
+                    <div class="py-8 text-center">
+                        <div class="mb-2 text-lg text-gray-400">📝</div>
+                        <p class="text-gray-400">لا توجد تعليقات بعد. كن أول من يعلق!</p>
+                    </div>
                     @endforelse
                 </div>
 
                 @if ($comments->count() >= 20)
-                    <div class="mt-6 text-center">
-                        <button id="loadMoreComments"
-                            class="px-6 py-2 text-sm text-white bg-gray-700 rounded transition-all hover:bg-gray-600">
-                            عرض المزيد من التعليقات
-                        </button>
-                    </div>
+                <div class="mt-6 text-center">
+                    <button id="loadMoreComments"
+                        class="px-6 py-2 text-sm text-white bg-gray-700 rounded transition-all hover:bg-gray-600">
+                        عرض المزيد من التعليقات
+                    </button>
+                </div>
                 @endif
             </div>
         </div>
@@ -614,49 +608,69 @@
 
     <!-- Comment Modal -->
     @auth
-        <div id="commentModal"
-            class="fixed inset-0 bg-black bg-opacity-70 backdrop-blur-sm z-[9999] hidden flex items-center justify-center">
-            <div class="p-6 w-full max-w-md text-white rounded-lg shadow-lg bg-zinc-900">
-                <h3 class="mb-4 text-lg font-bold">أضف تعليقك</h3>
-                <textarea id="commentInput"
-                    class="p-3 w-full h-24 text-sm rounded bg-zinc-800 focus:outline-none focus:ring-2 focus:ring-sky-500"
-                    placeholder="اكتب تعليقك هنا..."></textarea>
-                <div class="flex gap-3 justify-end mt-4">
-                    <button id="closeCommentModal" class="text-sm text-gray-400 hover:text-white">إلغاء</button>
-                    <button id="submitComment" class="px-4 py-1 text-sm bg-sky-600 rounded hover:bg-sky-700">نشر</button>
-                </div>
+    <div id="commentModal"
+        class="fixed inset-0 bg-black bg-opacity-70 backdrop-blur-sm z-[9999] hidden flex items-center justify-center">
+        <div class="p-6 w-full max-w-md text-white rounded-lg shadow-lg bg-zinc-900">
+            <h3 class="mb-4 text-lg font-bold">أضف تعليقك</h3>
+            <textarea id="commentInput"
+                class="p-3 w-full h-24 text-sm rounded bg-zinc-800 focus:outline-none focus:ring-2 focus:ring-sky-500"
+                placeholder="اكتب تعليقك هنا..."></textarea>
+            <div class="flex gap-3 justify-end mt-4">
+                <button id="closeCommentModal" class="text-sm text-gray-400 hover:text-white">إلغاء</button>
+                <button id="submitComment" class="px-4 py-1 text-sm bg-sky-600 rounded hover:bg-sky-700">نشر</button>
             </div>
         </div>
+    </div>
     @endauth
 
     @php
-        $videoFiles = $movie->videoFiles
-            ->map(function ($file) {
-                return [
-                    'quality' => $file->quality,
-                    'url' => $file->file_url,
-                    'size' => $file->file_size ?? 0,
-                ];
-            })
-            ->sortBy('quality')
-            ->values();
+    $videoFiles = $movie->videoFiles
+    ->map(function ($file) {
+    return [
+    'quality' => $file->quality,
+    'url' => $file->file_url,
+    'size' => $file->file_size ?? 0,
+    ];
+    })
+    ->sortBy('quality')
+    ->values();
     @endphp
-@push('scripts')
-<script src="https://cdn.plyr.io/3.7.8/plyr.polyfilled.js"></script>
-<script>
+    @push('scripts')
+    <script src="https://cdn.plyr.io/3.7.8/plyr.polyfilled.js"></script>
+    <script>
     // بيانات الفيلم
     const movieData = {
-        id: {{ $movie->id }},
+        id: {
+            {
+                $movie - > id
+            }
+        },
         videoFiles: @json($videoFiles ?? []),
-        subtitles: @json($movie->subtitles ?? []),
-        requireLogin: {{ $requireLogin ? 'true' : 'false' }},
-        requireSubscription: {{ $requireSubscription ? 'true' : 'false' }},
-        introSkipTime: {{ $movie->intro_skip_time ?? 0 }}
+        subtitles: @json($movie - > subtitles ?? []),
+        requireLogin: {
+            {
+                $requireLogin ? 'true' : 'false'
+            }
+        },
+        requireSubscription: {
+            {
+                $requireSubscription ? 'true' : 'false'
+            }
+        },
+        introSkipTime: {
+            {
+                $movie - > intro_skip_time ?? 0
+            }
+        }
     };
 
     // متغيرات الحالة
     let plyrInstance = null;
-    const isAuthenticated = {{ auth()->check() ? 'true' : 'false' }};
+    const isAuthenticated = {
+        {
+            auth() - > check() ? 'true' : 'false'
+        }
+    };
     const watchProgress = @json($watchProgress ?? null);
     let progressInterval = null;
     let isPlayerReady = false;
@@ -725,7 +739,8 @@
             quality: {
                 default: getOptimalQuality(),
                 // هذا السطر خاطئ - يجب أن يكون array من الأرقام
-                options: movieData.videoFiles ? movieData.videoFiles.map(file => parseInt(file.quality.replace('p', ''))) : [720],
+                options: movieData.videoFiles ? movieData.videoFiles.map(file => parseInt(file.quality.replace(
+                    'p', ''))) : [720],
                 forced: true,
                 onChange: (newQuality) => {
                     console.log('تم تغيير الجودة إلى:', newQuality + 'p');
@@ -745,7 +760,10 @@
                 controls: true,
                 seek: true
             },
-            speed: { selected: 1, options: [0.5, 0.75, 1, 1.25, 1.5, 1.75, 2] }
+            speed: {
+                selected: 1,
+                options: [0.5, 0.75, 1, 1.25, 1.5, 1.75, 2]
+            }
         });
 
         // ربط الأحداث
@@ -1038,7 +1056,8 @@
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute(
+                        'content') || ''
                 },
                 body: JSON.stringify({
                     current_time: currentTime,
@@ -1063,7 +1082,8 @@
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute(
+                        'content') || ''
                 }
             });
         } catch (error) {
@@ -1072,7 +1092,11 @@
     }
 
     function hasActiveSubscription() {
-        return {{ $hasSubscription ? 'true' : 'false' }};
+        return {
+            {
+                $hasSubscription ? 'true' : 'false'
+            }
+        };
     }
 
     // التعامل مع الخروج من الشاشة الكاملة
@@ -1088,6 +1112,6 @@
     });
 
     console.log('تم تحميل سكريبت مشغل Plyr بالكامل');
-</script>
-@endpush
+    </script>
+    @endpush
 </x-front-layout>

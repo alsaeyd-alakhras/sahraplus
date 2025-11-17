@@ -2,7 +2,7 @@
 
 namespace App\Helper\Series;
 
-use App\Models\MovieCategory;
+use App\Models\Category;
 use App\Models\Series;
 use App\Models\UserProfile;
 use App\Models\WatchProgres;
@@ -40,7 +40,7 @@ class SeriesHelper
         $comment = $movie->comments()->create([
             'user_id' => Auth::id(),
             'profile_id' => $activeProfileId,
-            'content' => $request->content,
+            'content' => $request->get('content'),
             'status' => 'approved'
         ]);
 
@@ -150,7 +150,8 @@ class SeriesHelper
             Series::class,
             $movie->id,
             $request->current_time,
-            $request->duration
+            $request->duration,
+            Auth::id()
         );
 
         return response()->json(['success' => true]);

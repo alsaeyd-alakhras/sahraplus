@@ -4,7 +4,7 @@ namespace App\Http\Controllers\API\V1;
 
 use App\Http\Controllers\Controller;
 use App\Models\Category;
-use App\Http\Resources\MovieCategoryResource;
+use App\Http\Resources\CategoryResource;
 use Illuminate\Support\Facades\Cache;
 
 class CategoryController extends Controller
@@ -16,7 +16,7 @@ class CategoryController extends Controller
             return Category::select('id','name_ar','name_en','slug')->orderBy('name_ar')->get();
         });
 
-        return MovieCategoryResource::collection($categories);
+        return CategoryResource::collection($categories);
     }
 
     // GET /api/v1/categories/{id}
@@ -29,6 +29,6 @@ class CategoryController extends Controller
                 'message' => 'Category not found'
             ], 404);
         }
-        return new MovieCategoryResource($category);
+        return new CategoryResource($category);
     }
 }

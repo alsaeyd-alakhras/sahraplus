@@ -14,7 +14,7 @@
         $relatedMovies = \App\Models\Movie::published()
             ->where('id', '!=', $movie->id)
             ->whereHas('categories', function ($q) use ($movie) {
-                $q->whereIn('movie_categories.id', $movie->categories->pluck('id'));
+                $q->whereIn('categories.id', $movie->categories->pluck('id'));
             })
             ->limit(10)
             ->get();
@@ -385,7 +385,7 @@
                                                             stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
                                                     </svg>
                                                 </button>
-                                                <a href="{{ route('movie.show', $relatedMovie) }}"
+                                                <a href="{{ route('site.movie.show', $relatedMovie) }}"
                                                     class="flex items-center px-4 py-1 space-x-2 font-bold text-white rounded-lg transition-all duration-300 text-[10px] bg-fire-red hover:bg-red-700 btn-glow rtl:space-x-reverse">
                                                     <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
                                                         <path d="M8 5v14l11-7z" />
@@ -429,7 +429,7 @@
                         <div class="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
                             @foreach ($relatedMovies as $relatedMovie)
                                 <div class="overflow-hidden bg-gray-800 rounded-lg movie-card">
-                                    <a href="{{ route('movie.show', $relatedMovie) }}">
+                                    <a href="{{ route('site.movie.show', $relatedMovie) }}">
                                         <img src="{{ $relatedMovie->poster_full_url }}"
                                             alt="{{ $relatedMovie->$title }}"
                                             class="w-full aspect-[2/3] object-cover">
@@ -458,7 +458,7 @@
                         <div class="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
                             @foreach ($topViewedMovies as $topMovie)
                                 <div class="overflow-hidden bg-gray-800 rounded-lg movie-card">
-                                    <a href="{{ route('movie.show', $topMovie) }}">
+                                    <a href="{{ route('site.movie.show', $topMovie) }}">
                                         <img src="{{ $topMovie->poster_full_url }}" alt="{{ $topMovie->$title }}"
                                             class="w-full aspect-[2/3] object-cover">
                                         <div class="p-3">

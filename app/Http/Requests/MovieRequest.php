@@ -57,7 +57,7 @@ class MovieRequest extends FormRequest
 
             // التصنيفات
             'category_ids'   => ['nullable', 'array'],
-            'category_ids.*' => ['nullable', 'integer', 'exists:movie_categories,id'],
+            'category_ids.*' => ['nullable', 'integer', 'exists:categories,id'],
 
             // الطاقم
             'cast'           => ['nullable', 'array'],

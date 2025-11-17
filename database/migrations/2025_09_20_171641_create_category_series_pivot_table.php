@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('category_series_pivot', function (Blueprint $table) {
             $table->id();
             $table->foreignId('series_id')->constrained('series')->cascadeOnDelete();
-            $table->foreignId('category_id')->constrained('movie_categories')->cascadeOnDelete();
+            $table->foreignId('category_id')->constrained('categories')->cascadeOnDelete();
             $table->timestamps();
         });
     }

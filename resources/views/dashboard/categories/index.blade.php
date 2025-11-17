@@ -30,7 +30,7 @@
             </select>
         </div>
 
-        @can('create', 'App\\Models\\MovieCategory')
+        @can('create', 'App\\Models\\Category')
         <div class="mx-2 nav-item">
             <a href="{{ route('dashboard.movie-categories.create') }}" class="m-0 btn btn-icon text-success">
                 <i class="fa-solid fa-plus fe-16"></i>
@@ -158,10 +158,10 @@
             const urlDelete  = '{{ route("dashboard.movie-categories.destroy", ":id") }}';
 
             // ability
-            const abilityCreate = "{{ Auth::guard('admin')->user()->can('create', 'App\\Models\\MovieCategory') }}";
-            const abilityShow   = "{{ Auth::guard('admin')->user()->can('show',   'App\\Models\\MovieCategory') }}";
-            const abilityEdit   = "{{ Auth::guard('admin')->user()->can('update', 'App\\Models\\MovieCategory') }}";
-            const abilityDelete = "{{ Auth::guard('admin')->user()->can('delete', 'App\\Models\\MovieCategory') }}";
+            const abilityCreate = "{{ Auth::guard('admin')->user()->can('create', 'App\\Models\\Category') }}";
+            const abilityShow   = "{{ Auth::guard('admin')->user()->can('show',   'App\\Models\\Category') }}";
+            const abilityEdit   = "{{ Auth::guard('admin')->user()->can('update', 'App\\Models\\Category') }}";
+            const abilityDelete = "{{ Auth::guard('admin')->user()->can('delete', 'App\\Models\\Category') }}";
 
             // أسماء الحقول للفلترة في الهيدر
             const fields = ['#','name_ar','name_en','sort_order','is_active'];

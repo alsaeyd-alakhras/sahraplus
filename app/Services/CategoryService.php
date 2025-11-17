@@ -2,15 +2,15 @@
 
 namespace App\Services;
 
-use App\Repositories\MovieCategoryRepository;
+use App\Repositories\CategoryRepository;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Yajra\DataTables\Facades\DataTables;
 
-class MovieCategoryService
+class CategoryService
 {
-    public function __construct(private MovieCategoryRepository $repo) {}
+    public function __construct(private CategoryRepository $repo) {}
 
     public function datatableIndex(Request $request)
     {

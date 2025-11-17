@@ -5,7 +5,7 @@ namespace App\Repositories;
 use App\Models\Category;
 use Illuminate\Database\Eloquent\Builder;
 
-class MovieCategoryRepository
+class CategoryRepository
 {
     public function __construct(protected Category $category) {}
 

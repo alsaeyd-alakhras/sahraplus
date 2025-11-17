@@ -5,18 +5,18 @@ namespace App\Http\Controllers\Dashboard;
 use Illuminate\Http\Request;
 use App\Models\Category;
 use App\Http\Controllers\Controller;
-use App\Services\MovieCategoryService;
-use App\Http\Requests\MovieCategoryRequest;
+use App\Services\CategoryService;
+use App\Http\Requests\CategoryRequest;
 
 class CategoryController extends Controller
 {
-    public function __construct(private MovieCategoryService $service) {}
+    public function __construct(private CategoryService $service) {}
 
     public function index()
     {
         $this->authorize('view', Category::class);
         if (request()->ajax()) return $this->service->datatableIndex(request());
-        return view('dashboard.movie_categories.index');
+        return view('dashboard.categories.index');
     }
 
     public function getFilterOptions(Request $request, $column)
@@ -28,10 +28,10 @@ class CategoryController extends Controller
     {
         $this->authorize('create', Category::class);
         $movie_category = new Category();
-        return view('dashboard.movie_categories.create', compact('movie_category'));
+        return view('dashboard.categories.create', compact('movie_category'));
     }
 
-    public function store(MovieCategoryRequest $request)
+    public function store(CategoryRequest $request)
     {
         $this->authorize('create', Category::class);
         $this->service->save($request->validated());
@@ -41,7 +41,7 @@ class CategoryController extends Controller
     public function show(Category $movie_category)
     {
         $this->authorize('show', Category::class);
-        return view('dashboard.movie_categories.show', compact('movie_category'));
+        return view('dashboard.categories.show', compact('movie_category'));
     }
 
     public function edit($id)
@@ -49,10 +49,10 @@ class CategoryController extends Controller
         $this->authorize('update', Category::class);
         $movie_category = Category::findOrFail($id);
         $btn_label = "تعديل";
-        return view('dashboard.movie_categories.edit', compact('movie_category','btn_label'));
+        return view('dashboard.categories.edit', compact('movie_category','btn_label'));
     }
 
-    public function update(MovieCategoryRequest $request, Category $movie_category)
+    public function update(CategoryRequest $request, Category $movie_category)
     {
         $this->authorize('update', Category::class);
         $this->service->update($request->validated(), $movie_category->id);

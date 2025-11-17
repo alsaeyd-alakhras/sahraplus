@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
 use App\Models\Movie;
-use App\Models\MovieCategory;
+use App\Models\Category;
 use App\Models\UserProfile;
 use App\Models\WatchProgres;
 use Illuminate\Http\Request;
@@ -233,7 +233,7 @@ class MovieController extends Controller
      */
     private function getCategorySection($loadedSections)
     {
-        $categories = MovieCategory::active()
+        $categories = Category::active()
             ->orderBy('sort_order')
             ->get();
 
@@ -351,7 +351,7 @@ class MovieController extends Controller
         $comment = $movie->comments()->create([
             'user_id' => Auth::id(),
             'profile_id' => $activeProfileId,
-            'content' => $request->content,
+            'content' => $request->get('content'),
             'status' => 'approved'
         ]);
 
@@ -461,7 +461,8 @@ class MovieController extends Controller
             Movie::class,
             $movie->id,
             $request->current_time,
-            $request->duration
+            $request->duration,
+            Auth::id()
         );
 
         return response()->json(['success' => true]);

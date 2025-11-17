@@ -207,7 +207,7 @@ class Movie extends Model
     public function scopeByCategory($query, $categoryId)
     {
         return $query->whereHas('categories', function ($q) use ($categoryId) {
-            $q->where('movie_categories.id', $categoryId);
+            $q->where('categories.id', $categoryId);
         });
     }
 }

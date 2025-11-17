@@ -97,8 +97,6 @@ Route::group([
         Route::get('movie-categories-filters/{column}', [CategoryController::class, 'getFilterOptions'])->name('movie-categories.filters');
         Route::get('series-filters/{column}', [ SeriesController::class, 'getFilterOptions'])->name('series.filters');
 
-
-
         Route::resource('seasons', SeasonController::class)->except(['index']);
         Route::resource('episodes', EpisodeController::class)->except(['index']);
         Route::resource('shorts', ShortController::class)->parameters(['shorts' => 'short'])->names('shorts');

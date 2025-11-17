@@ -130,6 +130,9 @@ class SeriesService
             $data['slug'] = Str::slug($data['title_en'] ?? $data['title_ar']);
 
             $series = $this->repo->update($data, $id);
+            $this->syncCategories($series, $categoryIds ?? []);
+            $this->syncCast($series, $cast ?? []);
+
             DB::commit();
             return $series;
         } catch (\Throwable $e) {
