@@ -119,4 +119,12 @@ return [
         'update' => 'تعديل',
         'delete' => 'حذف',
     ],
+    'categories' => [
+        'name' => 'التصنيفات',
+        'view' => 'عرض',
+        'create' => 'اضافة',
+        'show' => 'عرض الملف',
+        'update' => 'تعديل',
+        'delete' => 'حذف',
+    ],
 ];

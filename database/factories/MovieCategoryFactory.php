@@ -34,7 +34,7 @@ class CategoryFactory extends Factory
             'slug'           => $slug,
             'description_ar' => 'وصف للتصنيف ' . $this->faker->sentence(6),
             'description_en' => $this->faker->sentence(10),
-            'image_url'      => $this->faker->imageUrl(600, 400, 'movie'),
+            'image_url'      => 'https://placehold.co/600x400?text=movie',
             'color'          => $this->faker->hexColor(),
             'sort_order'     => $this->faker->numberBetween(1, 20),
             'is_active'      => $this->faker->boolean(90),

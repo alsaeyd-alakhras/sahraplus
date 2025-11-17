@@ -22,7 +22,7 @@ class PersonFactory extends Factory
             'name_en'     => $this->faker->name(),
             'bio_ar'      => 'نبذة: ' . $this->faker->sentence(10),
             'bio_en'      => $this->faker->paragraph(),
-            'photo_url'   => $this->faker->imageUrl(400, 400, 'person'),
+            'photo_url'   => 'https://placehold.co/400x400?text=movie+molestiae',
             'birth_date'  => $this->faker->date(),
             'birth_place'  => $this->faker->word(),
             'nationality' => $this->faker->countryCode(),

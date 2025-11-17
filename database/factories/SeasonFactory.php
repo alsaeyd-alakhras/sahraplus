@@ -22,7 +22,7 @@ class SeasonFactory extends Factory
             'title_en'       => 'Season ' . $this->faker->word(),
             'description_ar' => 'وصف الموسم ' . $this->faker->sentence(8),
             'description_en' => $this->faker->paragraph(),
-            'poster_url'     => $this->faker->imageUrl(600, 900, 'season'),
+            'poster_url'     => 'https://placehold.co/600x900?text=movie+molestiae',
             'air_date'       => $this->faker->date(),
             'episode_count'  => $this->faker->numberBetween(3, 16),
             'status'         => $this->faker->randomElement(['draft', 'published']),

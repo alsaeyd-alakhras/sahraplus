@@ -6,14 +6,13 @@
     <!-- Video Container -->
     <div class="overflow-y-scroll relative h-screen video-container" id="shorts-container">
         <!-- Video Item 1 -->
-        @foreach ($videos as $video)
-            <div class="flex justify-center items-center h-screen video-item" data-video-id="1">
+        @foreach ($shorts as $short)
+            <div class="flex justify-center items-center h-screen video-item" data-video-id="{{ $short->id }}">
                 <div class="relative bg-gray-800 rounded-lg shadow-xl backdrop-blur-md backdrop-brightness-75 shadow-white/40 video-wrapper group"
-                    data-aspect="{{ $video->aspect_ratio }}">
+                    data-aspect="{{ $short->aspect_ratio }}">
                     <video class="object-contain w-full h-full rounded-lg cursor-pointer" loop muted playsinline
-                        poster="{{ $video->poster_full_path }}" data-src="{{ $video->video_full_url }}"
-                        data-video-url="{{ $video->video_full_url }}">
-                        <source src="{{ $video->video_full_url }}" type="video/mp4">
+                        poster="{{ $short->poster_full_path }}" data-src="{{ $short->video_full_url }}"
+                        data-video-url="{{ $short->video_full_url }}">
                     </video>
 
                     <!-- overlay Play/Pause -->
@@ -44,30 +43,30 @@
                     <!-- أزرار التفاعل -->
                     <div
                         class="flex absolute left-3 bottom-4 z-10 flex-col items-center transition-all duration-200 group-hover:bottom-20">
-                        <a href="{{ $video->share_url }}"
+                        <a href="{{ $short->share_url }}"
                             class="flex flex-col justify-center items-center w-12 h-12 rounded-full transition-all duration-200 action-btn"
-                            data-video="1">
+                            data-video="{{ $short->id }}">
                             <i class="text-xl fas fa-play"></i>
                         </a>
                         <div class="text-xs">مشاهدة</div>
                         <button
                             class="flex flex-col justify-center items-center w-12 h-12 rounded-full transition-all duration-200 like-btn action-btn"
-                            data-video="1">
+                            data-video="{{ $short->id }}">
                             <i class="text-xl fas fa-heart"></i>
                         </button>
-                        <div class="mb-2 text-xs like-count like-btn-1">{{ $video->likes_count }}</div>
+                        <div class="mb-2 text-xs like-count like-btn-{{ $short->id }}">{{ $short->likes_count }}</div>
 
-                        <button class="action-btn comment-btn" data-video="1">
+                        <button class="action-btn comment-btn" data-video="{{ $short->id }}">
                             <i class="text-xl fas fa-comment"></i>
                         </button>
-                        <div class="mb-2 text-xs comment-count comment-btn-1">{{ $video->comments_count }}</div>
+                        <div class="mb-2 text-xs comment-count comment-btn-{{ $short->id }}">{{ $short->comments_count }}</div>
 
-                        <button class="action-btn share-btn" data-video="1" data-url="{{ $video->share_url }}">
+                        <button class="action-btn share-btn" data-video="{{ $short->id }}" data-url="{{ $short->share_url }}">
                             <i class="text-xl fas fa-share"></i>
                         </button>
-                        <div class="mb-2 text-xs share-count share-btn-1">{{ $video->shares_count }}</div>
+                        <div class="mb-2 text-xs share-count share-btn-{{ $short->id }}">{{ $short->shares_count }}</div>
 
-                        <button class="action-btn watch-btn" data-video="1">
+                        <button class="action-btn save-btn" data-video="{{ $short->id }}">
                             <i class="text-xl fas fa-bookmark"></i>
                         </button>
                         <div class="text-xs">حفظ</div>
@@ -87,8 +86,8 @@
                     <!-- معلومات الفيديو -->
                     <div
                         class="absolute right-2 left-[5rem] bottom-4 text-white z-10 group-hover:bottom-24 transition-all duration-200">
-                        <h3 class="text-lg font-bold">{{ $video->title }}</h3>
-                        <p class="text-sm opacity-80 line-clamp-2">{{ $video->description }}
+                        <h3 class="text-lg font-bold">{{ $short->title }}</h3>
+                        <p class="text-sm opacity-80 line-clamp-2">{{ $short->description }}
                         </p>
                     </div>
                 </div>

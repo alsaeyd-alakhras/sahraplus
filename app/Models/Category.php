@@ -97,4 +97,26 @@ class Category extends Model
             }
         });
     }
+
+    // Accessor
+    public function getImageFullUrlAttribute()
+    {
+        // إذا كان الرابط http/https تأكد أنه يعمل قبل الإرجاع
+        if (Str::startsWith($this->image_url, ['http', 'https'])) {
+            try {
+                $headers = @get_headers($this->image_url);
+                if ($headers && strpos($headers[0], '200') !== false) {
+                    return $this->image_url;
+                }
+            } catch (\Exception $e) {
+                // Nothing, will fallback to default
+                return asset('assets-site/images/categories/1.png');
+            }
+        }
+
+        if ($this->image_url) {
+            return asset('storage/' . $this->image_url);
+        }
+        return asset('assets-site/images/categories/1.png');
+    }
 }
