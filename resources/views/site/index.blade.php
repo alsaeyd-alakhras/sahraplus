@@ -1,4 +1,7 @@
 <x-front-layout>
+    <x-slot name="attributes">
+        <body class="home-page">
+    </x-slot>
     <!-- Hero Section -->
     <section id="hero" class="overflow-hidden relative h-screen">
         <!-- Slides -->
@@ -193,12 +196,12 @@
     </div>
 
     <!-- متابعة المشاهدة -->
-    <div class="overflow-visible mb-6 px-4 py-6 mx-auto max-w-[95%]">
+    <div id="continue-watching-section" class="overflow-visible mb-6 px-4 py-6 mx-auto max-w-[95%]">
         <!-- عنوان القسم -->
         <h2 class="mb-4 text-2xl font-bold text-right">متابعة المشاهدة</h2>
 
         <!-- سلايدر Swiper -->
-        <div class="isolate overflow-visible relative pb-44 swiper mySwiper-horizontal">
+        <div id="continue-watching-container" class="isolate overflow-visible relative pb-44 swiper mySwiper-horizontal">
             <div class="swiper-wrapper">
                 @auth
                     @if(($continueWatching ?? collect())->count())
@@ -339,4 +342,7 @@
         </div>
     </div>
 
+    @push('scripts')
+    <script src="{{ asset('assets-site/js/home.js') }}"></script>
+    @endpush
 </x-front-layout>

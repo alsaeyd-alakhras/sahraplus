@@ -91,7 +91,7 @@ class SeriesController extends Controller
         $seriesStatusOptions = $this->seriesStatusOptions;
 
         $allCategories = Category::select('id','name_ar','name_en')->orderBy('name_ar')->get();
-        $allPeople = Person::select('id','name_ar','name_en')->orderBy('name_ar')->get();
+           $allPeople = Person::select('id','name_ar','name_en')->orderBy('name_ar')->get();
 
         return view('dashboard.series.create', compact( 'series', 'contentRatingOptions', 'languageOptions', 'countries', 'statusOptions', 'seriesStatusOptions','allCategories','allPeople'));
     }

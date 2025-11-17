@@ -40,7 +40,7 @@ class SeriesHelper
         $comment = $movie->comments()->create([
             'user_id' => Auth::id(),
             'profile_id' => $activeProfileId,
-            'content' => $request->content,
+            'content' => $request->get('content'),
             'status' => 'approved'
         ]);
 
@@ -150,7 +150,8 @@ class SeriesHelper
             Series::class,
             $movie->id,
             $request->current_time,
-            $request->duration
+            $request->duration,
+            Auth::id()
         );
 
         return response()->json(['success' => true]);

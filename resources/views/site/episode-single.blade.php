@@ -1,4 +1,7 @@
 <x-front-layout>
+    <x-slot name="attributes">
+        <body data-page-type="episode">
+    </x-slot>
     @php
         $title = 'title_' . app()->getLocale();
         $description = 'description_' . app()->getLocale();
@@ -226,10 +229,24 @@
                             </button>
                         @endif
 
-                        <button id="addToWatchlist" data-episode-id="{{ $episode->id }}"
+                        <button id="addToWatchlist" 
+                            data-content-id="{{ $episode->id }}"
+                            data-content-type="episode"
+                            data-profile-id="{{ session('active_profile_id') }}"
+                            data-in-watchlist="false"
                             class="flex gap-2 items-center px-5 py-2 text-sm font-bold text-white bg-gray-700 rounded-lg transition-all hover:bg-gray-600">
                             <i class="fas fa-plus"></i>
                             <span>{{ __('site.add_to_watchlist') }}</span>
+                        </button>
+
+                        <button id="addToFavorite" 
+                            data-content-id="{{ $episode->id }}"
+                            data-content-type="episode"
+                            data-profile-id="{{ session('active_profile_id') }}"
+                            data-is-favorite="false"
+                            class="flex gap-2 items-center px-5 py-2 text-sm font-bold text-white bg-gray-700 rounded-lg transition-all hover:bg-gray-600">
+                            <i class="far fa-heart"></i>
+                            <span>{{ __('site.favorite') }}</span>
                         </button>
 
                         <div class="inline-block relative" id="share-container">
@@ -1569,19 +1586,12 @@
                         progressUpdateInterval = null;
                     }
                 }
-                // حفظ التقدم في السيرفر
+                // حفظ التقدم في السيرفر باستخدام API v1
                 function saveProgressToServer(currentTime, duration) {
-                    fetch(`/api/episodes/{{ $episode->id }}/progress`, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
-                        },
-                        body: JSON.stringify({
-                            current_time: currentTime,
-                            duration: duration
-                        })
-                    }).catch(e => console.log('Failed to save progress:', e));
+                    if (typeof WatchProgressManager !== 'undefined') {
+                        WatchProgressManager.updateProgress('episode', {{ $episode->id }}, currentTime, duration)
+                            .catch(e => console.log('Failed to save progress:', e));
+                    }
                 }
 
                 function loadSavedProgress() {

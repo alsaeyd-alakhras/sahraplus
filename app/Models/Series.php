@@ -158,7 +158,7 @@ class Series extends Model
     /** مطابق لـ Movie::scopeByCategory */
     public function scopeByCategory($query, $categoryId)
     {
-        return $query->whereHas('categories', fn($q) => $q->where('movie_categories.id', $categoryId));
+        return $query->whereHas('categories', fn($q) => $q->where('categories.id', $categoryId));
     }
 
     /** تحديث العدادين كما لديك */

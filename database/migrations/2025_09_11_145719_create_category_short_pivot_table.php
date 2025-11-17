@@ -17,7 +17,7 @@ return new class extends Migration
                 ->constrained('shorts')
                 ->cascadeOnDelete();
             $table->foreignId('category_id')
-                ->constrained('movie_categories')
+                ->constrained('categories')
                 ->cascadeOnDelete();
             $table->timestamps();
         });

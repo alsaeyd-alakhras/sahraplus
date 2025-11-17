@@ -142,6 +142,6 @@ class Short extends Model
 
     public function scopeByCategory($q, $categoryId)
     {
-        return $q->whereHas('categories', fn($qq) => $qq->where('movie_categories.id', $categoryId));
+        return $q->whereHas('categories', fn($qq) => $qq->where('categories.id', $categoryId));
     }
 }

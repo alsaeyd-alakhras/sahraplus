@@ -39,7 +39,7 @@ class ShortRequest extends FormRequest
 
         // التصنيفات
         'category_ids'   => ['nullable', 'array'],
-        'category_ids.*' => ['integer', 'exists:movie_categories,id'],
+        'category_ids.*' => ['integer', 'exists:categories,id'],
 
         // البوستر
         'poster_path_out' => ['nullable', 'url', 'max:191'],

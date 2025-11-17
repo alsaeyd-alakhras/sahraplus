@@ -53,7 +53,7 @@ class SeriesRequest extends FormRequest
 
         // NEW: التصنيفات
         'category_ids'   => ['nullable','array'],
-        'category_ids.*' => ['nullable','integer','exists:movie_categories,id'],
+        'category_ids.*' => ['nullable','integer','exists:categories,id'],
 
         // NEW: الطاقم
         'cast'                 => ['nullable','array'],

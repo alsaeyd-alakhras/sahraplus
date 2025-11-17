@@ -74,6 +74,19 @@ Route::group([
         'as' => 'site.',
         'middleware' => ['auth:web'],
     ], function () {
+        // User Lists (Phase 3) ************************
+        Route::get('/watchlist', function () {
+            return view('site.watchlist');
+        })->name('watchlist');
+        
+        Route::get('/favorites', function () {
+            return view('site.favorites');
+        })->name('favorites');
+        
+        Route::get('/history', function () {
+            return view('site.history');
+        })->name('history');
+
         // profiles ************************
         Route::get('/profiles', [ProfileController::class, 'index'])->name('profile.index');
         Route::post('/profiles', [ProfileController::class, 'store'])->name('profile.store');

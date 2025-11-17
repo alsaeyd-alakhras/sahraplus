@@ -16,8 +16,15 @@
         const auth_user_check = {{ $auth_user ? 'true' : 'false' }};
         const avatarImg = "{{ asset('assets-site/images/avatars/1.jpg') }}";
         const _token = "{{ csrf_token() }}";
+        
+        // Global API configuration for Phase 3 interactions
+        window.apiBaseUrl = '/api/v1';
+        window.csrfToken = "{{ csrf_token() }}";
+        window.authUser = {{ $auth_user ? 'true' : 'false' }};
+        window.activeProfileId = {{ session('active_profile_id') ?? 'null' }};
     </script>
     <script src="{{ asset('assets-site/js/profile.js') }}"></script>
+    <script src="{{ asset('assets-site/js/content-interactions.js') }}"></script>
     @stack('scripts')
 </body>
 
