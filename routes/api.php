@@ -34,6 +34,8 @@ use App\Http\Controllers\API\V1\UserRatingController;
 use App\Http\Controllers\API\V1\FavoritesController;
 use App\Http\Controllers\API\V1\DownloadsController;
 use App\Http\Controllers\API\V1\ShortController;
+use App\Http\Controllers\API\V1\EPGController;
+use App\Http\Controllers\API\V1\LiveTvController;
 
 /*
 |--------------------------------------------------------------------------
@@ -157,5 +159,27 @@ Route::prefix('v1')->name('api.v1.')->group(function () {
 
         //analytics
         Route::get('admin/analytics', [AnalyticsController::class, 'index']);
+    });
+
+    // ================================
+    // 📺 Live TV (المرحلة الخامسة)
+    // ================================
+    Route::prefix('live-tv')->group(function () {
+        // فئات التلفاز المباشر
+        Route::get('categories', [LiveTvController::class, 'categories']);
+
+        // القنوات
+        Route::get('channels', [LiveTvController::class, 'channels']);
+        Route::get('categories/{id}/channels', [LiveTvController::class, 'channelsByCategory']);
+        Route::get('channels/{slug}', [LiveTvController::class, 'showChannel']);
+
+        // جدول البرامج (EPG)
+        Route::get('channels/{id}/programs', [EPGController::class, 'programs']);
+        Route::get('channels/{id}/programs/current', [EPGController::class, 'currentProgram']);
+        Route::get('channels/{id}/programs/upcoming', [EPGController::class, 'upcomingPrograms']);
+
+        // مشاهدة وبيانات البث
+        Route::post('channels/{id}/watch', [LiveTvController::class, 'watch']);
+        Route::get('channels/{id}/stream', [LiveTvController::class, 'stream']);
     });
 });
