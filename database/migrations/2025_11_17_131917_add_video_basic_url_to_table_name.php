@@ -12,7 +12,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('shorts', function (Blueprint $table) {
-            $table->string('video_basic_url');
+            $table->string('video_basic_url')->nullable(); // أو غير nullable إذا كان مطلوب
+
         });
     }
 
@@ -22,7 +23,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('shorts', function (Blueprint $table) {
-             $table->dropColumn(['video_basic_url']);
+            $table->dropColumn('video_basic_url');
         });
     }
 };

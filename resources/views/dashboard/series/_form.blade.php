@@ -163,6 +163,7 @@
                                                     'role_type' => $p->pivot->role_type,
                                                     'character_name' => $p->pivot->character_name,
                                                     'sort_order' => $p->pivot->sort_order,
+                                                    'id' => $p->pivot->id,
                                                 ];
                                             })
                                             ->toArray()

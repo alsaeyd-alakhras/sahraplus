@@ -155,7 +155,8 @@
                                     </p>
                                     <div
                                         class="flex-wrap gap-4 d-flex flex-column flex-md-row text-nowrap flex-md-nowrap flex-lg-wrap flex-xxl-nowrap">
-                                        <button class="w-100 btn btn-label-secondary d-flex align-items-center editSeasonBtn"
+                                        <button
+                                            class="w-100 btn btn-label-secondary d-flex align-items-center editSeasonBtn"
                                             id="editSeasonBtn-{{ $season->id }}"
                                             data-season-id="{{ $season->id }}">
                                             <i class="align-middle ti ti-edit ti-xs scaleX-n1-rtl me-2"></i>
@@ -234,23 +235,24 @@
                             </div>
 
                             <div class="mb-4 col-md-6">
-                                <input type="text" id="posterInput" name="poster_url" value="" class="d-none form-control">
+                                <input type="text" id="posterInput" name="poster_url" value=""
+                                    class="d-none form-control">
                                 <div class="d-flex justify-content-between align-items-center">
                                     <button type="button" data-bs-toggle="modal" data-bs-target="#mediaModal"
                                         data-clear-btn="#clearPosterBtn" data-img="#poster_img" data-mode="single"
-                                        data-model-next="#seasonModal"
-                                        data-input="#posterInput" class="mt-3 btn btn-primary openMediaModal">
+                                        data-model-next="#seasonModal" data-input="#posterInput"
+                                        class="mt-3 btn btn-primary openMediaModal">
                                         {{ __('admin.poster_img_choose') }}
                                     </button>
                                     <button type="button" id="clearPosterBtn"
-                                        class="mt-3 clear-btn btn btn-danger d-none"
-                                        data-img="#poster_img" data-input="#posterInput">
+                                        class="mt-3 clear-btn btn btn-danger d-none" data-img="#poster_img"
+                                        data-input="#posterInput">
                                         <i class="fas fa-trash"></i>
                                     </button>
                                 </div>
                                 <div class="mt-2">
-                                    <img src="" alt="poster" id="poster_img"
-                                        class="d-none" style="max-height:100px">
+                                    <img src="" alt="poster" id="poster_img" class="d-none"
+                                        style="max-height:100px">
                                 </div>
                             </div>
 
@@ -323,12 +325,23 @@
             $(document).ready(function() {
                 let modeForm = 'create';
                 let seasonId = null;
+
+
                 $('#addSeasonBtn').click(function() {
                     modeForm = 'create';
-                    $('#seasonModal').modal('show');
-                    getNewSeason();
                     seasonId = null;
+
+                    // فرغ جميع الحقول
+                    $('#addSeasonForm')[0].reset(); // يفرغ كل input و textarea و select
+                    $('#poster_img').attr('src', '').addClass('d-none'); // يفرغ الصورة
+                    $('#posterInput').val(''); // يفرغ input البوستر
+                    $('#clearPosterBtn').addClass('d-none'); // يخفي زر الحذف
+                    $('#seasonModalTitle').text("{{ __('admin.add_season') }}"); // عنوان المودال
+
+                    // افتح المودال
+                    $('#seasonModal').modal('show');
                 });
+
 
                 function getNewSeason() {
                     $.ajax({
@@ -378,7 +391,7 @@
                         },
                         success: function(response) {
                             Object.entries(response).forEach(([key, value]) => {
-                                if (key == 'poster_full_url'){
+                                if (key == 'poster_full_url') {
                                     $('#poster_img').attr('src', value);
                                     $('#poster_img').removeClass('d-none');
                                 }
@@ -457,7 +470,8 @@
                     }
                     if (modeForm == 'edit') {
                         $.ajax({
-                            url: "{{ route('dashboard.seasons.update', ':id') }}".replace(':id',seasonId),
+                            url: "{{ route('dashboard.seasons.update', ':id') }}".replace(':id',
+                                seasonId),
                             method: "PUT",
                             data: $('#addSeasonForm').serialize(),
                             success: function(response) {
@@ -493,7 +507,8 @@
                                     </div>
                                 </div>`;
                                 html = html.replace(':id', response.id);
-                                $('#seasons-container').find('#season-' + response.id).replaceWith(html);
+                                $('#seasons-container').find('#season-' + response.id).replaceWith(
+                                    html);
                                 toastr.success("تم تعديل الموسم بنجاح.");
                                 $('#seasonModal').modal('hide');
                             },
@@ -509,13 +524,13 @@
     @endpush
 
     @push('scripts')
-    <script>
-        const urlIndex = "{{ route('dashboard.media.index') }}";
-        const urlStore = "{{ route('dashboard.media.store') }}";
-        const urlDelete = "{{ route('dashboard.media.destroy', ':id') }}";
-        const _token = "{{ csrf_token() }}";
-        const urlAssetPath = "{{ config('app.asset_url') }}";
-    </script>
-    <script src="{{ asset('js/custom/mediaPage.js') }}"></script>
+        <script>
+            const urlIndex = "{{ route('dashboard.media.index') }}";
+            const urlStore = "{{ route('dashboard.media.store') }}";
+            const urlDelete = "{{ route('dashboard.media.destroy', ':id') }}";
+            const _token = "{{ csrf_token() }}";
+            const urlAssetPath = "{{ config('app.asset_url') }}";
+        </script>
+        <script src="{{ asset('js/custom/mediaPage.js') }}"></script>
     @endpush
 </x-dashboard-layout>

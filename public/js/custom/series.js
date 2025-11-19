@@ -47,11 +47,11 @@ $(function () {
 // =====================
 // Cast (Series)
 // =====================
-$(function() {
+$(function () {
 
     function initPersonSelect(context) {
         $(context).find('.person-select').select2({
-            placeholder: function() {
+            placeholder: function () {
                 return $(this).data('placeholder') || "اكتب للبحث...";
             },
             allowClear: true,
@@ -62,7 +62,7 @@ $(function() {
                 data: params => ({ term: params.term }),
                 processResults: data => {
                     // امنع اختيار نفس الشخص مرتين
-                    let usedIds = $('#cast-rows .person-select').map(function() {
+                    let usedIds = $('#cast-rows .person-select').map(function () {
                         return $(this).val();
                     }).get();
                     return { results: data.filter(p => !usedIds.includes(String(p.id))) };
@@ -78,21 +78,21 @@ $(function() {
             templateSelection: person => person.text || person.id,
             escapeMarkup: m => m
         })
-        .on('select2:select', function(e) {
-            let selectedId = e.params.data.id;
-            let duplicates = $('#cast-rows .person-select').not(this).filter(function() {
-                return $(this).val() == selectedId;
-            });
+            .on('select2:select', function (e) {
+                let selectedId = e.params.data.id;
+                let duplicates = $('#cast-rows .person-select').not(this).filter(function () {
+                    return $(this).val() == selectedId;
+                });
 
-            if (duplicates.length > 0) {
-                $(this).val(null).trigger('change');
-                if (typeof toastr !== 'undefined') toastr.error(person_duplicate);
-            }
-            refreshSelected();
-        })
-        .on('select2:unselect', function() {
-            refreshSelected();
-        });
+                if (duplicates.length > 0) {
+                    $(this).val(null).trigger('change');
+                    if (typeof toastr !== 'undefined') toastr.error(person_duplicate);
+                }
+                refreshSelected();
+            })
+            .on('select2:unselect', function () {
+                refreshSelected();
+            });
     }
 
     // chips of selected cast
@@ -101,8 +101,8 @@ $(function() {
         wrap.empty();
 
         let any = false;
-        $('#cast-rows .person-select').each(function() {
-            const pid  = $(this).val();
+        $('#cast-rows .person-select').each(function () {
+            const pid = $(this).val();
             const name = $(this).find('option:selected').text().trim();
             if (pid && name) {
                 any = true;
@@ -119,19 +119,30 @@ $(function() {
     }
 
     function renumberOrdering() {
-        $('#cast-rows .cast-row').each(function(index) {
-            $(this).find('input[name*="[sort_order]"]').val(index);
+        // في وضع التعديل لا نلمس ترتيب السطور الموجودة
+        if (form_type_ser === "edit") {
+            return;
+        }
+
+        // في وضع الإضافة فقط نعمل إعادة ترقيم
+        $('#cast-rows .cast-row').each(function (index) {
+            let id = $(this).find('.cast-id').val();
+
+            // للحفاظ على السطور من DB → فقط السطور الجديدة تُرقّم
+            if (!id || id === "" || id === null) {
+                $(this).find('input[name*="[sort_order]"]').val(index);
+            }
         });
     }
 
     // init existing rows
-    $(function() { initPersonSelect(document); });
+    $(function () { initPersonSelect(document); });
     let castIndex = $('#cast-rows .cast-row').length ? $('#cast-rows .cast-row').length - 1 : 0;
 
     // add row
-    $('#add-cast-row').on('click', function() {
+    $('#add-cast-row').on('click', function () {
         castIndex++;
-        $.get(seriesCastRowPartial, { i: castIndex }, function(html) {
+        $.get(seriesCastRowPartial, { i: castIndex }, function (html) {
             let newRow = $(html);
             $('#cast-rows').append(newRow);
             renumberOrdering();
@@ -141,29 +152,55 @@ $(function() {
     });
 
     // remove row
-    $(document).on('click', '.remove-cast-row', function() {
-        $(this).closest('.cast-row').remove();
-        renumberOrdering();
-        refreshSelected();
+    // حذف كاست من قاعدة البيانات أو من الواجهة
+    $(document).on('click', '.remove-cast-row', function () {
+        let row = $(this).closest('.cast-row');
+        let castId = row.find('.cast-id').val();
+       // alert(castId)
+        if (castId) {
+            $.ajax({
+                url: '/dashboard/series-casts/' + castId,
+                type: 'DELETE',
+                data: {
+                    _token: $('meta[name="csrf-token"]').attr('content')
+                },
+                success: function (res) {
+                    if (res.status) {
+                        row.remove();
+                        renumberOrdering();
+                        refreshSelected();
+                    } else {
+                        alert(res.message);
+                    }
+                },
+                error: function () {
+                    alert('حدث خطأ أثناء الحذف!');
+                }
+            });
+        } else {
+            row.remove();
+            renumberOrdering();
+            refreshSelected();
+        }
     });
 
     // move up/down
-    $(document).on('click', '.move-up', function() {
+    $(document).on('click', '.move-up', function () {
         let row = $(this).closest('.cast-row');
         row.prev('.cast-row').before(row);
         renumberOrdering();
     });
-    $(document).on('click', '.move-down', function() {
+    $(document).on('click', '.move-down', function () {
         let row = $(this).closest('.cast-row');
         row.next('.cast-row').after(row);
         renumberOrdering();
     });
 
     // remove from chips
-    $(document).on('click', '.chip-remove', function() {
+    $(document).on('click', '.chip-remove', function () {
         let id = $(this).closest('.cast-chip').data('id');
         // فضيّ select2 تبع نفس الشخص
-        $('#cast-rows .person-select').each(function() {
+        $('#cast-rows .person-select').each(function () {
             if ($(this).val() == id) {
                 $(this).val(null).trigger('change');
             }
@@ -172,7 +209,7 @@ $(function() {
     });
 
     // initial run
-    $(function() {
+    $(function () {
         renumberOrdering();
         refreshSelected();
     });

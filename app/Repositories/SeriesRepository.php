@@ -16,7 +16,7 @@ class SeriesRepository
 
     public function getQuery(): Builder
     {
-        return $this->series->query();
+        return $this->series->query()->latest();
     }
 
     public function getById(int $id): ?Series

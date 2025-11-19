@@ -8,6 +8,7 @@ use App\Models\Category;
 use App\Services\ShortService;
 use App\Http\Requests\ShortRequest;
 use App\Http\Controllers\Controller;
+use App\Models\VideoFiles;
 
 class ShortController extends Controller
 {
@@ -41,17 +42,17 @@ class ShortController extends Controller
     {
         $this->authorize('create', Short::class);
         $short = new Short();
-        $allCategories = Category::select('id','name_ar','name_en')->orderBy('name_ar')->get();
+        $allCategories = Category::select('id', 'name_ar', 'name_en')->orderBy('name_ar')->get();
         $statusOptions = $this->statusOptions;
         $aspectOptions = ['vertical' => 'عمودي', 'horizontal' => 'أفقي'];
 
-        return view('dashboard.shorts.create', compact('short','allCategories','statusOptions','aspectOptions'));
+        return view('dashboard.shorts.create', compact('short', 'allCategories', 'statusOptions', 'aspectOptions'));
     }
 
     public function store(ShortRequest $request)
     {
 
-        //  dd($request->all());
+        // dd($request->all());
         $this->authorize('create', Short::class);
 
         $this->shortService->save($request->validated());
@@ -69,21 +70,18 @@ class ShortController extends Controller
     public function edit(Request $request, Short $short)
     {
         $this->authorize('update', Short::class);
-
         $short->load(['categories:id', 'videoFiles']);
-
         $btn_label = "تعديل";
         $statusOptions = $this->statusOptions;
         $aspectOptions = ['vertical' => 'عمودي', 'horizontal' => 'أفقي'];
-        $allCategories = Category::select('id','name_ar','name_en')->orderBy('name_ar')->get();
+        $allCategories = Category::select('id', 'name_ar', 'name_en')->orderBy('name_ar')->get();
 
-        return view('dashboard.shorts.edit', compact('short','btn_label','statusOptions','aspectOptions','allCategories'));
+        return view('dashboard.shorts.edit', compact('short', 'btn_label', 'statusOptions', 'aspectOptions', 'allCategories'));
     }
 
     public function update(ShortRequest $request, Short $short)
     {
         $this->authorize('update', Short::class);
-
         $this->shortService->update($request->validated(), $short->id);
 
         return redirect()->route('dashboard.shorts.index')
@@ -129,5 +127,21 @@ class ShortController extends Controller
             'message' => 'Share count increased successfully',
             'shares_count' => $short->shares_count
         ]);
+    }
+
+    public function deleteVideo($id)
+    {
+        $video = VideoFiles::find($id);
+        if ($video) {
+            $video->delete();
+            return response()->json([
+                'status' => true,
+                'message' => 'تم حذف الفيديو بنجاح'
+            ]);
+        }
+        return response()->json([
+            'status' => false,
+            'message' => 'الفيديو غير موجود'
+        ], 404);
     }
 }

@@ -75,6 +75,14 @@ Route::group([
 
 
         Route::get('shorts/videoRowPartial', [ShortController::class, 'videoRowPartial'])->name('shorts.videoRowPartial');
+        Route::delete('video-files/{id}', [ShortController::class, 'deleteVideo'])->name('shorts.video-files.delete');
+        Route::delete('movies-video-files/{id}', [MoviesController::class, 'deleteVideo'])->name('movies.video-files.delete');
+        Route::delete('movies-subtitles/{id}', [MoviesController::class, 'deleteSubtitle'])->name('movies.video-files.delete');
+        Route::delete('movies-casts/{id}', [MoviesController::class, 'deleteCast'])->name('movies.video-files.delete');
+        Route::delete('series-casts/{id}', [SeriesController::class, 'deleteCast'])->name('movies.video-files.delete');
+        Route::delete('episodes-video-files/{id}', [EpisodeController::class, 'deleteVideo'])->name('episodes.video-files.delete');
+        Route::delete('episodes-subtitles/{id}', [EpisodeController::class, 'deleteSubtitle'])->name('episodes.video-files.delete');
+
 
         Route::get('series/castRowPartial', [SeriesController::class, 'castRowPartial'])
         ->name('series.castRowPartial');

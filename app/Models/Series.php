@@ -34,6 +34,7 @@ class Series extends Model
         'is_featured',
         'view_count',
         'tmdb_id',
+        'logo_url',
         'created_by'
     ];
 
@@ -45,7 +46,6 @@ class Series extends Model
         'imdb_rating'    => 'decimal:1',
         'is_featured'    => 'boolean',
         'view_count'     => 'integer',
-        'logo_url'     => 'integer',
     ];
 
     protected $appends = ['poster_full_url', 'backdrop_full_url', 'is_favorite'];
@@ -68,7 +68,7 @@ class Series extends Model
     public function people()
     {
         return $this->belongsToMany(Person::class, 'series_cast', 'series_id', 'person_id')
-            ->withPivot(['role_type', 'character_name', 'sort_order'])
+            ->withPivot(['role_type', 'character_name', 'sort_order','id'])
             ->withTimestamps();
     }
 

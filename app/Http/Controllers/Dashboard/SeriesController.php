@@ -10,6 +10,7 @@ use App\Models\Person;
 use App\Services\SeriesService;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\SeriesRequest;
+use App\Models\SeriesCast;
 
 class SeriesController extends Controller
 {
@@ -198,6 +199,23 @@ class SeriesController extends Controller
         $i = (int) $request->get('i', 0);
         $row = [];
         return view('dashboard.series.episodes.partials._subtitle_row', compact('i', 'row'));
+    }
+
+    public function deleteCast($id)
+    {
+        $cast = SeriesCast::find($id);
+        // افترض اسم الموديل Cast
+        if ($cast) {
+            $cast->delete();
+            return response()->json([
+                'status' => true,
+                'message' => 'تم حذف الممثل بنجاح'
+            ]);
+        }
+        return response()->json([
+            'status' => false,
+            'message' => 'الممثل غير موجود'
+        ], 404);
     }
 
 }

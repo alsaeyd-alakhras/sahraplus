@@ -68,6 +68,7 @@ class Movie extends Model
                 'role_type',
                 'character_name',
                 'sort_order',
+                'id',
                 ])
             ->withTimestamps();
     }

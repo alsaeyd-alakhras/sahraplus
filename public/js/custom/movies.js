@@ -121,11 +121,36 @@ $(function() {
         });
     });
 
-    // حذف سطر
-    $(document).on('click', '.remove-cast-row', function() {
-        $(this).closest('.cast-row').remove();
-        renumberOrdering();
-        refreshSelected();
+    // حذف كاست من قاعدة البيانات أو من الواجهة
+    $(document).on('click', '.remove-cast-row', function () {
+        let row = $(this).closest('.cast-row');
+        let castId = row.find('.cast-id').val();
+       // alert(castId)
+        if (castId) {
+            $.ajax({
+                url: '/dashboard/movies-casts/' + castId,
+                type: 'DELETE',
+                data: {
+                    _token: $('meta[name="csrf-token"]').attr('content')
+                },
+                success: function (res) {
+                    if (res.status) {
+                        row.remove();
+                        renumberOrdering();
+                        refreshSelected();
+                    } else {
+                        alert(res.message);
+                    }
+                },
+                error: function () {
+                    alert('حدث خطأ أثناء الحذف!');
+                }
+            });
+        } else {
+            row.remove();
+            renumberOrdering();
+            refreshSelected();
+        }
     });
 
     // مسح الشخص من حقل الإدخال
@@ -183,10 +208,22 @@ $(function() {
     // ===== Helpers =====
 
     function renumberOrdering() {
-        $('#cast-rows .cast-row').each(function(index) {
-            $(this).find('input[name*="[sort_order]"]').val(index);
+        // في وضع التعديل لا نلمس ترتيب السطور الموجودة
+        if (form_type === "edit") {
+            return;
+        }
+
+        // في وضع الإضافة فقط نعمل إعادة ترقيم
+        $('#cast-rows .cast-row').each(function (index) {
+            let id = $(this).find('.cast-id').val();
+
+            // للحفاظ على السطور من DB → فقط السطور الجديدة تُرقّم
+            if (!id || id === "" || id === null) {
+                $(this).find('input[name*="[sort_order]"]').val(index);
+            }
         });
     }
+
 
 
     function isDuplicate(personId, currentRow) {
@@ -372,9 +409,36 @@ $(function() {
     });
 
     // حذف صف
-    $(document).on('click', '.remove-video-row', function() {
-        $(this).closest('.video-row').remove();
-        enforceUniqueVideoCombo();
+    $(document).on('click', '.remove-video-row', function () {
+        let row = $(this).closest('.video-row');
+        let videoId = row.find('.video-id').val();
+       // alert('test')
+        if (videoId) {
+            //alert('test')
+            // إذا الفيديو موجود مسبقًا في DB → نرسل طلب حذف
+            $.ajax({
+                url: '/dashboard/movies-video-files/' + videoId,
+                type: 'DELETE',
+                data: {
+                    _token: $('meta[name="csrf-token"]').attr('content')
+                },
+                success: function (res) {
+                    if (res.status) {
+                        row.remove();
+                        enforceUniqueVideoCombo(); // إعادة فحص الجودة بعد الحذف
+                    } else {
+                        alert(res.message);
+                    }
+                },
+                error: function () {
+                    alert('حدث خطأ أثناء الحذف!');
+                }
+            });
+        } else {
+            // الفيديو جديد ولم يُحفظ بعد → نحذفه مباشرة من الواجهة
+            row.remove();
+            enforceUniqueVideoCombo();
+        }
     });
     $(document).on('change', '.source-toggle', function(){
         const $row   = $(this).closest('.video-row');
@@ -552,12 +616,38 @@ $(function() {
         });
     });
 
-    // حذف صف
-    $(document).on('click', '.remove-sub-row', function() {
-        $(this).closest('.sub-row').remove();
-        enforceUniqueLanguage();
-        enforceUniqueLabel();
+
+    // حذف ترجمة من قاعدة البيانات أو من الواجهة
+    $(document).on('click', '.remove-sub-row', function () {
+        let row = $(this).closest('.sub-row');
+        let subId = row.find('.sub-id').val();
+        if (subId) {
+            $.ajax({
+                url: '/dashboard/movies-subtitles/' + subId,
+                type: 'DELETE',
+                data: {
+                    _token: $('meta[name="csrf-token"]').attr('content')
+                },
+                success: function (res) {
+                    if (res.status) {
+                        row.remove();
+                        enforceUniqueLanguage();
+                        enforceUniqueLabel();
+                    } else {
+                        alert(res.message);
+                    }
+                },
+                error: function () {
+                    alert('حدث خطأ أثناء الحذف!');
+                }
+            });
+        } else {
+            row.remove();
+            enforceUniqueLanguage();
+            enforceUniqueLabel();
+        }
     });
+
 
     // init للصفوف الموجودة
     $('#sub-rows .sub-row').each(function() {

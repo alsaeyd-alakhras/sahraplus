@@ -18,7 +18,7 @@ class MovieService
 
     public function datatableIndex(Request $request)
     {
-        $q = $this->repo->getQuery();
+        $q = $this->repo->getQuery()->latest();
 
         // فلاتر الأعمدة (حسب نمطك)
         if ($request->column_filters) {
@@ -122,8 +122,8 @@ class MovieService
             return $movie;
         } catch (\Throwable $e) {
             DB::rollBack();
-            // throw $e;
-            return back()->with('danger', $e->getMessage());
+            dd($e->getMessage());
+            //return back()->with('danger', $e->getMessage());
         }
     }
 
@@ -162,9 +162,10 @@ class MovieService
 
             // مزامنة العلاقات
             $this->syncCategories($movie, $categoryIds ?? []);
+            // dd($video_files );
             $this->syncCast($movie, $cast ?? []);
             $this->syncVideoFiles($movie, $video_files ?? [], true);
-            $this->syncSubtitles($movie, $subtitles ?? []);
+            $this->syncSubtitles($movie, $subtitles ?? [], true);
 
             DB::commit();
             return $movie;
@@ -212,9 +213,9 @@ class MovieService
     private function syncVideoFiles(Movie $movie, array $files, bool $replace = false): void
     {
 
-        // if ($replace) {
-        //     $movie->videoFiles()->delete();
-        // }
+        if ($replace) {
+            $movie->videoFiles()->delete();
+        }
 
         $payload = [];
         $usedTypes = [];
@@ -227,7 +228,8 @@ class MovieService
 
             // التحقق من وجود file أو file_url أولاً
             if ((!isset($f['file']) || empty($f['file'])) &&
-                (!isset($f['file_url']) || empty($f['file_url']))) {
+                (!isset($f['file_url']) || empty($f['file_url']))
+            ) {
                 continue;
             }
 
@@ -240,7 +242,7 @@ class MovieService
             $usedTypes[] = $type;
             $usedQualities[] = $quality;
             $fileUrl = isset($f['file_url']) ? $f['file_url'] : null;
-            $format  = $f['format']   ?? null;
+            $format  = $f['format']   ?? 'mp4';
             $size    = null;
             // لو رُفع ملف
             if ($sourceType == 'file') {
@@ -282,7 +284,7 @@ class MovieService
                 $movie->save();
             }
         }
-        if(empty($files)){
+        if (empty($files)) {
             $movie->videoFiles()->delete();
         }
 
@@ -291,13 +293,11 @@ class MovieService
         }
     }
 
-
-
     private function syncSubtitles(Movie $movie, array $subs, bool $replace = false): void
     {
-        // if ($replace) {
-        //     $movie->subtitles()->delete();
-        // }
+        if ($replace) {
+            $movie->subtitles()->delete();
+        }
 
         $payload = [];
         $seenLangs  = [];
@@ -339,7 +339,7 @@ class MovieService
                 'content_id'   => $movie->id,
                 'language'   => $lang,
                 'label'      => $label,
-                'url'        => $url,
+                'file_url'        => $url,
                 'is_default' => !empty($s['is_default']),
             ];
 
@@ -347,7 +347,7 @@ class MovieService
             $seenLabels[] = $label;
         }
 
-        if(empty($subs)){
+        if (empty($subs)) {
             $movie->subtitles()->delete();
         }
 
