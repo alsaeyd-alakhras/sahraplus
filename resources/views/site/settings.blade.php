@@ -286,7 +286,7 @@
                             class="px-4 py-2 mb-4 w-full text-white bg-gray-800 rounded"
                             placeholder="اسم الجهاز الجديد">
                         <div class="flex gap-2 justify-end">
-                            <button onclick="closeModal()"
+                            <button onclick="closeDeviceModal()"
                                 class="px-4 py-2 text-white bg-gray-600 rounded hover:bg-gray-700">إلغاء</button>
                             <button onclick="saveDeviceName()"
                                 class="px-4 py-2 text-white rounded bg-primary hover:bg-blue-600">حفظ</button>
@@ -386,7 +386,7 @@
                 toastr.success("تم التبديل بنجاح", "نجاح!");
             }
 
-            function closeModal() {
+            function closeDeviceModal() {
                 document.getElementById('editModal').classList.add('hidden');
             }
 
@@ -394,7 +394,7 @@
                 const newName = document.getElementById('editDeviceName').value;
                 if (currentEditingCard && newName.trim()) {
                     currentEditingCard.querySelector('span').textContent = newName;
-                    closeModal();
+                    closeDeviceModal();
                 }
                 toastr.success("تم الحفظ بنجاح", "نجاح!");
             }

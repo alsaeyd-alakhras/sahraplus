@@ -1,5 +1,5 @@
 <!-- ملف: profile-modal -->
-<div id="profileModal" class="flex flex-col hidden fixed inset-0 justify-center items-center bg-background-base z-[9999]">
+<div id="profileModal" class="flex flex-col hidden fixed inset-0 justify-center items-center bg-background-base z-[1000]">
     <div class="flex justify-end p-4 w-full">
         <button onclick="closeModal('profileModal')" class="text-2xl">&times;</button>
     </div>

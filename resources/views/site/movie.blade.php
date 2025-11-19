@@ -576,7 +576,7 @@
                                             alt="{{ $director->$name }}"
                                             class="object-cover w-full h-52 rounded-lg group-hover:opacity-90" />
                                     </div>
-                                    <a href="{{ route('site.cast', $actor->id) }}"
+                                    <a href="{{ route('site.cast', $director->id) }}"
                                         class="block mt-2 text-sm font-semibold text-gray-300 group-hover:text-white">
                                         {{ $director->$name }}
                                     </a>

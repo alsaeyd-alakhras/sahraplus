@@ -31,21 +31,8 @@ class DatabaseSeeder extends Seeder
         ]);
 
 
-        User::create([
-            'first_name' => 'User',
-            'last_name' => null,
-            'email' => 'user@gmail.com',
-            'phone' => null,
-            'password' => Hash::make('12345678'),
-            'date_of_birth' => null,
-            'gender' => 'male',
-            'country_code' => null,
-            'avatar' => null,
-            'last_activity' => now()
-        ]);
-
-
         if (app()->environment('local')) {
+            $this->call(UserSeeder::class);
             $this->call(ContentSeeder::class);
         }
     }

@@ -8,6 +8,10 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Mcamara\LaravelLocalization\Facades\LaravelLocalization;
 
+Route::get('/login',function(){
+    return redirect()->route('login');
+});
+
 Route::group([
     'prefix' => LaravelLocalization::setLocale(),
     'middleware' => [
