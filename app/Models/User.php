@@ -100,6 +100,24 @@ public function downloads()
     return $this->hasMany(Download::class);
 }
 
+    // Phase 4: Subscriptions & Devices
+    public function subscriptions()
+    {
+        return $this->hasMany(UserSubscription::class);
+    }
+
+    public function activeSubscription()
+    {
+        return $this->hasOne(UserSubscription::class)
+            ->whereIn('status', ['active', 'trial'])
+            ->where('ends_at', '>', now());
+    }
+
+    public function activeDevices()
+    {
+        return $this->hasMany(UserActiveDevice::class)->where('is_active', true);
+    }
+
     // Accessors & Mutators
     public function getFullNameAttribute() // $user->full_name
     {

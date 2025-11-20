@@ -48,5 +48,11 @@ class DatabaseSeeder extends Seeder
         if (app()->environment('local')) {
             $this->call(ContentSeeder::class);
         }
+
+        // Phase 4: Subscription Plans and Coupons
+        $this->call([
+            SubscriptionPlansSeeder::class,
+            CouponsSeeder::class,
+        ]);
     }
 }

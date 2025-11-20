@@ -34,6 +34,15 @@ use App\Http\Controllers\API\V1\FavoritesController;
 use App\Http\Controllers\API\V1\DownloadsController;
 use App\Http\Controllers\API\V1\ShortController;
 
+// ================================
+// 💳 Subscriptions & Billing (المرحلة الرابعة)
+// ================================
+use App\Http\Controllers\API\V1\PlanController;
+use App\Http\Controllers\API\V1\SubscriptionController;
+use App\Http\Controllers\API\V1\BillingController;
+use App\Http\Controllers\API\V1\CouponController;
+use App\Http\Controllers\API\V1\DeviceController;
+
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -136,4 +145,38 @@ Route::prefix('v1')->name('api.v1.')->group(function () {
         Route::get('downloads', [DownloadsController::class, 'index']);
         Route::get('downloads/{download}', [DownloadsController::class, 'show']);
     });
+
+
+    // ================================
+    // 💳 Subscriptions & Billing (المرحلة الرابعة)
+    // ================================
+    
+    // 📋 Subscription Plans (Public)
+    Route::get('plans', [PlanController::class, 'index']);
+    Route::get('plans/{id}', [PlanController::class, 'show']);
+
+    // 🔐 Authenticated subscription routes
+    Route::middleware(['auth:sanctum'])->group(function () {
+        
+        // 💳 Subscriptions
+        Route::post('subscriptions', [SubscriptionController::class, 'store']);
+        Route::get('subscriptions/me', [SubscriptionController::class, 'me']);
+        Route::post('subscriptions/cancel', [SubscriptionController::class, 'cancel']);
+        Route::get('subscriptions/check-quality', [SubscriptionController::class, 'checkQuality']);
+
+        // 💰 Billing
+        Route::post('billing/checkout', [BillingController::class, 'checkout']);
+
+        // 🎟️ Coupons
+        Route::post('coupons/validate', [CouponController::class, 'validate']);
+
+        // 📱 Devices
+        Route::post('devices/register', [DeviceController::class, 'registerDevice']);
+        Route::post('devices/heartbeat', [DeviceController::class, 'heartbeat']);
+        Route::get('devices', [DeviceController::class, 'index']);
+        Route::post('devices/{deviceId}/deactivate', [DeviceController::class, 'deactivate']);
+    });
+
+    // 🔔 Webhooks (No authentication)
+    Route::post('billing/webhook', [BillingController::class, 'webhook'])->name('billing.webhook');
 });

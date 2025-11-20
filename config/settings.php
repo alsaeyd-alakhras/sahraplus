@@ -37,4 +37,12 @@ return [
     // إعدادات الأطفال
     'require_pin_for_children' => false,
 
+    // ================================
+    // إعدادات الاشتراكات والدفع (المرحلة الرابعة)
+    // ================================
+    'subscriptions' => [
+        'default_gateway' => env('SUBSCRIPTION_DEFAULT_GATEWAY', 'paylink'),
+        'test_mode' => env('SUBSCRIPTION_TEST_MODE', true),
+    ],
+
 ];
