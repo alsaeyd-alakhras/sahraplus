@@ -272,12 +272,16 @@ function deleteProfile() {
 // الأحداث
 $("#openProfileModal").on("click", () => {
     renderProfiles();
-    $("#profileModal").removeClass("hidden");
+    // $("#profileModal").removeClass("hidden");
+    $(`#profileModal`).css("display", "flex").removeClass("hidden");
+
 });
 
-function closeModal(id) {
-    $(`#${id}`).addClass("hidden");
+window.closeModal = function(id) {
+    console.log("CLOSE MODAL:", id);
+    $(`#${id}`).css("display", "none").addClass("hidden");
 }
+
 
 function switchProfile(profileId) {
     const p = profiles.find((x) => x.id == profileId);

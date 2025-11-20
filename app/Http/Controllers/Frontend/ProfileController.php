@@ -14,7 +14,7 @@ class ProfileController extends Controller
     public function index()
     {
         return response()->json([
-            'profiles' => User::find(Auth::guard('web')->user()->id)->first()->profiles
+            'profiles' => User::with(['profiles', 'sessions'])->find(Auth::id())->profiles
         ]);
     }
 
@@ -89,7 +89,7 @@ class ProfileController extends Controller
         }
 
 
-        $user = User::find(Auth::guard('web')->user()->id)->first();
+        $user = User::with(['profiles', 'sessions'])->find(Auth::id());
         $profile = $user->profiles()->create([
             'user_id' => $user->id,
             'name' => $request->name,

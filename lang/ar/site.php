@@ -64,7 +64,8 @@ return [
     // Hero Section
     'hero_background' => 'خلفية البطل',
     'watch_now' => 'شاهد الآن',
-    'add_to_watchlist' => 'أضف للمفضلة',
+    'add_to_watchlist' => 'أضف للمشاهدة',
+    'favorite' => 'المفضلة',
     'share' => 'مشاركة',
     'copied' => 'تم النسخ',
     'copy_failed' => 'فشل النسخ',

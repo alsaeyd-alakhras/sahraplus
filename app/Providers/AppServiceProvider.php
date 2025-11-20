@@ -88,11 +88,12 @@ class AppServiceProvider extends ServiceProvider
         Short::observe(ShortObserver::class);
         TmdbSyncLog::observe(TmdbSyncLogObserver::class);
 
+
         View::composer('*', function ($view) {
             $view->with([
                 'auth_admin' => Auth::guard('admin')->check() ? Auth::guard('admin')->user() : null,
-                'auth_user'  => Auth::guard('web')->check()
-                    ? User::find(Auth::guard('web')->user()?->id)->with('profiles', 'sessions')->first()
+                'auth_user' => Auth::check()
+                    ? User::with(['profiles', 'sessions'])->find(Auth::id())
                     : null,
                 'settings'   => SystemSetting::get()->pluck('value', 'key')->toArray(),
             ]);

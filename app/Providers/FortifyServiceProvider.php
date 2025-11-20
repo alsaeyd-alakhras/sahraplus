@@ -40,7 +40,7 @@ class FortifyServiceProvider extends ServiceProvider
             Config::set('fortify.guard', 'web');
             Config::set('fortify.passwords', 'users');
             Config::set('fortify.prefix', $locale);
-            Config::set('fortify.home', '/' . $locale . '/home');
+            Config::set('fortify.home', '/' . $locale . '/');
         }
 
         $this->app->instance(LoginResponse::class, new class implements LoginResponse {
@@ -97,9 +97,7 @@ class FortifyServiceProvider extends ServiceProvider
                     return $user;
                 }
             }
-            $user = User::where('email', $request->username)
-                ->first();
-
+            $user = User::where('email', $request->username)->first();
             if ($user && Hash::check($request->password, $user->password)) {
                 return $user;
             }

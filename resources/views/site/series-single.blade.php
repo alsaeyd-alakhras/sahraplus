@@ -1,4 +1,7 @@
 <x-front-layout>
+    <x-slot name="attributes">
+        <body data-page-type="series">
+    </x-slot>
     @php
         $title = app()->getLocale() === 'ar' ? 'title_ar' : 'title_en';
         $description = app()->getLocale() === 'ar' ? 'description_ar' : 'description_en';

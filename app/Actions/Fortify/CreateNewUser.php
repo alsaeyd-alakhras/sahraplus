@@ -21,7 +21,7 @@ class CreateNewUser implements CreatesNewUsers
      */
     public function create(array $input)
     {
-        if(Config::get('fortify.guard') == 'admins'){
+        if (Config::get('fortify.guard') == 'admins') {
             Validator::make($input, [
                 'username' => [
                     'required',
@@ -30,13 +30,13 @@ class CreateNewUser implements CreatesNewUsers
                     Rule::unique(Admin::class),
                 ],
             ])->validate();
-            if(isset($input['avatar']) && $input['avatar'] != null){
+            if (isset($input['avatar']) && $input['avatar'] != null) {
                 $avatar = $input['avatar'];
                 $avatar = $avatar->store('avatars');
-            }else{
+            } else {
                 $avatar = null;
             }
-            return Admin::create([
+            $admin = Admin::create([
                 'name' => $input['name'],
                 'username' => $input['username'],
                 'password' => Hash::make($input['password']),
@@ -46,6 +46,8 @@ class CreateNewUser implements CreatesNewUsers
                 'last_activity' => now(),
                 'avatar' => $avatar,
             ]);
+
+            return $admin;
         }
         Validator::make($input, [
             'first_name' => ['required', 'string', 'max:255'],
@@ -60,7 +62,7 @@ class CreateNewUser implements CreatesNewUsers
             'password' => $this->passwordRules(),
         ])->validate();
 
-        return User::create([
+        $user = User::create([
             'first_name' => $input['first_name'],
             'last_name' => $input['last_name'],
             'email' => $input['email'],
@@ -78,5 +80,29 @@ class CreateNewUser implements CreatesNewUsers
             'parental_controls' => $input['parental_controls'] ?? false,
             'last_activity' => now(),
         ]);
+
+        // Guest Profile
+        $user->profiles()->create([
+            'name' => 'Guest',
+            'avatar_url' => null,
+            'is_default' => true,
+            'is_child_profile' => false,
+            'pin_code' => null,
+            'language' => 'ar',
+            'is_active' => true
+        ]);
+
+        // Child Profile
+        $user->profiles()->create([
+            'name' => 'Child',
+            'avatar_url' => null,
+            'is_default' => false,
+            'is_child_profile' => true,
+            'pin_code' => null,
+            'language' => 'ar',
+            'is_active' => true
+        ]);
+
+        return $user;
     }
 }

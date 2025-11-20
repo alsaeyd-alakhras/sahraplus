@@ -1,4 +1,7 @@
 <x-front-layout>
+    <x-slot name="attributes">
+        <body data-page-type="movie">
+    </x-slot>
     @php
         $title = 'title_' . app()->getLocale();
         $description = 'description_' . app()->getLocale();
@@ -251,10 +254,24 @@
                             </button>
                         @endif
 
-                        <button id="addToWatchlist" data-movie-id="{{ $movie->id }}"
+                        <button id="addToWatchlist" 
+                            data-content-id="{{ $movie->id }}"
+                            data-content-type="movie"
+                            data-profile-id="{{ session('active_profile_id') }}"
+                            data-in-watchlist="false"
                             class="flex gap-2 items-center px-5 py-2 text-sm font-bold text-white bg-gray-700 rounded-lg transition-all hover:bg-gray-600">
                             <i class="fas fa-plus"></i>
                             <span>{{ __('site.add_to_watchlist') }}</span>
+                        </button>
+
+                        <button id="addToFavorite" 
+                            data-content-id="{{ $movie->id }}"
+                            data-content-type="movie"
+                            data-profile-id="{{ session('active_profile_id') }}"
+                            data-is-favorite="false"
+                            class="flex gap-2 items-center px-5 py-2 text-sm font-bold text-white bg-gray-700 rounded-lg transition-all hover:bg-gray-600">
+                            <i class="far fa-heart"></i>
+                            <span>{{ __('site.favorite') }}</span>
                         </button>
 
                         <div class="inline-block relative" id="share-container">
@@ -416,6 +433,8 @@
                 class="flex-1 px-4 py-2 text-center bg-gray-800 rounded-md transition-all duration-300 tab hover:bg-fire-red">التفاصيل</button>
             <button data-tab="cast"
                 class="flex-1 px-4 py-2 text-center bg-gray-800 rounded-md transition-all duration-300 tab hover:bg-fire-red">الممثلين</button>
+            <button data-tab="ratings"
+                class="flex-1 px-4 py-2 text-center bg-gray-800 rounded-md transition-all duration-300 tab hover:bg-fire-red">التقييمات</button>
             <button data-tab="comments"
                 class="flex-1 px-4 py-2 text-center bg-gray-800 rounded-md transition-all duration-300 tab hover:bg-fire-red">التعليقات</button>
         </div>
@@ -557,7 +576,7 @@
                                             alt="{{ $director->$name }}"
                                             class="object-cover w-full h-52 rounded-lg group-hover:opacity-90" />
                                     </div>
-                                    <a href="{{ route('site.cast', $actor->id) }}"
+                                    <a href="{{ route('site.cast', $director->id) }}"
                                         class="block mt-2 text-sm font-semibold text-gray-300 group-hover:text-white">
                                         {{ $director->$name }}
                                     </a>
@@ -591,6 +610,87 @@
                         </div>
                     </div>
                 @endif
+            </div>
+
+            <!-- Ratings Tab -->
+            <div id="ratings" class="tab-content animate-fade-in">
+                <div class="mb-8">
+                    <h2 class="pb-2 mb-6 text-2xl font-bold text-white border-b border-gray-600">التقييمات</h2>
+                    
+                    <!-- Overall Rating Display -->
+                    <div id="overall-rating" class="p-6 mb-6 bg-gray-800 rounded-lg">
+                        <div class="flex items-center gap-4">
+                            <div class="text-center">
+                                <div id="avg-rating" class="text-4xl font-bold text-yellow-400">-</div>
+                                <div class="text-sm text-gray-400">من 5</div>
+                            </div>
+                            <div class="flex-1">
+                                <div id="rating-stars" class="flex gap-1 mb-2">
+                                    <i class="far fa-star text-2xl text-gray-600"></i>
+                                    <i class="far fa-star text-2xl text-gray-600"></i>
+                                    <i class="far fa-star text-2xl text-gray-600"></i>
+                                    <i class="far fa-star text-2xl text-gray-600"></i>
+                                    <i class="far fa-star text-2xl text-gray-600"></i>
+                                </div>
+                                <div id="total-ratings" class="text-sm text-gray-400">لا توجد تقييمات بعد</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- User Rating Form -->
+                    @auth
+                    <div id="user-rating-form" class="p-6 mb-6 bg-gray-800 rounded-lg">
+                        <h3 class="mb-4 text-lg font-bold text-white">قيّم هذا الفيلم</h3>
+                        <form id="ratingForm">
+                            <div class="mb-4">
+                                <label class="block mb-2 text-sm text-gray-300">تقييمك</label>
+                                <div id="user-rating-stars" class="flex gap-2">
+                                    <i class="far fa-star text-3xl text-gray-600 cursor-pointer hover:text-yellow-400 transition-colors" data-rating="1"></i>
+                                    <i class="far fa-star text-3xl text-gray-600 cursor-pointer hover:text-yellow-400 transition-colors" data-rating="2"></i>
+                                    <i class="far fa-star text-3xl text-gray-600 cursor-pointer hover:text-yellow-400 transition-colors" data-rating="3"></i>
+                                    <i class="far fa-star text-3xl text-gray-600 cursor-pointer hover:text-yellow-400 transition-colors" data-rating="4"></i>
+                                    <i class="far fa-star text-3xl text-gray-600 cursor-pointer hover:text-yellow-400 transition-colors" data-rating="5"></i>
+                                </div>
+                                <input type="hidden" id="rating-value" value="0">
+                            </div>
+                            <div class="mb-4">
+                                <label class="block mb-2 text-sm text-gray-300">مراجعتك (اختياري)</label>
+                                <textarea id="review-text" rows="4" 
+                                    class="w-full p-3 text-sm text-white bg-gray-700 rounded focus:outline-none focus:ring-2 focus:ring-fire-red"
+                                    placeholder="شاركنا رأيك في الفيلم..."></textarea>
+                            </div>
+                            <div class="mb-4">
+                                <label class="flex items-center gap-2 text-sm text-gray-300">
+                                    <input type="checkbox" id="is-spoiler" class="w-4 h-4 text-fire-red bg-gray-700 border-gray-600 rounded focus:ring-fire-red">
+                                    <span>تحتوي المراجعة على حرق للأحداث</span>
+                                </label>
+                            </div>
+                            <button type="submit" id="submit-rating"
+                                class="px-6 py-2 text-sm font-bold text-white rounded transition-all bg-fire-red hover:bg-red-700">
+                                إرسال التقييم
+                            </button>
+                        </form>
+                    </div>
+                    @else
+                    <div class="p-6 mb-6 text-center bg-gray-800 rounded-lg">
+                        <p class="mb-4 text-gray-400">سجل دخولك لتقييم الفيلم</p>
+                        <a href="{{ route('login') }}" 
+                            class="inline-block px-6 py-2 text-sm font-bold text-white rounded transition-all bg-fire-red hover:bg-red-700">
+                            تسجيل الدخول
+                        </a>
+                    </div>
+                    @endauth
+
+                    <!-- User's Current Rating Display -->
+                    <div id="current-user-rating" class="hidden p-6 mb-6 bg-gray-800 rounded-lg">
+                        <h3 class="mb-2 text-lg font-bold text-white">تقييمك</h3>
+                        <div class="flex items-center gap-2 mb-2">
+                            <div id="current-rating-stars" class="flex gap-1"></div>
+                            <span id="current-rating-value" class="text-yellow-400 font-bold"></span>
+                        </div>
+                        <p id="current-rating-review" class="text-sm text-gray-300"></p>
+                    </div>
+                </div>
             </div>
 
             <!-- Comments Tab -->
@@ -1478,66 +1578,8 @@
                 }
 
                 // ===== Watchlist Button =====
-                const addToWatchlistBtn = document.getElementById('addToWatchlist');
-
-                function initWatchlistButton() {
-                    if (addToWatchlistBtn) addToWatchlistBtn.addEventListener('click', handleWatchlistClick);
-                }
-
-                async function handleWatchlistClick(e) {
-                    e.preventDefault();
-                    const isAuthenticated = document.querySelector('#watchNow').dataset.isAuthenticated === 'true';
-                    if (!isAuthenticated) {
-                        window.location.href = '/login';
-                        return;
-                    }
-                    const movieId = addToWatchlistBtn.dataset.movieId;
-                    const btn = addToWatchlistBtn;
-                    const icon = btn.querySelector('i');
-                    const text = btn.querySelector('span');
-
-                    btn.disabled = true;
-                    icon.className = 'fas fa-spinner fa-spin';
-
-                    try {
-                        const response = await fetch(`/api/watchlist/${movieId}`, {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')
-                                    ?.getAttribute('content') || ''
-                            }
-                        });
-                        const data = await response.json();
-                        if (data.success) {
-                            if (data.action === 'added') {
-                                icon.classList.replace('fa-spinner', 'fa-check');
-                                icon.classList.remove('fa-spin');
-                                text.textContent = 'في القائمة';
-                                btn.classList.add('bg-green-600', 'hover:bg-green-700');
-                                btn.classList.remove('bg-gray-700', 'hover:bg-gray-600');
-                            } else {
-                                icon.classList.replace('fa-spinner', 'fa-plus');
-                                icon.classList.remove('fa-spin');
-                                text.textContent = 'أضف للمفضلة';
-                                btn.classList.remove('bg-green-600', 'hover:bg-green-700');
-                                btn.classList.add('bg-gray-700', 'hover:bg-gray-600');
-                            }
-                            showNotification(data.message || 'تم التحديث بنجاح', 'success');
-                        } else {
-                            icon.classList.replace('fa-spinner', 'fa-plus');
-                            icon.classList.remove('fa-spin');
-                            showNotification(data.message || 'حدث خطأ', 'error');
-                        }
-                    } catch (error) {
-                        console.error('Watchlist error:', error);
-                        icon.classList.replace('fa-spinner', 'fa-plus');
-                        icon.classList.remove('fa-spin');
-                        showNotification('فشل في تحديث قائمة المشاهدة', 'error');
-                    } finally {
-                        btn.disabled = false;
-                    }
-                }
+                // Now handled by content-interactions.js WatchlistManager
+                // Initialization happens automatically on page load
 
                 // ===== Share Button =====
                 const copyLinkBtn = document.getElementById('copy-link');
@@ -1806,19 +1848,12 @@
                         progressUpdateInterval = null;
                     }
                 }
-                // حفظ التقدم في السيرفر
+                // حفظ التقدم في السيرفر باستخدام API v1
                 function saveProgressToServer(currentTime, duration) {
-                    fetch(`/api/movies/{{ $movie->id }}/progress`, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
-                        },
-                        body: JSON.stringify({
-                            current_time: currentTime,
-                            duration: duration
-                        })
-                    }).catch(e => console.log('Failed to save progress:', e));
+                    if (typeof WatchProgressManager !== 'undefined') {
+                        WatchProgressManager.updateProgress('movie', {{ $movie->id }}, currentTime, duration)
+                            .catch(e => console.log('Failed to save progress:', e));
+                    }
                 }
 
                 function loadSavedProgress() {
@@ -2209,18 +2244,142 @@
                     initHeroSection();
                     initWatchNowButtons();
                     initVideoControls();
-                    initWatchlistButton();
+                    // Watchlist handled by content-interactions.js
                     initShareButton();
                     initTabs();
                     initCommentModal();
                     initSwiper();
                     initPictureInPicture();
+                    initRatings();
 
                     console.log('All components initialized successfully ✅');
 
                 } catch (error) {
                     console.error('Error during initialization:', error);
                     showNotification('حدث خطأ في تهيئة الصفحة', 'error');
+                }
+
+                // ===== Ratings System =====
+                function initRatings() {
+                    loadRatings();
+
+                    $('#user-rating-stars i').on('mouseenter', function() {
+                        const rating = $(this).data('rating');
+                        highlightStars('#user-rating-stars', rating);
+                    });
+
+                    $('#user-rating-stars').on('mouseleave', function() {
+                        const currentRating = $('#rating-value').val();
+                        highlightStars('#user-rating-stars', currentRating);
+                    });
+
+                    $('#user-rating-stars i').on('click', function() {
+                        const rating = $(this).data('rating');
+                        $('#rating-value').val(rating);
+                        highlightStars('#user-rating-stars', rating);
+                    });
+
+                    $('#ratingForm').on('submit', function(e) {
+                        e.preventDefault();
+                        submitRating();
+                    });
+                }
+
+                function loadRatings() {
+                    if (typeof RatingsManager === 'undefined') return;
+
+                    RatingsManager.getRatings('movie', {{ $movie->id }}).then(data => {
+                        if (data) {
+                            if (data.average_rating) {
+                                $('#avg-rating').text(parseFloat(data.average_rating).toFixed(1));
+                                highlightStars('#rating-stars', Math.round(data.average_rating));
+                            }
+                            
+                            if (data.total_ratings) {
+                                $('#total-ratings').text(`${data.total_ratings} تقييم`);
+                            }
+
+                            if (data.current_user_rating && data.current_user_rating.length > 0) {
+                                const userRating = data.current_user_rating[0];
+                                displayUserRating(userRating);
+                            }
+                        }
+                    }).catch(error => {
+                        console.log('No ratings yet');
+                    });
+                }
+
+                function displayUserRating(rating) {
+                    $('#current-user-rating').removeClass('hidden');
+                    $('#user-rating-form').addClass('hidden');
+                    
+                    let starsHtml = '';
+                    for (let i = 1; i <= 5; i++) {
+                        if (i <= rating.rating) {
+                            starsHtml += '<i class="fas fa-star text-yellow-400"></i>';
+                        } else {
+                            starsHtml += '<i class="far fa-star text-gray-600"></i>';
+                        }
+                    }
+                    $('#current-rating-stars').html(starsHtml);
+                    $('#current-rating-value').text(`${rating.rating}/5`);
+                    
+                    if (rating.review) {
+                        $('#current-rating-review').text(rating.review).removeClass('hidden');
+                    } else {
+                        $('#current-rating-review').addClass('hidden');
+                    }
+                }
+
+                function submitRating() {
+                    const rating = parseInt($('#rating-value').val());
+                    const review = $('#review-text').val().trim();
+                    const isSpoiler = $('#is-spoiler').is(':checked');
+
+                    if (rating === 0) {
+                        showToast('يرجى اختيار تقييم', 'warning');
+                        return;
+                    }
+
+                    const $btn = $('#submit-rating');
+                    $btn.prop('disabled', true).text('جاري الإرسال...');
+
+                    RatingsManager.submitRating('movie', {{ $movie->id }}, rating, review, isSpoiler)
+                        .then(response => {
+                            showToast('تم إرسال تقييمك بنجاح', 'success');
+                            
+                            if (response.data && response.data.avg_rating) {
+                                $('#avg-rating').text(parseFloat(response.data.avg_rating).toFixed(1));
+                                highlightStars('#rating-stars', Math.round(response.data.avg_rating));
+                            }
+
+                            if (response.data && response.data.rating_user) {
+                                displayUserRating(response.data.rating_user);
+                            }
+
+                            $('#rating-value').val(0);
+                            $('#review-text').val('');
+                            $('#is-spoiler').prop('checked', false);
+                            highlightStars('#user-rating-stars', 0);
+                        })
+                        .catch(error => {
+                            console.error('Rating error:', error);
+                            const message = error.responseJSON?.message || 'فشل في إرسال التقييم';
+                            showToast(message, 'error');
+                        })
+                        .always(() => {
+                            $btn.prop('disabled', false).text('إرسال التقييم');
+                        });
+                }
+
+                function highlightStars(selector, rating) {
+                    $(selector + ' i').each(function(index) {
+                        if (index < rating) {
+                            $(this).removeClass('far text-gray-600').addClass('fas text-yellow-400');
+                        } else {
+                            $(this).removeClass('fas text-yellow-400').addClass('far text-gray-600');
+                        }
+                    });
                 }
             });
         </script>

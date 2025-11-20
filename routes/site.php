@@ -8,6 +8,10 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Mcamara\LaravelLocalization\Facades\LaravelLocalization;
 
+Route::get('/login',function(){
+    return redirect()->route('login');
+});
+
 Route::group([
     'prefix' => LaravelLocalization::setLocale(),
     'middleware' => [
@@ -74,6 +78,19 @@ Route::group([
         'as' => 'site.',
         'middleware' => ['auth:web'],
     ], function () {
+        // User Lists (Phase 3) ************************
+        Route::get('/watchlist', function () {
+            return view('site.watchlist');
+        })->name('watchlist');
+        
+        Route::get('/favorites', function () {
+            return view('site.favorites');
+        })->name('favorites');
+        
+        Route::get('/history', function () {
+            return view('site.history');
+        })->name('history');
+
         // profiles ************************
         Route::get('/profiles', [ProfileController::class, 'index'])->name('profile.index');
         Route::post('/profiles', [ProfileController::class, 'store'])->name('profile.store');
