@@ -13,6 +13,7 @@ use App\Models\TmdbSyncLog;
 use App\Models\Notification;
 use App\Models\Movie;
 use App\Models\Series;
+use App\Models\LiveTvCategory;
 use Illuminate\Http\Request;
 use App\Observers\UserObserver;
 use App\Observers\AdminObserver;
@@ -22,6 +23,7 @@ use App\Observers\SeasonObserver;
 use App\Observers\EpisodeObserver;
 use App\Observers\TmdbSyncLogObserver;
 use App\Observers\NotificationObserver;
+use App\Observers\LiveTvCategoryObserver;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
@@ -37,8 +39,8 @@ class AppServiceProvider extends ServiceProvider
 
     public function register(): void
     {
-        $this->app->bind('abilities', fn () => include base_path('data/abilities.php'));
-        $this->app->bind('constants', fn () => include base_path('data/constants.php'));
+        $this->app->bind('abilities', fn() => include base_path('data/abilities.php'));
+        $this->app->bind('constants', fn() => include base_path('data/constants.php'));
     }
 
     public function boot(): void
@@ -87,6 +89,7 @@ class AppServiceProvider extends ServiceProvider
         Season::observe(SeasonObserver::class);
         Short::observe(ShortObserver::class);
         TmdbSyncLog::observe(TmdbSyncLogObserver::class);
+        LiveTvCategory::observe(LiveTvCategoryObserver::class);
 
 
         View::composer('*', function ($view) {
@@ -98,6 +101,5 @@ class AppServiceProvider extends ServiceProvider
                 'settings'   => SystemSetting::get()->pluck('value', 'key')->toArray(),
             ]);
         });
-
     }
 }

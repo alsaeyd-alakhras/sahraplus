@@ -21,6 +21,7 @@ use App\Http\Controllers\Dashboard\SeriesController;
 use App\Http\Controllers\Dashboard\SystemSettingsController;
 use App\Http\Controllers\Dashboard\UserRatingController;
 use App\Http\Controllers\Dashboard\DownloadController;
+use App\Http\Controllers\Dashboard\LiveTvCategoryController;
 use Mcamara\LaravelLocalization\Facades\LaravelLocalization;
 
 Route::group([
@@ -77,9 +78,9 @@ Route::group([
         Route::get('shorts/videoRowPartial', [ShortController::class, 'videoRowPartial'])->name('shorts.videoRowPartial');
 
         Route::get('series/castRowPartial', [SeriesController::class, 'castRowPartial'])
-        ->name('series.castRowPartial');
+            ->name('series.castRowPartial');
 
-         Route::get('episodes/videoRowPartial', [EpisodeController::class, 'videoRowPartial'])->name('episodes.videoRowPartial');
+        Route::get('episodes/videoRowPartial', [EpisodeController::class, 'videoRowPartial'])->name('episodes.videoRowPartial');
         Route::get('episodes/subtitleRowPartial', [EpisodeController::class, 'subtitleRowPartial'])->name('episodes.subtitleRowPartial');
 
 
@@ -91,11 +92,13 @@ Route::group([
         Route::get('countries-filters/{column}', [CountryController::class, 'getFilterOptions'])->name('countries.filters');
         Route::get('userRatings-filters/{column}', [UserRatingController::class, 'getFilterOptions'])->name('userRatings.filters');
         Route::get('downloads-filters/{column}', [DownloadController::class, 'getFilterOptions'])->name('downloads.filters');
-        Route::get('movies-filters/{column}', [ MoviesController::class, 'getFilterOptions'])->name('movies.filters');
-        Route::get('people-filters/{column}', [ PeopleController::class, 'getFilterOptions'])->name('people.filters');
-        Route::get('short-filters/{column}', [ ShortController::class, 'getFilterOptions'])->name('short.filters');
+        Route::get('movies-filters/{column}', [MoviesController::class, 'getFilterOptions'])->name('movies.filters');
+        Route::get('people-filters/{column}', [PeopleController::class, 'getFilterOptions'])->name('people.filters');
+        Route::get('short-filters/{column}', [ShortController::class, 'getFilterOptions'])->name('short.filters');
         Route::get('movie-categories-filters/{column}', [CategoryController::class, 'getFilterOptions'])->name('movie-categories.filters');
-        Route::get('series-filters/{column}', [ SeriesController::class, 'getFilterOptions'])->name('series.filters');
+        Route::get('series-filters/{column}', [SeriesController::class, 'getFilterOptions'])->name('series.filters');
+        Route::get('live-tv-categories-filters/{column}', [LiveTvCategoryController::class, 'getFilterOptions'])->name('live-tv-categories.filters');
+        Route::get('live-tv-categories/export', [LiveTvCategoryController::class, 'export'])->name('live-tv-categories.export');
 
         Route::resource('seasons', SeasonController::class)->except(['index']);
         Route::resource('episodes', EpisodeController::class)->except(['index']);
@@ -115,6 +118,7 @@ Route::group([
             // 'shorts'    => ShortController::class,
             'movie-categories'    => CategoryController::class,
             'series'    => SeriesController::class,
+            'live-tv-categories' => LiveTvCategoryController::class,
         ]);
     });
 });
