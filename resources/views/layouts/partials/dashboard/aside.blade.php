@@ -52,7 +52,17 @@
             class="menu-item {{ request()->is('dashboard/live-tv-categories') || request()->is('dashboard/live-tv-categories/*') ? 'active' : '' }}">
             <a href="{{ route('dashboard.live-tv-categories.index') }}" class="menu-link">
                 <i class="ph ph-television me-2"></i>
-                <div data-i18n="live-tv-categories">فئات القنوات</div>
+                <div data-i18n="live-tv-categories">{{ __('admin.Live_TV_Categories') }}</div>
+            </a>
+        </li>
+        @endcan
+
+        @can('view', 'App\\Models\LiveTvChannel')
+        <li
+            class="menu-item {{ request()->is('dashboard/live-tv-channels') || request()->is('dashboard/live-tv-channels/*') ? 'active' : '' }}">
+            <a href="{{ route('dashboard.live-tv-channels.index') }}" class="menu-link">
+                <i class="ph ph-broadcast me-2"></i>
+                <div data-i18n="live-tv-channels">{{ __('admin.Live_TV_Channels') }}</div>
             </a>
         </li>
         @endcan

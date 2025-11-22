@@ -24,7 +24,7 @@
             border-color: #28c76f !important;
         }
 
-        .category-icon {
+        .channel-logo {
             width: 40px;
             height: 40px;
             object-fit: cover;
@@ -44,7 +44,7 @@
         </div>
         {{-- excel export --}}
         <div class="mx-2 nav-item">
-            <a href="{{ route('dashboard.live-tv-categories.export') }}" class="text-white btn btn-icon btn-success"
+            <a href="{{ route('dashboard.live-tv-channels.export') }}" class="text-white btn btn-icon btn-success"
                 id="excel-export" title="{{ __('admin.Export_Excel') }}">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" width="16" height="16">
                     <path
@@ -52,9 +52,9 @@
                 </svg>
             </a>
         </div>
-        @can('create', 'App\\Models\\LiveTvCategory')
+        @can('create', 'App\\Models\\LiveTvChannel')
         <div class="mx-2 nav-item">
-            <a href="{{ route('dashboard.live-tv-categories.create') }}" class="m-0 btn btn-icon text-success">
+            <a href="{{ route('dashboard.live-tv-channels.create') }}" class="m-0 btn btn-icon text-success">
                 <i class="fa-solid fa-plus fe-16"></i>
             </a>
         </div>
@@ -73,24 +73,28 @@
     </x-slot:extra_nav>
     @php
     $fields = [
-    'icon_url' => __('admin.Icon'),
+    'logo_url' => __('admin.Logo'),
     'name_ar' => __('admin.Name_ar'),
     'name_en' => __('admin.Name_en'),
+    'category_id' => __('admin.Category'),
+    'stream_type' => __('admin.Stream_Type'),
+    'language' => __('admin.Language'),
+    'country' => __('admin.Country'),
     'sort_order' => __('admin.Sort_order'),
     'is_featured' => __('admin.Is_featured'),
     'is_active' => __('admin.Is_active'),
-    'channels_count' => __('admin.Channels_count'),
+    'programs_count' => __('admin.Programs_Count'),
     ];
     @endphp
     <div class="shadow-lg enhanced-card">
         <div class="table-header-title">
-            <i class="icon ph ph-television me-2"></i>
-            {{ __('admin.Live_TV_Categories') }}
+            <i class="icon ph ph-broadcast me-2"></i>
+            {{ __('admin.Live_TV_Channels') }}
         </div>
         <div class="enhanced-card-body">
             <div class="col-12" style="padding: 0;">
                 <div class="table-container">
-                    <table id="live-tv-categories-table" class="table enhanced-sticky table-striped table-hover"
+                    <table id="live-tv-channels-table" class="table enhanced-sticky table-striped table-hover"
                         style="display: table; width:100%; height: auto;">
                         <thead>
                             <tr>
@@ -99,7 +103,7 @@
                                 <th>
                                     <div class="d-flex align-items-center justify-content-between">
                                         <span>{{$label}}</span>
-                                        @if($index !== 'icon_url')
+                                        @if($index !== 'logo_url')
                                         <div class="enhanced-filter-dropdown">
                                             <div class="dropdown">
                                                 <button class="enhanced-btn-filter btn-filter" type="button"
@@ -192,40 +196,44 @@
 
     {{-- script --}}
     <script>
-        const tableId = 'live-tv-categories-table';
+        const tableId = 'live-tv-channels-table';
             const arabicFileJson = "{{ asset('files/Arabic.json')}}";
 
             const pageLength = $('#advanced-pagination').val();
 
             // urls
             const _token = "{{ csrf_token() }}";
-            const urlIndex = `{{ route('dashboard.live-tv-categories.index') }}`;
-            const urlFilters = `{{ route('dashboard.live-tv-categories.filters', ':column') }}`;
-            const urlCreate = '{{ route("dashboard.live-tv-categories.create") }}';
-            const urlEdit = '{{ route("dashboard.live-tv-categories.edit", ":id") }}';
-            const urlDelete = '{{ route("dashboard.live-tv-categories.destroy", ":id") }}';
+            const urlIndex = `{{ route('dashboard.live-tv-channels.index') }}`;
+            const urlFilters = `{{ route('dashboard.live-tv-channels.filters', ':column') }}`;
+            const urlCreate = '{{ route("dashboard.live-tv-channels.create") }}';
+            const urlEdit = '{{ route("dashboard.live-tv-channels.edit", ":id") }}';
+            const urlDelete = '{{ route("dashboard.live-tv-channels.destroy", ":id") }}';
 
             // ability
-            const abilityCreate = "{{ Auth::guard('admin')->user()->can('create', 'App\\Models\\LiveTvCategory') }}";
-            const abilityEdit = "{{ Auth::guard('admin')->user()->can('update', 'App\\Models\\LiveTvCategory') }}";
-            const abilityDelete = "{{ Auth::guard('admin')->user()->can('delete', 'App\\Models\\LiveTvCategory') }}";
+            const abilityCreate = "{{ Auth::guard('admin')->user()->can('create', 'App\\Models\\LiveTvChannel') }}";
+            const abilityEdit = "{{ Auth::guard('admin')->user()->can('update', 'App\\Models\\LiveTvChannel') }}";
+            const abilityDelete = "{{ Auth::guard('admin')->user()->can('delete', 'App\\Models\\LiveTvChannel') }}";
 
             const fields = [
                 '#',
-                'icon_url',
+                'logo_url',
                 'name_ar',
                 'name_en',
+                'category_id',
+                'stream_type',
+                'language',
+                'country',
                 'sort_order',
                 'is_featured',
                 'is_active',
-                'channels_count'
+                'programs_count'
             ];
 
             const columnsTable = [
                 { data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, class: 'text-center'},
-                { data: 'icon_url', name: 'icon_url', orderable: false, render: function (data, type, row) {
+                { data: 'logo_url', name: 'logo_url', orderable: false, render: function (data, type, row) {
                     if (data && data !== '') {
-                        return `<img src="/storage/${data}" alt="Icon" class="category-icon">`;
+                        return `<img src="/storage/${data}" alt="Logo" class="channel-logo">`;
                     }
                     return '<span class="text-muted">-</span>';
                 }},
@@ -234,6 +242,23 @@
                 }},
                 { data: 'name_en', name: 'name_en', orderable: false, render: function (data, type, row) {
                     return data ?? '';
+                }},
+                { data: 'category', name: 'category', orderable: false, render: function (data, type, row) {
+                    return data ?? '-';
+                }},
+                { data: 'stream_type', name: 'stream_type', orderable: false, render: function (data, type, row) {
+                    const badges = {
+                        'HLS': '<span class="badge bg-primary">HLS</span>',
+                        'DASH': '<span class="badge bg-success">DASH</span>',
+                        'RTMP': '<span class="badge bg-warning">RTMP</span>'
+                    };
+                    return badges[data] || data;
+                }},
+                { data: 'language', name: 'language', orderable: false, render: function (data, type, row) {
+                    return data ?? '-';
+                }},
+                { data: 'country', name: 'country', orderable: false, render: function (data, type, row) {
+                    return data ?? '-';
                 }},
                 { data: 'sort_order', name: 'sort_order', orderable: false, class: 'text-center', render: function (data, type, row) {
                     return data ?? '0';
@@ -250,7 +275,7 @@
                               ${active ? '{{ __("admin.active") }}' : '{{ __("admin.inactive") }}'}
                             </span>`;
                 }},
-                { data: 'channels_count', name: 'channels_count', orderable: false, class: 'text-center', render: function (data, type, row) {
+                { data: 'programs_count', name: 'programs_count', orderable: false, class: 'text-center', render: function (data, type, row) {
                     return data ?? '0';
                 }},
                 { data: 'edit', name: 'edit', orderable: false, searchable: false, render: function (data, type, row) {

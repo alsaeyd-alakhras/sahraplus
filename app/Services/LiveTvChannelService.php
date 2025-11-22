@@ -2,23 +2,30 @@
 
 namespace App\Services;
 
-use App\Repositories\LiveTvCategoryRepository;
+use App\Repositories\LiveTvChannelRepository;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Yajra\DataTables\Facades\DataTables;
 
-class LiveTvCategoryService
+class LiveTvChannelService
 {
-    public function __construct(private LiveTvCategoryRepository $repo) {}
+    public function __construct(private LiveTvChannelRepository $repo) {}
 
     public function datatableIndex(Request $request)
     {
-        $q = $this->repo->getQuery()->withCount('channels');
+        $q = $this->repo->getQuery()
+            ->with('category:id,name_ar,name_en')
+            ->withCount('programs');
 
         return DataTables::of($q)
             ->addIndexColumn()
+            ->addColumn('category', fn($c) => $c->category?->name_ar ?? '-')
+            ->addColumn('stream_type', function ($c) {
+                $types = ['hls' => 'HLS', 'dash' => 'DASH', 'rtmp' => 'RTMP'];
+                return $types[$c->stream_type] ?? $c->stream_type;
+            })
             ->addColumn('is_featured', fn($c) => $c->is_featured ? __('admin.featured') : __('admin.not_featured'))
             ->addColumn('is_active', fn($c) => $c->is_active ? __('admin.active') : __('admin.inactive'))
             ->addColumn('edit', fn($c) => $c->id)
@@ -57,6 +64,10 @@ class LiveTvCategoryService
                                 false => 0
                             ];
                             $query->whereIn('is_featured', array_map(fn($v) => $map[$v] ?? $v, $vals));
+                        } elseif ($field === 'category_id') {
+                            $query->whereIn('category_id', $vals);
+                        } elseif ($field === 'stream_type') {
+                            $query->whereIn('stream_type', $vals);
                         } else {
                             $query->whereIn($field, $vals);
                         }
@@ -69,6 +80,7 @@ class LiveTvCategoryService
                         $q->where('name_ar', 'like', "%{$search}%")
                             ->orWhere('name_en', 'like', "%{$search}%")
                             ->orWhere('slug', 'like', "%{$search}%")
+                            ->orWhere('stream_url', 'like', "%{$search}%")
                             ->orWhere('description_ar', 'like', "%{$search}%")
                             ->orWhere('description_en', 'like', "%{$search}%");
                     });
@@ -88,10 +100,32 @@ class LiveTvCategoryService
                 if (!$vals) continue;
 
                 if ($field === 'is_active') {
-                    $map = ['نشط' => 1, '1' => 1, 1 => 1, true => 1, 'غير نشط' => 0, '0' => 0, 0 => 0, false => 0];
+                    $map = [
+                        __('admin.active') => 1,
+                        'نشط' => 1,
+                        '1' => 1,
+                        1 => 1,
+                        true => 1,
+                        __('admin.inactive') => 0,
+                        'غير نشط' => 0,
+                        '0' => 0,
+                        0 => 0,
+                        false => 0
+                    ];
                     $q->whereIn('is_active', array_map(fn($v) => $map[$v] ?? $v, $vals));
                 } elseif ($field === 'is_featured') {
-                    $map = ['مميز' => 1, '1' => 1, 1 => 1, true => 1, 'غير مميز' => 0, '0' => 0, 0 => 0, false => 0];
+                    $map = [
+                        __('admin.featured') => 1,
+                        'مميز' => 1,
+                        '1' => 1,
+                        1 => 1,
+                        true => 1,
+                        __('admin.not_featured') => 0,
+                        'غير مميز' => 0,
+                        '0' => 0,
+                        0 => 0,
+                        false => 0
+                    ];
                     $q->whereIn('is_featured', array_map(fn($v) => $map[$v] ?? $v, $vals));
                 } else {
                     $q->whereIn($field, $vals);
@@ -111,10 +145,21 @@ class LiveTvCategoryService
                 ['value' => __('admin.not_featured'), 'label' => __('admin.not_featured')]
             ]);
         }
+        if ($column === 'stream_type') {
+            return response()->json([
+                ['value' => 'HLS', 'label' => 'HLS'],
+                ['value' => 'DASH', 'label' => 'DASH'],
+                ['value' => 'RTMP', 'label' => 'RTMP']
+            ]);
+        }
+        if ($column === 'category_id') {
+            $categories = \App\Models\LiveTvCategory::active()->ordered()->get(['id', 'name_ar']);
+            return response()->json($categories->map(fn($c) => ['value' => $c->name_ar, 'label' => $c->name_ar, 'id' => $c->id]));
+        }
 
         $unique = $q->whereNotNull($column)->where($column, '!=', '')
-            ->distinct()->pluck($column)->filter()->values()->toArray();
-        return response()->json($unique);
+            ->distinct()->pluck($column)->filter()->values();
+        return response()->json($unique->map(fn($v) => ['value' => $v, 'label' => $v]));
     }
 
     private function uniqueSlug(string $base, int $excludeId = null): string
@@ -147,28 +192,31 @@ class LiveTvCategoryService
             $nameForSlug = $data['name_en'] ?? $data['name_ar'];
             $data['slug'] = !empty($data['slug']) ? $data['slug'] : $this->uniqueSlug($nameForSlug);
 
-            // Handle icon_url upload
-            if (isset($data['icon_url_out']) && $data['icon_url_out'] !== null && $data['icon_url_out'] !== '') {
-                $data['icon_url'] = $data['icon_url_out'];
-                unset($data['icon_url_out']);
-            } elseif (!isset($data['icon_url']) || empty($data['icon_url'])) {
-                $data['icon_url'] = null;
+            // Handle logo upload
+            if (isset($data['logo_url_out']) && $data['logo_url_out'] !== null && $data['logo_url_out'] !== '') {
+                $data['logo_url'] = $data['logo_url_out'];
+                unset($data['logo_url_out']);
+            } elseif (!isset($data['logo_url']) || empty($data['logo_url'])) {
+                $data['logo_url'] = null;
             }
 
-            // Handle cover_image_url upload
-            if (isset($data['cover_image_url_out']) && $data['cover_image_url_out'] !== null && $data['cover_image_url_out'] !== '') {
-                $data['cover_image_url'] = $data['cover_image_url_out'];
-                unset($data['cover_image_url_out']);
-            } elseif (!isset($data['cover_image_url']) || empty($data['cover_image_url'])) {
-                $data['cover_image_url'] = null;
+            // Handle poster upload
+            if (isset($data['poster_url_out']) && $data['poster_url_out'] !== null && $data['poster_url_out'] !== '') {
+                $data['poster_url'] = $data['poster_url_out'];
+                unset($data['poster_url_out']);
+            } elseif (!isset($data['poster_url']) || empty($data['poster_url'])) {
+                $data['poster_url'] = null;
             }
 
             // Clean up any remaining file inputs
-            unset($data['icon_url_out'], $data['cover_image_url_out']);
+            unset($data['logo_url_out'], $data['poster_url_out']);
 
-            $category = $this->repo->save($data);
+            // Set default viewer_count
+            $data['viewer_count'] = $data['viewer_count'] ?? 0;
+
+            $channel = $this->repo->save($data);
             DB::commit();
-            return $category;
+            return $channel;
         } catch (\Throwable $e) {
             DB::rollBack();
             throw $e;
@@ -179,38 +227,38 @@ class LiveTvCategoryService
     {
         DB::beginTransaction();
         try {
-            $category = $this->repo->getById($id);
+            $channel = $this->repo->getById($id);
 
             // Generate slug if provided or names changed
             if (!empty($data['slug'])) {
                 $data['slug'] = $this->uniqueSlug($data['slug'], $id);
             } elseif (isset($data['name_en']) || isset($data['name_ar'])) {
-                $nameForSlug = $data['name_en'] ?? $data['name_ar'] ?? $category->name_en ?? $category->name_ar;
+                $nameForSlug = $data['name_en'] ?? $data['name_ar'] ?? $channel->name_en ?? $channel->name_ar;
                 $data['slug'] = $this->uniqueSlug($nameForSlug, $id);
             }
 
-            // Handle icon_url upload
-            if (isset($data['icon_url_out']) && $data['icon_url_out'] !== null && $data['icon_url_out'] !== '') {
-                $data['icon_url'] = $data['icon_url_out'];
-                unset($data['icon_url_out']);
-            } elseif (!isset($data['icon_url'])) {
-                $data['icon_url'] = $category->icon_url;
+            // Handle logo upload
+            if (isset($data['logo_url_out']) && $data['logo_url_out'] !== null && $data['logo_url_out'] !== '') {
+                $data['logo_url'] = $data['logo_url_out'];
+                unset($data['logo_url_out']);
+            } elseif (!isset($data['logo_url'])) {
+                $data['logo_url'] = $channel->logo_url;
             }
 
-            // Handle cover_image_url upload
-            if (isset($data['cover_image_url_out']) && $data['cover_image_url_out'] !== null && $data['cover_image_url_out'] !== '') {
-                $data['cover_image_url'] = $data['cover_image_url_out'];
-                unset($data['cover_image_url_out']);
-            } elseif (!isset($data['cover_image_url'])) {
-                $data['cover_image_url'] = $category->cover_image_url;
+            // Handle poster upload
+            if (isset($data['poster_url_out']) && $data['poster_url_out'] !== null && $data['poster_url_out'] !== '') {
+                $data['poster_url'] = $data['poster_url_out'];
+                unset($data['poster_url_out']);
+            } elseif (!isset($data['poster_url'])) {
+                $data['poster_url'] = $channel->poster_url;
             }
 
             // Clean up any remaining file inputs
-            unset($data['icon_url_out'], $data['cover_image_url_out']);
+            unset($data['logo_url_out'], $data['poster_url_out']);
 
-            $category = $this->repo->update($data, $id);
+            $channel = $this->repo->update($data, $id);
             DB::commit();
-            return $category;
+            return $channel;
         } catch (\Throwable $e) {
             DB::rollBack();
             throw $e;
@@ -232,7 +280,9 @@ class LiveTvCategoryService
 
     public function export(Request $request)
     {
-        $q = $this->repo->getQuery()->withCount('channels');
+        $q = $this->repo->getQuery()
+            ->with('category:id,name_ar')
+            ->withCount('programs');
 
         // Apply same filters as datatable
         if ($request->column_filters) {
@@ -252,24 +302,30 @@ class LiveTvCategoryService
             }
         }
 
-        $categories = $q->orderBy('sort_order', 'asc')->orderBy('id', 'desc')->get();
+        $channels = $q->orderBy('sort_order', 'asc')->orderBy('id', 'desc')->get();
 
         $export = new \App\Exports\ModelExport(
-            $categories,
-            ['#', __('admin.Name_ar'), __('admin.Name_en'), __('admin.Sort_order'), __('admin.Is_featured'), __('admin.Status'), __('admin.Channels_count')],
-            function ($cat, $index) {
+            $channels,
+            ['#', 'الاسم بالعربية', 'الاسم بالإنجليزية', 'الفئة', 'نوع البث', 'اللغة', 'البلد', 'الترتيب', 'مميز', 'نشط', 'عدد البرامج', 'المشاهدين'],
+            function ($ch, $index) {
+                $types = ['hls' => 'HLS', 'dash' => 'DASH', 'rtmp' => 'RTMP'];
                 return [
                     $index + 1,
-                    $cat->name_ar,
-                    $cat->name_en,
-                    $cat->sort_order,
-                    $cat->is_featured ? __('admin.Yes') : __('admin.No'),
-                    $cat->is_active ? __('admin.Yes') : __('admin.No'),
-                    $cat->channels_count ?? 0
+                    $ch->name_ar,
+                    $ch->name_en,
+                    $ch->category?->name_ar ?? '-',
+                    $types[$ch->stream_type] ?? $ch->stream_type,
+                    $ch->language ?? '-',
+                    $ch->country ?? '-',
+                    $ch->sort_order,
+                    $ch->is_featured ? 'نعم' : 'لا',
+                    $ch->is_active ? 'نعم' : 'لا',
+                    $ch->programs_count ?? 0,
+                    $ch->viewer_count ?? 0
                 ];
             }
         );
 
-        return \Maatwebsite\Excel\Facades\Excel::download($export, 'live-tv-categories-' . now()->format('Y-m-d') . '.xlsx');
+        return \Maatwebsite\Excel\Facades\Excel::download($export, 'live-tv-channels-' . now()->format('Y-m-d') . '.xlsx');
     }
 }

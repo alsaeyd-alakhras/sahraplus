@@ -96,7 +96,7 @@ class LiveTvCategoryController extends Controller
         $this->authorize('update', LiveTvCategory::class);
 
         $category = $liveTvCategory;
-        $btn_label = "تعديل";
+        $btn_label = __('admin.Edit');
         return view('dashboard.live-tv-categories.edit', compact('category', 'btn_label'));
     }
 
