@@ -39,5 +39,3 @@ class LiveTvChannelResource extends JsonResource
         ];
     }
 }
-
-

@@ -66,7 +66,7 @@ class StreamHealthService
                 streamName: $channel->stream_url,
                 protocol: 'hls'
             );
-            
+
             // Check stream health using the authenticated URL
             $healthCheck = $this->flussonicService->checkStreamHealth(
                 $channel->stream_url,

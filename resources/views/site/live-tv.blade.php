@@ -4,7 +4,8 @@
         <div class="absolute inset-0 opacity-100 hero-slide">
             <img src="{{ asset('assets/images/slider/slider1.avif') }}" alt="Hero Background"
                 class="object-cover absolute inset-0 w-full h-full" />
-            <video id="heroVideo" src="http://filmszone.shop:8484/stream/test/ssc/master.m3u8?u=admin&p=8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918"
+            <video id="heroVideo"
+                src="http://filmszone.shop:8484/stream/test/ssc/master.m3u8?u=admin&p=8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918"
                 class="hidden object-cover absolute inset-0 w-full h-full" playsinline></video>
             <div class="absolute inset-0 hero-gradient"></div>
         </div>
@@ -23,13 +24,15 @@
                 <div class="max-w-2xl text-white">
                     <!-- Logo -->
                     <div class="h-[60px] mb-4">
-                        <img src="{{ asset('assets/images/logos/mbs1.png') }}" alt="logo" class="object-contain h-full" />
+                        <img src="{{ asset('assets/images/logos/mbs1.png') }}" alt="logo"
+                            class="object-contain h-full" />
                     </div>
 
 
                     <!-- Description -->
                     <p class="mb-4 text-base leading-relaxed text-gray-200 md:text-lg">
-                        Lorem ipsum dolor, sit amet consectetur adipisicing elit. Quo nesciunt similique veritatis optio, corrupti eos. Magnam totam rem distinctio illum!
+                        Lorem ipsum dolor, sit amet consectetur adipisicing elit. Quo nesciunt similique veritatis
+                        optio, corrupti eos. Magnam totam rem distinctio illum!
                     </p>
 
                     <!-- Progress & Rating -->

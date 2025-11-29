@@ -19,7 +19,7 @@ class CheckStreamHealthTest extends TestCase
     public function it_can_be_dispatched()
     {
         $this->expectNotToPerformAssertions();
-        
+
         CheckStreamHealth::dispatch();
     }
 
@@ -28,7 +28,7 @@ class CheckStreamHealthTest extends TestCase
     {
         // Create active channels
         LiveTvChannel::factory()->count(3)->create(['is_active' => true]);
-        
+
         // Create inactive channel (should be skipped)
         LiveTvChannel::factory()->create(['is_active' => false]);
 

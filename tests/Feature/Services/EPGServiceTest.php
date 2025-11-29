@@ -127,7 +127,7 @@ class EPGServiceTest extends TestCase
 
         $programs = $this->epgService->parseXMLTV($xmlContent);
         $channel = LiveTvChannel::factory()->create(['stream_url' => 'ch1']);
-        
+
         $this->epgService->syncChannelPrograms($channel, 'ch1', $programs['ch1']);
 
         $this->assertDatabaseHas('channel_programs', [

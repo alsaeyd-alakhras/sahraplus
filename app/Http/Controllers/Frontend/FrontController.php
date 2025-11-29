@@ -325,15 +325,14 @@ class FrontController extends Controller
         $categories = Category::active()->orderBy('sort_order')->get();
         return view('site.categories.index', compact('categories'));
     }
-    
+
     public function categoryShow(Category $category)
     {
         $category->load([
             'movies' => fn($q) => $q->published()->with('categories')->latest()->limit(50),
             'series' => fn($q) => $q->with('categories')->latest()->limit(50)
         ]);
-        
+
         return view('site.categories.show', compact('category'));
     }
-
 }

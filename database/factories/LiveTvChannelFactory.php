@@ -19,7 +19,7 @@ class LiveTvChannelFactory extends Factory
     {
         $nameEn = $this->faker->unique()->company() . ' TV';
         $nameAr = 'Channel ' . $this->faker->unique()->company();
-        
+
         return [
             'category_id' => LiveTvCategory::factory(),
             'name_ar' => $nameAr,
@@ -45,7 +45,7 @@ class LiveTvChannelFactory extends Factory
      */
     public function active(): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn(array $attributes) => [
             'is_active' => true,
         ]);
     }
@@ -55,7 +55,7 @@ class LiveTvChannelFactory extends Factory
      */
     public function inactive(): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn(array $attributes) => [
             'is_active' => false,
         ]);
     }

@@ -20,7 +20,7 @@ class ChannelProgramService
         return DataTables::of($q)
             ->addIndexColumn()
             ->addColumn('channel', fn($p) => $p->channel?->name_ar ?? '-')
-            ->addColumn('genre', fn($p) => $p->genre ? __('admin.'.$p->genre) : '-')
+            ->addColumn('genre', fn($p) => $p->genre ? __('admin.' . $p->genre) : '-')
             ->addColumn('start_time', fn($p) => $p->start_time?->format('Y-m-d H:i') ?? '-')
             ->addColumn('end_time', fn($p) => $p->end_time?->format('Y-m-d H:i') ?? '-')
             ->addColumn('duration', function ($p) {
@@ -128,7 +128,7 @@ class ChannelProgramService
         }
         if ($column === 'genre') {
             $genres = ['news', 'sports', 'drama', 'documentary', 'entertainment', 'kids', 'religious', 'educational', 'others'];
-            return response()->json(array_map(fn($g) => ['value' => $g, 'label' => __('admin.'.$g)], $genres));
+            return response()->json(array_map(fn($g) => ['value' => $g, 'label' => __('admin.' . $g)], $genres));
         }
 
         $unique = $q->whereNotNull($column)->where($column, '!=', '')
@@ -263,7 +263,7 @@ class ChannelProgramService
                     $prog->title_ar,
                     $prog->title_en ?? '-',
                     $prog->channel?->name_ar ?? '-',
-                    $prog->genre ? __('admin.'.$prog->genre) : '-',
+                    $prog->genre ? __('admin.' . $prog->genre) : '-',
                     $prog->start_time->format('Y-m-d H:i'),
                     $prog->end_time->format('Y-m-d H:i'),
                     $prog->duration_minutes . ' دقيقة',

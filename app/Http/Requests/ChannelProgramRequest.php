@@ -19,7 +19,7 @@ class ChannelProgramRequest extends FormRequest
     public function rules(): array
     {
         $id = $this->route('channel_program');
-        
+
         return [
             'channel_id' => ['required', 'integer', 'exists:live_tv_channels,id'],
             'title_ar' => ['required', 'string', 'max:255'],

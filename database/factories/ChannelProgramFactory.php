@@ -127,7 +127,7 @@ class ChannelProgramFactory extends Factory
      */
     public function genre(string $genre): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn(array $attributes) => [
             'genre' => $genre,
         ]);
     }

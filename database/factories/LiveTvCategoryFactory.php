@@ -18,7 +18,7 @@ class LiveTvCategoryFactory extends Factory
     {
         $nameEn = $this->faker->unique()->words(2, true);
         $nameAr = 'Category ' . $this->faker->unique()->word();
-        
+
         return [
             'name_ar' => $nameAr,
             'name_en' => ucfirst($nameEn),
@@ -38,7 +38,7 @@ class LiveTvCategoryFactory extends Factory
      */
     public function active(): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn(array $attributes) => [
             'is_active' => true,
         ]);
     }
@@ -48,7 +48,7 @@ class LiveTvCategoryFactory extends Factory
      */
     public function inactive(): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn(array $attributes) => [
             'is_active' => false,
         ]);
     }

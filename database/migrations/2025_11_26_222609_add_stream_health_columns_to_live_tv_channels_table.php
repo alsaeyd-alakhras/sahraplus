@@ -16,12 +16,12 @@ return new class extends Migration
                 ->default('unknown')
                 ->after('stream_type')
                 ->comment('Current stream health status');
-            
+
             $table->timestamp('stream_health_last_check')
                 ->nullable()
                 ->after('stream_health_status')
                 ->comment('Last time stream health was checked');
-            
+
             $table->text('stream_health_details')
                 ->nullable()
                 ->after('stream_health_last_check')

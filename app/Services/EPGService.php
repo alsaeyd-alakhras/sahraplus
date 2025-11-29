@@ -248,7 +248,7 @@ class EPGService
         try {
             // Fetch EPG data from URL
             Log::info('EPGService: Starting daily schedule update', ['url' => $epgUrl]);
-            
+
             $xmlContent = $this->fetchEPGFromUrl($epgUrl, 'xmltv');
 
             // Parse XMLTV

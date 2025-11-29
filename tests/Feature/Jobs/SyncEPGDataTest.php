@@ -28,7 +28,7 @@ class SyncEPGDataTest extends TestCase
         ]);
 
         SyncEPGData::dispatchSync();
-        
+
         $this->assertTrue(true);
     }
 
@@ -306,7 +306,7 @@ class SyncEPGDataTest extends TestCase
         // Program should be skipped since it already exists with same start/end time
         // Check that only 1 program exists (the original one)
         $this->assertEquals(1, ChannelProgram::count(), 'Expected only 1 program (duplicate should be skipped)');
-        
+
         // Verify the original program still exists
         $this->assertDatabaseHas('channel_programs', [
             'channel_id' => $channel->id,

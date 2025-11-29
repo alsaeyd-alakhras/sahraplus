@@ -68,5 +68,3 @@ class LiveTvChannel extends Model
             ->orderByDesc('viewer_count');
     }
 }
-
-

@@ -51,5 +51,3 @@ class ChannelProgram extends Model
             ->orderBy('start_time');
     }
 }
-
-

@@ -169,25 +169,25 @@ class LiveTvChannelController extends Controller
 
         try {
             $flussonicService = app(\App\Services\FlussonicService::class);
-            
+
             // First test server connection
             $connectionTest = $flussonicService->testConnection();
-            
+
             // Generate stream URL
             $streamData = $flussonicService->generateStreamUrl(
                 streamName: $request->stream_name,
                 protocol: $request->protocol
             );
-            
+
             // Check stream health using the generated URL (includes auth token)
             $health = $flussonicService->checkStreamHealth($request->stream_name, $streamData['url']);
-            
+
             // Build response message
             $message = __('admin.stream_test_successful');
             if (!$connectionTest['success']) {
                 $message = '⚠️ ' . __('admin.Server_Unreachable') . ': ' . $connectionTest['message'];
             }
-            
+
             return response()->json([
                 'success' => true,
                 'message' => $message,
@@ -197,7 +197,6 @@ class LiveTvChannelController extends Controller
                 'server_reachable' => $connectionTest['success'],
                 'warning' => !$connectionTest['success'] ? __('admin.Server_Connection_Warning') : null
             ]);
-            
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,

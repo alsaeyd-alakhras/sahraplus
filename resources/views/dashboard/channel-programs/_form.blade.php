@@ -83,8 +83,7 @@
                         <label class="form-label">{{ __('admin.Start_Time') }} <span
                                 class="text-danger">*</span></label>
                         <input type="datetime-local" name="start_time" class="form-control"
-                            value="{{ old('start_time', $program->start_time?->format('Y-m-d\TH:i') ?? '') }}"
-                            required>
+                            value="{{ old('start_time', $program->start_time?->format('Y-m-d\TH:i') ?? '') }}" required>
                         @error('start_time')
                         <span class="text-danger">{{ $message }}</span>
                         @enderror
@@ -93,8 +92,7 @@
                     <div class="mb-4 col-md-6">
                         <label class="form-label">{{ __('admin.End_Time') }} <span class="text-danger">*</span></label>
                         <input type="datetime-local" name="end_time" class="form-control"
-                            value="{{ old('end_time', $program->end_time?->format('Y-m-d\TH:i') ?? '') }}"
-                            required>
+                            value="{{ old('end_time', $program->end_time?->format('Y-m-d\TH:i') ?? '') }}" required>
                         <small class="text-muted">{{ __('admin.end_time_hint') }}</small>
                         @error('end_time')
                         <span class="text-danger">{{ $message }}</span>
@@ -124,8 +122,8 @@
 
                         @if(isset($program->poster_url) && $program->poster_url)
                         <div class="mb-2">
-                            <img src="{{ asset('storage/' . $program->poster_url) }}" alt="Poster"
-                                class="img-thumbnail" style="max-height: 100px;">
+                            <img src="{{ asset('storage/' . $program->poster_url) }}" alt="Poster" class="img-thumbnail"
+                                style="max-height: 100px;">
                         </div>
                         @endif
 

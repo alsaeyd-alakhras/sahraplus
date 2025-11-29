@@ -33,7 +33,7 @@ class LiveTvChannelService
                     'unknown' => '<span class="badge bg-secondary">Unknown</span>',
                 ];
                 $status = $statusLabels[$c->stream_health_status] ?? $statusLabels['unknown'];
-                $lastCheck = $c->stream_health_last_check 
+                $lastCheck = $c->stream_health_last_check
                     ? '<small class="text-muted d-block">' . $c->stream_health_last_check->diffForHumans() . '</small>'
                     : '';
                 return $status . $lastCheck;

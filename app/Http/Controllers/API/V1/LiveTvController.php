@@ -163,13 +163,13 @@ class LiveTvController extends Controller
             // Get authenticated user if available
             $user = $request->user();
             $userId = $user ? $user->id : null;
-            
+
             // Get user IP (optional - we'll use 'no_check_ip' by default)
             $ipAddress = $request->ip();
-            
+
             // Check if stream_url is already a full URL or just a stream name
             $streamUrl = $channel->stream_url;
-            
+
             // If it's just a stream name (not a full URL), generate Flussonic URL
             if (!filter_var($streamUrl, FILTER_VALIDATE_URL)) {
                 $flussonicService = app(\App\Services\FlussonicService::class);
@@ -185,7 +185,7 @@ class LiveTvController extends Controller
                 // Use the full URL as is
                 $expiresAt = time() + 3600; // 1 hour default
             }
-            
+
             return response()->json([
                 'success' => true,
                 'data' => [
@@ -202,7 +202,6 @@ class LiveTvController extends Controller
                     'country' => $channel->country,
                 ],
             ]);
-            
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
@@ -212,5 +211,3 @@ class LiveTvController extends Controller
         }
     }
 }
-
-

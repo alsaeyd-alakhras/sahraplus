@@ -41,9 +41,7 @@
                         <div class="input-group">
                             <input type="text" id="stream_url" name="stream_url" class="form-control"
                                 value="{{ old('stream_url', $channel->stream_url) }}"
-                                placeholder="{{ __('admin.stream_name_placeholder') }}" 
-                                maxlength="100"
-                                required>
+                                placeholder="{{ __('admin.stream_name_placeholder') }}" maxlength="100" required>
                             <button type="button" class="btn btn-info" id="testStreamBtn">
                                 <i class="ph ph-play-circle"></i> {{ __('admin.Test_Stream') }}
                             </button>

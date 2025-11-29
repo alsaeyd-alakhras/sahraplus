@@ -52,7 +52,7 @@ return [
         'url' => env('EPG_URL'),
         'format' => env('EPG_FORMAT', 'xmltv'), // xmltv or json
         'sync_interval' => env('EPG_SYNC_INTERVAL', 'daily'), // hourly, daily, weekly
-        
+
         // Map EPG channel IDs to our database channel IDs
         // Example: 'bein-sports-1-ar' => 1
         'channel_mapping' => [

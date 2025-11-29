@@ -209,7 +209,7 @@ class FlussonicService
                 // If stream URL with token provided, use it directly
                 // Otherwise try to check without auth (may fail on protected streams)
                 $testUrl = $streamUrl ?? "{$this->baseUrl}/{$streamName}/index.m3u8";
-                
+
                 // Try HEAD request (lightweight, doesn't download content)
                 $response = Http::timeout(5)
                     ->withOptions(['allow_redirects' => true])
