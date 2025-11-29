@@ -15,6 +15,7 @@ use App\Models\Movie;
 use App\Models\Series;
 use App\Models\LiveTvCategory;
 use App\Models\LiveTvChannel;
+use App\Models\ChannelProgram;
 use Illuminate\Http\Request;
 use App\Observers\UserObserver;
 use App\Observers\AdminObserver;
@@ -26,6 +27,7 @@ use App\Observers\TmdbSyncLogObserver;
 use App\Observers\NotificationObserver;
 use App\Observers\LiveTvCategoryObserver;
 use App\Observers\LiveTvChannelObserver;
+use App\Observers\ChannelProgramObserver;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
@@ -93,6 +95,7 @@ class AppServiceProvider extends ServiceProvider
         TmdbSyncLog::observe(TmdbSyncLogObserver::class);
         LiveTvCategory::observe(LiveTvCategoryObserver::class);
         LiveTvChannel::observe(LiveTvChannelObserver::class);
+        ChannelProgram::observe(ChannelProgramObserver::class);
 
 
         View::composer('*', function ($view) {

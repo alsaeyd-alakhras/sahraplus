@@ -19,13 +19,24 @@ class LiveTvChannel extends Model
         'logo_url',
         'poster_url',
         'stream_url',
+        'epg_id',
         'stream_type',
+        'stream_health_status',
+        'stream_health_last_check',
+        'stream_health_details',
         'viewer_count',
         'sort_order',
         'is_featured',
         'is_active',
         'language',
         'country',
+    ];
+
+    protected $casts = [
+        'stream_health_last_check' => 'datetime',
+        'stream_health_details' => 'array',
+        'is_featured' => 'boolean',
+        'is_active' => 'boolean',
     ];
 
     public function category()

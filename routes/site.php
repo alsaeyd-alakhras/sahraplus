@@ -27,7 +27,6 @@ Route::group([
         // 'middleware' => ['auth'],
     ], function () {
         Route::get('/',[FrontController::class,'index'])->name('home');
-        Route::get('/live',[FrontController::class,'live'])->name('live');
         Route::get('/categories',[FrontController::class,'categories'])->name('categories');
         Route::get('/categories/{category}',[FrontController::class,'categoryShow'])->name('categories.show');
         Route::get('/actors',[FrontController::class,'actors'])->name('actors');
@@ -78,6 +77,9 @@ Route::group([
         'as' => 'site.',
         'middleware' => ['auth:web'],
     ], function () {
+        // Live TV ************************
+        Route::get('/live-tv', [FrontController::class, 'liveTv'])->name('live-tv');
+        
         // User Lists (Phase 3) ************************
         Route::get('/watchlist', function () {
             return view('site.watchlist');

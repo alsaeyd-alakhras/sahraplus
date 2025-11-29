@@ -156,4 +156,53 @@ class LiveTvChannelController extends Controller
             ? response()->json(['status' => true, 'message' => __('controller.Deleted_item_successfully')])
             : redirect()->route('dashboard.live-tv-channels.index')->with('success', __('controller.Deleted_item_successfully'));
     }
+
+    /**
+     * Test stream connection to Flussonic server
+     */
+    public function testStream(Request $request)
+    {
+        $request->validate([
+            'stream_name' => 'required|string|max:100',
+            'protocol' => 'required|in:hls,dash,rtmp'
+        ]);
+
+        try {
+            $flussonicService = app(\App\Services\FlussonicService::class);
+            
+            // First test server connection
+            $connectionTest = $flussonicService->testConnection();
+            
+            // Generate stream URL
+            $streamData = $flussonicService->generateStreamUrl(
+                streamName: $request->stream_name,
+                protocol: $request->protocol
+            );
+            
+            // Check stream health using the generated URL (includes auth token)
+            $health = $flussonicService->checkStreamHealth($request->stream_name, $streamData['url']);
+            
+            // Build response message
+            $message = __('admin.stream_test_successful');
+            if (!$connectionTest['success']) {
+                $message = '⚠️ ' . __('admin.Server_Unreachable') . ': ' . $connectionTest['message'];
+            }
+            
+            return response()->json([
+                'success' => true,
+                'message' => $message,
+                'url' => $streamData['url'],
+                'expires_at' => $streamData['expires_at'],
+                'status' => $health['status'] ?? 'unknown',
+                'server_reachable' => $connectionTest['success'],
+                'warning' => !$connectionTest['success'] ? __('admin.Server_Connection_Warning') : null
+            ]);
+            
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage()
+            ], 422);
+        }
+    }
 }

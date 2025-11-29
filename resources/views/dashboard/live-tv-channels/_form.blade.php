@@ -36,21 +36,29 @@
                     </div>
 
                     <div class="mb-4 col-md-6">
-                        <label class="form-label">{{ __('admin.Stream_URL') }} <span
+                        <label class="form-label">{{ __('admin.Stream_Name') }} <span
                                 class="text-danger">*</span></label>
-                        <input type="url" name="stream_url" class="form-control"
-                            value="{{ old('stream_url', $channel->stream_url) }}"
-                            placeholder="{{ __('admin.stream_url_placeholder') }}" required>
-                        <small class="text-muted">{{ __('admin.stream_url_hint') }}</small>
+                        <div class="input-group">
+                            <input type="text" id="stream_url" name="stream_url" class="form-control"
+                                value="{{ old('stream_url', $channel->stream_url) }}"
+                                placeholder="{{ __('admin.stream_name_placeholder') }}" 
+                                maxlength="100"
+                                required>
+                            <button type="button" class="btn btn-info" id="testStreamBtn">
+                                <i class="ph ph-play-circle"></i> {{ __('admin.Test_Stream') }}
+                            </button>
+                        </div>
+                        <small class="text-muted">{{ __('admin.stream_name_hint') }}</small>
                         @error('stream_url')
                         <span class="text-danger">{{ $message }}</span>
                         @enderror
+                        <div id="stream-test-result" class="mt-2" style="display: none;"></div>
                     </div>
 
                     <div class="mb-4 col-md-6">
                         <label class="form-label">{{ __('admin.Stream_Type') }} <span
                                 class="text-danger">*</span></label>
-                        <select name="stream_type" class="form-control" required>
+                        <select name="stream_type" id="stream_type" class="form-control" required>
                             <option value="">{{ __('admin.select_stream_type') }}</option>
                             <option value="hls" @selected(old('stream_type', $channel->stream_type) == 'hls')>
                                 {{ __('admin.HLS') }}
@@ -65,6 +73,12 @@
                         @error('stream_type')
                         <span class="text-danger">{{ $message }}</span>
                         @enderror
+                    </div>
+
+                    <div class="mb-4 col-md-6">
+                        <x-form.input name="epg_id" label="{{ __('admin.EPG_ID') }}" :value="$channel->epg_id"
+                            placeholder="{{ __('admin.epg_id_placeholder') }}" />
+                        <small class="text-muted">{{ __('admin.epg_id_hint') }}</small>
                     </div>
 
                     <div class="mb-4 col-md-6">
@@ -132,7 +146,7 @@
                             {{ __('admin.logo_hint') }}
                         </small>
 
-                        @error('logo_url')
+                        @error('logo_url_out')
                         <span class="text-danger">{{ $message }}</span>
                         @enderror
                     </div>
@@ -156,7 +170,7 @@
                             {{ __('admin.poster_hint') }}
                         </small>
 
-                        @error('poster_url')
+                        @error('poster_url_out')
                         <span class="text-danger">{{ $message }}</span>
                         @enderror
                     </div>
@@ -202,20 +216,103 @@
 @push('scripts')
 <script>
     function previewImage(input, previewId) {
-    const preview = document.getElementById(previewId);
-    
-    if (input.files && input.files[0]) {
-        const reader = new FileReader();
+        const preview = document.getElementById(previewId);
         
-        reader.onload = function(e) {
-            preview.src = e.target.result;
-            preview.style.display = 'block';
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+            
+            reader.onload = function(e) {
+                preview.src = e.target.result;
+                preview.style.display = 'block';
+            }
+            
+            reader.readAsDataURL(input.files[0]);
+        } else {
+            preview.style.display = 'none';
         }
-        
-        reader.readAsDataURL(input.files[0]);
-    } else {
-        preview.style.display = 'none';
     }
-}
+    
+    // Test Flussonic Stream
+    document.addEventListener('DOMContentLoaded', function() {
+        const testBtn = document.getElementById('testStreamBtn');
+        const streamInput = document.getElementById('stream_url');
+        const streamType = document.getElementById('stream_type');
+        const resultDiv = document.getElementById('stream-test-result');
+        
+        testBtn.addEventListener('click', async function() {
+            const streamName = streamInput.value.trim();
+            const protocol = streamType.value;
+            
+            if (!streamName) {
+                showResult('danger', '{{ __('admin.enter_stream_name_first') }}');
+                return;
+            }
+            
+            if (!protocol) {
+                showResult('danger', '{{ __('admin.select_stream_type_first') }}');
+                return;
+            }
+            
+            // Disable button and show loading
+            testBtn.disabled = true;
+            testBtn.innerHTML = '<i class="ph ph-spinner ph-spin"></i> {{ __('admin.Testing') }}...';
+            
+            try {
+                const response = await fetch('{{ route('dashboard.live-tv-channels.test-stream') }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({ 
+                        stream_name: streamName,
+                        protocol: protocol
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    const expiresDate = new Date(data.expires_at * 1000).toLocaleString('ar-EG');
+                    const alertType = data.server_reachable ? 'success' : 'warning';
+                    let message = `<strong>${data.server_reachable ? '✅' : '⚠️'} ${data.message}</strong><br><small>`;
+                    
+                    message += `<strong>{{ __('admin.Stream_Status') }}:</strong> ${data.status || 'unknown'}<br>`;
+                    message += `<strong>{{ __('admin.Generated_URL') }}:</strong><br>`;
+                    message += `<code style="word-break: break-all; font-size: 11px;">${data.url}</code><br>`;
+                    message += `<strong>{{ __('admin.Expires_at') }}:</strong> ${expiresDate}`;
+                    
+                    if (data.warning) {
+                        message += `<br><br><strong style="color: #dc3545;">⚠️ ${data.warning}</strong>`;
+                    }
+                    
+                    message += `</small>`;
+                    showResult(alertType, message);
+                } else {
+                    showResult('danger', `❌ ${data.message}`);
+                }
+            } catch (error) {
+                showResult('danger', `❌ {{ __('admin.Connection_Error') }}: ${error.message}`);
+            } finally {
+                // Re-enable button
+                testBtn.disabled = false;
+                testBtn.innerHTML = '<i class="ph ph-play-circle"></i> {{ __('admin.Test_Stream') }}';
+            }
+        });
+        
+        function showResult(type, message) {
+            resultDiv.className = `alert alert-${type} mt-2`;
+            resultDiv.innerHTML = message;
+            resultDiv.style.display = 'block';
+            
+            // Auto-hide after 10 seconds for success
+            if (type === 'success') {
+                setTimeout(() => {
+                    resultDiv.style.display = 'none';
+                }, 10000);
+            }
+        }
+    });
 </script>
 @endpush

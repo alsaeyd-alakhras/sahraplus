@@ -1,0 +1,104 @@
+/* .hero-gradient {
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+} */
+
+.channel-card {
+  background: linear-gradient(145deg, #2a2a3e, #1e1e32);
+  border: 1px solid #333;
+  transition: all 0.3s ease;
+}
+
+.channel-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+  border-color: #e50914;
+}
+
+.timeline-container {
+  background: #1a1a2e;
+  border: 1px solid #333;
+}
+
+.program-item {
+  background: linear-gradient(90deg, #2d3748, #4a5568);
+  border-left: 3px solid #e50914;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.program-item:hover {
+  background: linear-gradient(90deg, #4a5568, #2d3748);
+  transform: scale(1.02);
+}
+
+.program-item.active {
+  background: linear-gradient(90deg, #e50914, #c53030);
+  color: white;
+}
+
+.time-indicator {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: #e50914;
+  z-index: 10;
+  transition: left 1s ease;
+}
+
+.time-indicator::before {
+  content: "";
+  position: absolute;
+  top: -5px;
+  left: -4px;
+  width: 10px;
+  height: 10px;
+  background: #e50914;
+  border-radius: 50%;
+}
+
+.modal-backdrop {
+  background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(5px);
+}
+
+.category-tag {
+  background: linear-gradient(45deg, #e50914, #ff6b6b);
+}
+
+.live-indicator {
+  background: #e50914;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.5;
+  }
+
+  100% {
+    opacity: 1;
+  }
+}
+
+.scroll-container {
+  scrollbar-width: thin;
+  scrollbar-color: #e50914 #1a1a2e;
+}
+
+.scroll-container::-webkit-scrollbar {
+  height: 8px;
+}
+
+.scroll-container::-webkit-scrollbar-track {
+  background: #1a1a2e;
+}
+
+.scroll-container::-webkit-scrollbar-thumb {
+  background: #e50914;
+  border-radius: 4px;
+}

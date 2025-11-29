@@ -26,9 +26,22 @@ class LiveTvChannelService
                 $types = ['hls' => 'HLS', 'dash' => 'DASH', 'rtmp' => 'RTMP'];
                 return $types[$c->stream_type] ?? $c->stream_type;
             })
+            ->addColumn('stream_health', function ($c) {
+                $statusLabels = [
+                    'online' => '<span class="badge bg-success">Online</span>',
+                    'offline' => '<span class="badge bg-danger">Offline</span>',
+                    'unknown' => '<span class="badge bg-secondary">Unknown</span>',
+                ];
+                $status = $statusLabels[$c->stream_health_status] ?? $statusLabels['unknown'];
+                $lastCheck = $c->stream_health_last_check 
+                    ? '<small class="text-muted d-block">' . $c->stream_health_last_check->diffForHumans() . '</small>'
+                    : '';
+                return $status . $lastCheck;
+            })
             ->addColumn('is_featured', fn($c) => $c->is_featured ? __('admin.featured') : __('admin.not_featured'))
             ->addColumn('is_active', fn($c) => $c->is_active ? __('admin.active') : __('admin.inactive'))
             ->addColumn('edit', fn($c) => $c->id)
+            ->rawColumns(['stream_health'])
             ->filter(function ($query) use ($request) {
                 // Apply column filters first
                 if ($request->column_filters) {

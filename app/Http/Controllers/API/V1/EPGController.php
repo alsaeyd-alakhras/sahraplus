@@ -19,6 +19,7 @@ class EPGController extends Controller
 
         if (! $channel) {
             return response()->json([
+                'success' => false,
                 'message' => 'Channel not found',
             ], 404);
         }
@@ -27,7 +28,10 @@ class EPGController extends Controller
             ->orderBy('start_time')
             ->get();
 
-        return ChannelProgramResource::collection($programs);
+        return response()->json([
+            'success' => true,
+            'data' => ChannelProgramResource::collection($programs)->resolve(),
+        ]);
     }
 
     /**
@@ -40,6 +44,7 @@ class EPGController extends Controller
 
         if (! $channel) {
             return response()->json([
+                'success' => false,
                 'message' => 'Channel not found',
             ], 404);
         }
@@ -50,11 +55,15 @@ class EPGController extends Controller
 
         if (! $program) {
             return response()->json([
+                'success' => false,
                 'message' => 'No current program found',
             ], 404);
         }
 
-        return new ChannelProgramResource($program);
+        return response()->json([
+            'success' => true,
+            'data' => (new ChannelProgramResource($program))->resolve(),
+        ]);
     }
 
     /**
@@ -67,6 +76,7 @@ class EPGController extends Controller
 
         if (! $channel) {
             return response()->json([
+                'success' => false,
                 'message' => 'Channel not found',
             ], 404);
         }
@@ -75,7 +85,10 @@ class EPGController extends Controller
             ->where('channel_id', $channel->id)
             ->get();
 
-        return ChannelProgramResource::collection($programs);
+        return response()->json([
+            'success' => true,
+            'data' => ChannelProgramResource::collection($programs)->resolve(),
+        ]);
     }
 }
 

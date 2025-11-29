@@ -67,6 +67,16 @@
         </li>
         @endcan
 
+        @can('view', 'App\\Models\ChannelProgram')
+        <li
+            class="menu-item {{ request()->is('dashboard/channel-programs') || request()->is('dashboard/channel-programs/*') ? 'active' : '' }}">
+            <a href="{{ route('dashboard.channel-programs.index') }}" class="menu-link">
+                <i class="ph ph-television me-2"></i>
+                <div data-i18n="channel-programs">{{ __('admin.Channel_Programs') }}</div>
+            </a>
+        </li>
+        @endcan
+
         @can('view', 'App\\Models\Series')
         <li
             class="menu-item {{ request()->is('dashboard/series') || request()->is('dashboard/series/*') ? 'active' : '' }}">

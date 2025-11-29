@@ -23,13 +23,6 @@
             background-color: #28c76f !important;
             border-color: #28c76f !important;
         }
-
-        .channel-logo {
-            width: 40px;
-            height: 40px;
-            object-fit: cover;
-            border-radius: 8px;
-        }
     </style>
     @endpush
     <x-slot:extra_nav>
@@ -44,7 +37,7 @@
         </div>
         {{-- excel export --}}
         <div class="mx-2 nav-item">
-            <a href="{{ route('dashboard.live-tv-channels.export') }}" class="text-white btn btn-icon btn-success"
+            <a href="{{ route('dashboard.channel-programs.export') }}" class="text-white btn btn-icon btn-success"
                 id="excel-export" title="{{ __('admin.Export_Excel') }}">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" width="16" height="16">
                     <path
@@ -52,9 +45,9 @@
                 </svg>
             </a>
         </div>
-        @can('create', 'App\\Models\\LiveTvChannel')
+        @can('create', 'App\\Models\\ChannelProgram')
         <div class="mx-2 nav-item">
-            <a href="{{ route('dashboard.live-tv-channels.create') }}" class="m-0 btn btn-icon text-success">
+            <a href="{{ route('dashboard.channel-programs.create') }}" class="m-0 btn btn-icon text-success">
                 <i class="fa-solid fa-plus fe-16"></i>
             </a>
         </div>
@@ -73,29 +66,26 @@
     </x-slot:extra_nav>
     @php
     $fields = [
-    'logo_url' => __('admin.Logo'),
-    'name_ar' => __('admin.Name_ar'),
-    'name_en' => __('admin.Name_en'),
-    'category_id' => __('admin.Category'),
-    'stream_type' => __('admin.Stream_Type'),
-    'stream_health' => __('admin.Stream_Health'),
-    'language' => __('admin.Language'),
-    'country' => __('admin.Country'),
-    'sort_order' => __('admin.Sort_order'),
-    'is_featured' => __('admin.Is_featured'),
-    'is_active' => __('admin.Is_active'),
-    'programs_count' => __('admin.Programs_Count'),
+    'title_ar' => __('admin.Title_ar'),
+    'title_en' => __('admin.Title_en'),
+    'channel_id' => __('admin.Channel'),
+    'genre' => __('admin.Genre'),
+    'start_time' => __('admin.Start_Time'),
+    'end_time' => __('admin.End_Time'),
+    'duration' => __('admin.Duration'),
+    'is_live' => __('admin.Is_Live'),
+    'is_repeat' => __('admin.Is_Repeat'),
     ];
     @endphp
     <div class="shadow-lg enhanced-card">
         <div class="table-header-title">
-            <i class="icon ph ph-broadcast me-2"></i>
-            {{ __('admin.Live_TV_Channels') }}
+            <i class="icon ph ph-television me-2"></i>
+            {{ __('admin.Channel_Programs') }}
         </div>
         <div class="enhanced-card-body">
             <div class="col-12" style="padding: 0;">
                 <div class="table-container">
-                    <table id="live-tv-channels-table" class="table enhanced-sticky table-striped table-hover"
+                    <table id="channel-programs-table" class="table enhanced-sticky table-striped table-hover"
                         style="display: table; width:100%; height: auto;">
                         <thead>
                             <tr>
@@ -104,7 +94,7 @@
                                 <th>
                                     <div class="d-flex align-items-center justify-content-between">
                                         <span>{{$label}}</span>
-                                        @if($index !== 'logo_url')
+                                        @if(!in_array($index, ['start_time', 'end_time', 'duration']))
                                         <div class="enhanced-filter-dropdown">
                                             <div class="dropdown">
                                                 <button class="enhanced-btn-filter btn-filter" type="button"
@@ -197,91 +187,71 @@
 
     {{-- script --}}
     <script>
-        const tableId = 'live-tv-channels-table';
+        const tableId = 'channel-programs-table';
             const arabicFileJson = "{{ asset('files/Arabic.json')}}";
 
             const pageLength = $('#advanced-pagination').val();
 
             // urls
             const _token = "{{ csrf_token() }}";
-            const urlIndex = `{{ route('dashboard.live-tv-channels.index') }}`;
-            const urlFilters = `{{ route('dashboard.live-tv-channels.filters', ':column') }}`;
-            const urlCreate = '{{ route("dashboard.live-tv-channels.create") }}';
-            const urlEdit = '{{ route("dashboard.live-tv-channels.edit", ":id") }}';
-            const urlDelete = '{{ route("dashboard.live-tv-channels.destroy", ":id") }}';
+            const urlIndex = `{{ route('dashboard.channel-programs.index') }}`;
+            const urlFilters = `{{ route('dashboard.channel-programs.filters', ':column') }}`;
+            const urlCreate = '{{ route("dashboard.channel-programs.create") }}';
+            const urlEdit = '{{ route("dashboard.channel-programs.edit", ":id") }}';
+            const urlDelete = '{{ route("dashboard.channel-programs.destroy", ":id") }}';
 
             // ability
-            const abilityCreate = "{{ Auth::guard('admin')->user()->can('create', 'App\\Models\\LiveTvChannel') }}";
-            const abilityEdit = "{{ Auth::guard('admin')->user()->can('update', 'App\\Models\\LiveTvChannel') }}";
-            const abilityDelete = "{{ Auth::guard('admin')->user()->can('delete', 'App\\Models\\LiveTvChannel') }}";
+            const abilityCreate = "{{ Auth::guard('admin')->user()->can('create', 'App\\Models\\ChannelProgram') }}";
+            const abilityEdit = "{{ Auth::guard('admin')->user()->can('update', 'App\\Models\\ChannelProgram') }}";
+            const abilityDelete = "{{ Auth::guard('admin')->user()->can('delete', 'App\\Models\\ChannelProgram') }}";
 
             const fields = [
                 '#',
-                'logo_url',
-                'name_ar',
-                'name_en',
-                'category_id',
-                'stream_type',
-                'stream_health',
-                'language',
-                'country',
-                'sort_order',
-                'is_featured',
-                'is_active',
-                'programs_count'
+                'title_ar',
+                'title_en',
+                'channel_id',
+                'genre',
+                'start_time',
+                'end_time',
+                'duration',
+                'is_live',
+                'is_repeat'
             ];
 
             const columnsTable = [
                 { data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, class: 'text-center'},
-                { data: 'logo_url', name: 'logo_url', orderable: false, render: function (data, type, row) {
-                    if (data && data !== '') {
-                        return `<img src="/storage/${data}" alt="Logo" class="channel-logo">`;
-                    }
-                    return '<span class="text-muted">-</span>';
-                }},
-                { data: 'name_ar', name: 'name_ar', orderable: false, render: function (data, type, row) {
+                { data: 'title_ar', name: 'title_ar', orderable: false, render: function (data, type, row) {
                     return data ?? '';
                 }},
-                { data: 'name_en', name: 'name_en', orderable: false, render: function (data, type, row) {
+                { data: 'title_en', name: 'title_en', orderable: false, render: function (data, type, row) {
                     return data ?? '';
                 }},
-                { data: 'category', name: 'category', orderable: false, render: function (data, type, row) {
+                { data: 'channel', name: 'channel', orderable: false, render: function (data, type, row) {
                     return data ?? '-';
                 }},
-                { data: 'stream_type', name: 'stream_type', orderable: false, render: function (data, type, row) {
-                    const badges = {
-                        'HLS': '<span class="badge bg-primary">HLS</span>',
-                        'DASH': '<span class="badge bg-success">DASH</span>',
-                        'RTMP': '<span class="badge bg-warning">RTMP</span>'
-                    };
-                    return badges[data] || data;
-                }},
-                { data: 'stream_health', name: 'stream_health', orderable: false, render: function (data, type, row) {
-                    return data ?? '<span class="badge bg-secondary">Unknown</span>';
-                }},
-                { data: 'language', name: 'language', orderable: false, render: function (data, type, row) {
+                { data: 'genre', name: 'genre', orderable: false, render: function (data, type, row) {
                     return data ?? '-';
                 }},
-                { data: 'country', name: 'country', orderable: false, render: function (data, type, row) {
+                { data: 'start_time', name: 'start_time', orderable: false, render: function (data, type, row) {
+                    return data ? new Date(data).toLocaleString('ar-EG') : '-';
+                }},
+                { data: 'end_time', name: 'end_time', orderable: false, render: function (data, type, row) {
+                    return data ? new Date(data).toLocaleString('ar-EG') : '-';
+                }},
+                { data: 'duration', name: 'duration', orderable: false, render: function (data, type, row) {
                     return data ?? '-';
                 }},
-                { data: 'sort_order', name: 'sort_order', orderable: false, class: 'text-center', render: function (data, type, row) {
-                    return data ?? '0';
-                }},
-                { data: 'is_featured', name: 'is_featured', orderable: false, render: function (data, type, row) {
-                    const featured = (data === '{{ __("admin.featured") }}');
-                    return `<span class="badge ${featured ? 'bg-warning' : 'bg-secondary'}">
-                              ${featured ? '{{ __("admin.featured") }}' : '{{ __("admin.not_featured") }}'}
+                { data: 'is_live', name: 'is_live', orderable: false, render: function (data, type, row) {
+                    const isLive = (data === '{{ __("admin.Yes") }}');
+                    return `<span class="badge ${isLive ? 'bg-danger' : 'bg-secondary'}">
+                              ${data}
                             </span>`;
                 }},
-                { data: 'is_active', name: 'is_active', orderable: false, render: function (data, type, row) {
-                    const active = (data === '{{ __("admin.active") }}');
-                    return `<span class="badge ${active ? 'bg-success' : 'bg-secondary'}">
-                              ${active ? '{{ __("admin.active") }}' : '{{ __("admin.inactive") }}'}
+                { data: 'is_repeat', name: 'is_repeat', orderable: false, render: function (data, type, row) {
+                    const isRepeat = (data === '{{ __("admin.Yes") }}');
+                    return `<span class="badge ${isRepeat ? 'bg-warning' : 'bg-secondary'}">
+                              ${data}
                             </span>`;
-                }},
-                { data: 'programs_count', name: 'programs_count', orderable: false, class: 'text-center', render: function (data, type, row) {
-                    return data ?? '0';
                 }},
                 { data: 'edit', name: 'edit', orderable: false, searchable: false, render: function (data, type, row) {
                     let linkshow = ``;

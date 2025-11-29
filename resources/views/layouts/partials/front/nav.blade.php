@@ -25,8 +25,10 @@ class="fixed top-0 right-0 left-0 z-[9999] navbar-initial navbar-inset-shadow tr
                 class="font-medium text-white transition-colors duration-300 hover:text-fire-red">{{__('site.Series')}}</a>
             <a href="{{route('site.movies')}}"
                 class="font-medium text-white transition-colors duration-300 hover:text-fire-red">{{__('site.Movies')}}</a>
-            <a href="{{route('site.live')}}"
+            @auth('web')
+            <a href="{{route('site.live-tv')}}"
                 class="font-medium text-white transition-colors duration-300 hover:text-fire-red">{{__('site.Live')}}</a>
+            @endauth
             <a href="{{route('site.categories')}}"
                 class="font-medium text-white transition-colors duration-300 hover:text-fire-red">{{__('site.Categories')}}</a>
         </div>

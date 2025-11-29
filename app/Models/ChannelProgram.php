@@ -24,6 +24,14 @@ class ChannelProgram extends Model
         'poster_url',
     ];
 
+    protected $casts = [
+        'start_time' => 'datetime',
+        'end_time' => 'datetime',
+        'is_live' => 'boolean',
+        'is_repeat' => 'boolean',
+        'duration_minutes' => 'integer',
+    ];
+
     public function channel()
     {
         return $this->belongsTo(LiveTvChannel::class);

@@ -23,6 +23,7 @@ use App\Http\Controllers\Dashboard\UserRatingController;
 use App\Http\Controllers\Dashboard\DownloadController;
 use App\Http\Controllers\Dashboard\LiveTvCategoryController;
 use App\Http\Controllers\Dashboard\LiveTvChannelController;
+use App\Http\Controllers\Dashboard\ChannelProgramController;
 use Mcamara\LaravelLocalization\Facades\LaravelLocalization;
 
 Route::group([
@@ -102,6 +103,9 @@ Route::group([
         Route::get('live-tv-categories/export', [LiveTvCategoryController::class, 'export'])->name('live-tv-categories.export');
         Route::get('live-tv-channels-filters/{column}', [LiveTvChannelController::class, 'getFilterOptions'])->name('live-tv-channels.filters');
         Route::get('live-tv-channels/export', [LiveTvChannelController::class, 'export'])->name('live-tv-channels.export');
+        Route::post('live-tv-channels/test-stream', [LiveTvChannelController::class, 'testStream'])->name('live-tv-channels.test-stream');
+        Route::get('channel-programs-filters/{column}', [ChannelProgramController::class, 'getFilterOptions'])->name('channel-programs.filters');
+        Route::get('channel-programs/export', [ChannelProgramController::class, 'export'])->name('channel-programs.export');
 
         Route::resource('seasons', SeasonController::class)->except(['index']);
         Route::resource('episodes', EpisodeController::class)->except(['index']);
@@ -123,6 +127,7 @@ Route::group([
             'series'    => SeriesController::class,
             'live-tv-categories' => LiveTvCategoryController::class,
             'live-tv-channels' => LiveTvChannelController::class,
+            'channel-programs' => ChannelProgramController::class,
         ]);
     });
 });

@@ -273,6 +273,11 @@ class FrontController extends Controller
         return view('site.shorts', compact('shorts'));
     }
 
+    public function liveTv()
+    {
+        return view('site.live-tv');
+    }
+
     public function cast($id)
     {
         $cast = Person::with(['movies', 'series'])->findOrFail($id);
