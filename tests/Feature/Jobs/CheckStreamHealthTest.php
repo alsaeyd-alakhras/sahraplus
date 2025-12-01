@@ -15,6 +15,24 @@ class CheckStreamHealthTest extends TestCase
 {
     use RefreshDatabase;
 
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        // Configure Flussonic service for tests
+        config([
+            'services.flussonic.base_url' => 'http://flussonic.test',
+            'services.flussonic.secret_key' => 'test-secret',
+            'services.flussonic.token_lifetime' => 3600,
+            'services.flussonic.desync' => 0,
+            'services.flussonic.protocols' => [
+                'hls' => '/index.m3u8',
+                'dash' => '/manifest.mpd',
+                'rtmp' => '',
+            ],
+        ]);
+    }
+
     /** @test */
     public function it_can_be_dispatched()
     {

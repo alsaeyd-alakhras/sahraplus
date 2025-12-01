@@ -63,8 +63,8 @@ class StreamHealthService
         try {
             // Generate authenticated stream URL first
             $streamData = $this->flussonicService->generateStreamUrl(
-                streamName: $channel->stream_url,
-                protocol: 'hls'
+                $channel->stream_url,null,null,
+                'hls'
             );
 
             // Check stream health using the authenticated URL
