@@ -153,7 +153,15 @@
                 </a>
             </li>
         @endcan
-
+        @can('view', 'App\\Models\HomeBanner')
+            <li
+                class="menu-item {{ request()->is('dashboard/home-banners') || request()->is('dashboard/home-banners/*') ? 'active' : '' }}">
+                <a href="{{ route('dashboard.home-banners.index') }}" class="menu-link">
+                    <i class="ph ph-film-strip me-2"></i>
+                    <div data-i18n="home-banners">{{ __('admin.HomeBanners') }}</div>
+                </a>
+            </li>
+        @endcan
         @can('view', 'App\\Models\SystemSetting')
             <li
                 class="menu-item {{ request()->is('dashboard/settings') || request()->is('dashboard/settings/*') ? 'active' : '' }}">
@@ -163,6 +171,7 @@
                 </a>
             </li>
         @endcan
+
 
         {{-- <li class="menu-item">
             <a href="page-2.html" class="menu-link">

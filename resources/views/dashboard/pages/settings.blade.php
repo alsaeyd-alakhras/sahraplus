@@ -109,6 +109,9 @@
                         <button class="nav-link" data-bs-toggle="pill" data-bs-target="#system-tab" type="button" role="tab">
                             <i class="fas fa-server me-2"></i>{{ __('admin.system_settings') }}
                         </button>
+                        <button class="nav-link" data-bs-toggle="pill" data-bs-target="#mobile-tab" type="button" role="tab">
+                            <i class="fas fa-mobile-alt me-2"></i>{{ __('admin.mobile_app_settings') }}
+                        </button>
                         <button class="nav-link" data-bs-toggle="pill" data-bs-target="#social-tab" type="button" role="tab">
                             <i class="fas fa-share-alt me-2"></i>{{ __('admin.social_media') }}
                         </button>
@@ -461,6 +464,68 @@
                                                 {{ ($setting['email_verification'] ?? false) ? 'checked' : '' }}>
                                             <label class="form-check-label">{{ __('admin.email_verification_required') }}</label>
                                         </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- إعدادات تطبيق الهاتف -->
+                    <div class="tab-pane fade" id="mobile-tab" role="tabpanel">
+                        <div class="card settings-card">
+                            <div class="card-header">
+                                <h5 class="mb-0">
+                                    <i class="fas fa-mobile-alt me-2"></i>{{ __('admin.mobile_app_settings') }}
+                                </h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="mb-3 col-md-6">
+                                        <x-form.input
+                                            label="{{ __('admin.android_app_url') }}"
+                                            name="android_app_url"
+                                            :value="$setting['android_app_url'] ?? ''"
+                                            placeholder="https://play.google.com/store/apps/details?id=com.example.app" />
+                                    </div>
+                                    <div class="mb-3 col-md-6">
+                                        <x-form.input
+                                            label="{{ __('admin.ios_app_url') }}"
+                                            name="ios_app_url"
+                                            :value="$setting['ios_app_url'] ?? ''"
+                                            placeholder="https://apps.apple.com/app/id0000000000" />
+                                    </div>
+                                    <div class="mb-3 col-md-6">
+                                        <x-form.input
+                                            label="{{ __('admin.huawei_app_url') }}"
+                                            name="huawei_app_url"
+                                            :value="$setting['huawei_app_url'] ?? ''"
+                                            placeholder="https://appgallery.huawei.com/#/app/C000000" />
+                                    </div>
+                                    <div class="mb-3 col-md-3">
+                                        <x-form.input
+                                            label="{{ __('admin.app_version') }}"
+                                            name="app_version"
+                                            :value="$setting['app_version'] ?? '1.0.0'"
+                                            placeholder="1.0.0" />
+                                    </div>
+                                    <div class="mb-3 col-md-3">
+                                        <x-form.input
+                                            label="{{ __('admin.min_supported_version') }}"
+                                            name="min_supported_version"
+                                            :value="$setting['min_supported_version'] ?? '1.0.0'"
+                                            placeholder="1.0.0" />
+                                    </div>
+                                    <div class="mb-3 col-md-6">
+                                        <div class="form-check form-switch mt-4">
+                                            <input class="form-check-input" type="checkbox" name="force_update" value="1"
+                                                {{ ($setting['force_update'] ?? false) ? 'checked' : '' }}>
+                                            <label class="form-check-label">{{ __('admin.force_update') }}</label>
+                                        </div>
+                                    </div>
+                                    <div class="mb-3 col-md-12">
+                                        <label class="form-label">{{ __('admin.mobile_update_message') }}</label>
+                                        <textarea class="form-control" name="mobile_update_message" rows="3"
+                                            placeholder="{{ __('admin.mobile_update_message_placeholder') }}">{{ $setting['mobile_update_message'] ?? '' }}</textarea>
                                     </div>
                                 </div>
                             </div>

@@ -21,6 +21,7 @@ class Short extends Model
         'shares_count',
         'share_url',
         'is_featured',
+        'is_kids',
         'status',
         'created_by',
         'video_basic_url'
@@ -31,6 +32,7 @@ class Short extends Model
         'comments_count' => 'integer',
         'shares_count' => 'integer',
         'is_featured' => 'boolean',
+        'is_kids' => 'boolean',
     ];
 
     protected $appends = [
@@ -143,5 +145,21 @@ class Short extends Model
     public function scopeByCategory($q, $categoryId)
     {
         return $q->whereHas('categories', fn($qq) => $qq->where('categories.id', $categoryId));
+    }
+
+    /**
+     * سكوب لشورتس الأطفال فقط
+     */
+    public function scopeKids($query)
+    {
+        return $query->where('is_kids', true);
+    }
+
+    /**
+     * سكوب لشورتس الكبار (غير الأطفال)
+     */
+    public function scopeAdults($query)
+    {
+        return $query->where('is_kids', false);
     }
 }

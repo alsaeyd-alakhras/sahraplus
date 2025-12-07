@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\API\V1\AnalyticsController;
+use App\Http\Controllers\Frontend\ProfileController;
 use Illuminate\Support\Facades\Route;
 
 // ================================
@@ -36,6 +37,7 @@ use App\Http\Controllers\API\V1\DownloadsController;
 use App\Http\Controllers\API\V1\ShortController;
 use App\Http\Controllers\API\V1\EPGController;
 use App\Http\Controllers\API\V1\LiveTvController;
+use App\Http\Controllers\API\V1\HomeBannerController;
 
 /*
 |--------------------------------------------------------------------------
@@ -64,6 +66,14 @@ Route::prefix('v1')->name('api.v1.')->group(function () {
         // 🔔 Notifications
         Route::get('me/notifications', [UserController::class, 'notifications']);
         Route::post('me/notifications/{id}/read', [UserController::class, 'markNotificationRead']);
+
+        // profiles ************************
+        Route::get('/profiles', [ProfileController::class, 'index'])->name('profile.index');
+        Route::post('/profiles', [ProfileController::class, 'store'])->name('profile.store');
+        Route::put('/profiles/{profile}', [ProfileController::class, 'update'])->name('profile.update');
+        Route::delete('/profiles/{profile}', [ProfileController::class, 'destroy'])->name('profile.destroy');
+        Route::post('/profiles/{profile}/verify-pin', [ProfileController::class, 'verifyPin'])->name('profile.verify-pin');
+        Route::post('/profiles/{profile}/reset-pin', [ProfileController::class, 'resetPin'])->name('profile.reset-pin');
     });
 
     // ⚙️ Settings
@@ -116,6 +126,9 @@ Route::prefix('v1')->name('api.v1.')->group(function () {
 
     // 🔎 Search & Filter
     Route::get('search', [SearchController::class, 'index'])->name('search');
+
+    // 🏠 Home Banners
+    Route::get('home/banners', [HomeBannerController::class, 'index'])->name('home.banners');
 
 
     // ================================

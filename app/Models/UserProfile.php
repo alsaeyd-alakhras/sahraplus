@@ -119,6 +119,9 @@ class UserProfile extends Model
         if ($this->avatar_url) {
             return asset('storage/' . $this->avatar_url);
         }
-        return asset('assets/img/avatars/1.png');
+        if($this->is_child_profile) {
+            return asset('assets-site/images/avatars/3.png');
+        }
+        return asset('assets-site/images/avatars/1.jpg');
     }
 }

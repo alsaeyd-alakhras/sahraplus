@@ -32,6 +32,7 @@ class Series extends Model
         'status',
         'series_status',
         'is_featured',
+        'is_kids',
         'view_count',
         'tmdb_id',
         'created_by'
@@ -44,6 +45,7 @@ class Series extends Model
         'episodes_count' => 'integer',
         'imdb_rating'    => 'decimal:1',
         'is_featured'    => 'boolean',
+        'is_kids'        => 'boolean',
         'view_count'     => 'integer',
         'logo_url'     => 'integer',
     ];
@@ -169,6 +171,21 @@ class Series extends Model
         $this->save();
     }
 
+    /**
+     * سكوب لمسلسلات الأطفال فقط
+     */
+    public function scopeKids($query)
+    {
+        return $query->where('is_kids', true);
+    }
+
+    /**
+     * سكوب لمسلسلات الكبار (غير الأطفال)
+     */
+    public function scopeAdults($query)
+    {
+        return $query->where('is_kids', false);
+    }
 
     public function watchlists()
     {

@@ -7,20 +7,33 @@ use App\Models\Short;
 use Illuminate\Http\Request;
 use App\Http\Resources\ShortResource;
 use App\Models\ViewingHistory;
+use App\Services\ProfileContextService;
 use Illuminate\Support\Facades\Auth;
 
 class ShortController extends Controller
 {
-    public function index()
+    protected ProfileContextService $profileContextService;
+
+    public function __construct(ProfileContextService $profileContextService)
     {
-        $perPage = (int) request('per_page', 10);
-        $shorts = Short::active()
-            ->orderByDesc('id')
-            ->paginate($perPage);
+        $this->profileContextService = $profileContextService;
+    }
+
+    public function index(Request $request)
+    {
+        $perPage = (int) $request->input('per_page', 10);
+        
+        $query = Short::active();
+
+        // تطبيق فلتر محتوى الأطفال إذا لزم الأمر
+        $query = $this->profileContextService->applyKidsFilterIfNeeded($query, $request);
+
+        $shorts = $query->orderByDesc('id')->paginate($perPage);
+        
         return ShortResource::collection($shorts);
     }
 
-    public function show($id)
+    public function show(Request $request, $id)
     {
         $short = Short::find($id);
 
@@ -29,6 +42,15 @@ class ShortController extends Controller
                 'message' => 'short not found'
             ], 404);
         }
+
+        // التحقق من أن الشورت مناسب للبروفايل (لو كان طفل)
+        $profile = $this->profileContextService->resolveProfile($request);
+        if ($this->profileContextService->shouldApplyKidsFilter($profile)) {
+            if (!$short->is_kids) {
+                return response()->json(['message' => 'هذا المحتوى غير متاح لملفات الأطفال'], 403);
+            }
+        }
+
         return new ShortResource($short);
     }
 

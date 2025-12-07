@@ -54,12 +54,18 @@
                             :selected="$series->series_status ?? 'returning'" :options="$seriesStatusOptions" />
                     </div>
                     <div class="col-md-4">
-                        <label class="form-label d-block">{{ __('admin.is_featured') }}</label>
-                        <div class="form-check form-switch">
+                        <label class="form-label d-block">خيارات العرض</label>
+                        <div class="form-check form-switch mb-2">
                             <input type="hidden" name="is_featured" value="0">
                             <input class="form-check-input" type="checkbox" id="is_featured" name="is_featured"
                                 value="1" @checked($series->is_featured)>
                             <label class="form-check-label" for="is_featured">{{ __('admin.is_featured') }}</label>
+                        </div>
+                        <div class="form-check form-switch">
+                            <input type="hidden" name="is_kids" value="0">
+                            <input class="form-check-input" type="checkbox" id="is_kids" name="is_kids"
+                                value="1" @checked(old('is_kids', $series->is_kids))>
+                            <label class="form-check-label" for="is_kids">محتوى للأطفال</label>
                         </div>
                     </div>
                 </div>

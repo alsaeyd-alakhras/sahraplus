@@ -8,6 +8,7 @@ use App\Models\User;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
+use Database\Seeders\SystemSettingsSeeder;
 
 class DatabaseSeeder extends Seeder
 {
@@ -29,7 +30,9 @@ class DatabaseSeeder extends Seeder
             'super_admin'  => 1,
             'is_active' => 1,
         ]);
-
+        
+        // System settings (متاحة في جميع البيئات)
+        $this->call(SystemSettingsSeeder::class);
 
         if (app()->environment('local')) {
             $this->call(UserSeeder::class);

@@ -4,15 +4,34 @@
         <!-- الشعار والوصف -->
         <div>
             @php
-            $logo = $settings['logo_url'] ?? null;
+                $locale = app()->getLocale();
+                $siteName = $locale === 'ar'
+                    ? ($settings['site_name_ar'] ?? 'سهرة بلس')
+                    : ($settings['site_name_en'] ?? 'Sahra Plus');
+
+                $logoPath = $settings['logo_url'] ?? null;
+                $logoUrl = null;
+
+                if ($logoPath) {
+                    if (\Illuminate\Support\Str::startsWith($logoPath, ['http://', 'https://'])) {
+                        $logoUrl = $logoPath;
+                    } else {
+                        $logoUrl = asset('storage/' . ltrim($logoPath, '/'));
+                    }
+                }
+
+                $defaultDescription = 'منصة ترفيهية لمشاهدة أحدث الأفلام والمسلسلات بجودة عالية وبدون إعلانات مزعجة. استمتع بمحتوى متجدد يوميًا أينما كنت.';
+                $description = $locale === 'ar'
+                    ? ($settings['site_description_ar'] ?? $defaultDescription)
+                    : ($settings['site_description_en'] ?? config('settings.app_description'));
             @endphp
-            @if($logo)
-                <img src="{{asset('storage/'.$logo)}}" alt="Logo" class="w-32" />
+            @if($logoUrl)
+                <img src="{{ $logoUrl }}" alt="{{ $siteName }}" class="w-32" />
             @else
-                <h1 class="mb-3 text-2xl font-extrabold text-red-600">سهرة بلس</h1>
+                <h1 class="mb-3 text-2xl font-extrabold text-red-600">{{ $siteName }}</h1>
             @endif
             <p class="text-sm leading-relaxed text-gray-400">
-                {{ $settings['description'] ?? 'منصة ترفيهية لمشاهدة أحدث الأفلام والمسلسلات بجودة عالية وبدون إعلانات مزعجة. استمتع بمحتوى متجدد يوميًا أينما كنت.' }}
+                {{ $description }}
             </p>
         </div>
 
@@ -32,7 +51,11 @@
         <div class="md:text-left">
             <h3 class="mb-3 text-lg font-semibold">حمل التطبيق</h3>
             <div class="flex flex-col space-y-3">
-                <a href="#"
+                @php
+                    $androidAppUrl = $settings['android_app_url'] ?? null;
+                    $iosAppUrl     = $settings['ios_app_url'] ?? null;
+                @endphp
+                <a href="{{ $androidAppUrl ?: '#' }}"
                     class="inline-flex items-center px-4 py-2 space-x-2 text-sm text-white bg-gray-800 rounded-md transition hover:bg-gray-700 rtl:space-x-reverse">
                     <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
                         <path
@@ -40,7 +63,7 @@
                     </svg>
                     <span>تحميل للأندرويد</span>
                 </a>
-                <a href="#"
+                <a href="{{ $iosAppUrl ?: '#' }}"
                     class="inline-flex items-center px-4 py-2 space-x-2 text-sm text-white bg-gray-800 rounded-md transition hover:bg-gray-700 rtl:space-x-reverse">
                     <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
                         <path
@@ -54,6 +77,12 @@
 
     <!-- الحقوق -->
     <div class="pt-4 mt-10 text-xs text-center text-gray-500 border-t border-gray-800">
-        &copy; 2025 سهرة بلس. جميع الحقوق محفوظة.
+        @php
+            $locale = app()->getLocale();
+            $siteName = $locale === 'ar'
+                ? ($settings['site_name_ar'] ?? 'سهرة بلس')
+                : ($settings['site_name_en'] ?? 'Sahra Plus');
+        @endphp
+        &copy; {{ date('Y') }} {{ $siteName }}. جميع الحقوق محفوظة.
     </div>
 </footer>

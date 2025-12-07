@@ -79,10 +79,15 @@
 
                     <div class="col-md-6">
                         <label class="form-label d-block">{{__('admin.Status')}}</label>
-                        <div class="form-check form-switch">
+                        <div class="form-check form-switch mb-2">
                             <input type="hidden" name="is_active" value="0">
                             <input class="form-check-input" type="checkbox" name="is_active" value="1" @checked(old('is_active', $movie_category->is_active))>
                             <label class="form-check-label">{{__('admin.Active')}}</label>
+                        </div>
+                        <div class="form-check form-switch">
+                            <input type="hidden" name="is_kids" value="0">
+                            <input class="form-check-input" type="checkbox" name="is_kids" value="1" @checked(old('is_kids', $movie_category->is_kids))>
+                            <label class="form-check-label">محتوى للأطفال</label>
                         </div>
                     </div>
                 </div>

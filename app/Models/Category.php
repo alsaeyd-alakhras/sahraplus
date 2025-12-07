@@ -26,6 +26,7 @@ class Category extends Model
         'color',
         'sort_order',
         'is_active',
+        'is_kids',
     ];
 
     protected $appends = ['is_favorite'];
@@ -35,6 +36,7 @@ class Category extends Model
      */
     protected $casts = [
         'is_active'  => 'boolean',
+        'is_kids'    => 'boolean',
         'sort_order' => 'integer',
     ];
 
@@ -66,6 +68,22 @@ class Category extends Model
     public function scopeActive($query)
     {
         return $query->where('is_active', true);
+    }
+
+    /**
+     * سكوب لتصنيفات الأطفال فقط
+     */
+    public function scopeKids($query)
+    {
+        return $query->where('is_kids', true);
+    }
+
+    /**
+     * سكوب لتصنيفات الكبار (غير الأطفال)
+     */
+    public function scopeAdults($query)
+    {
+        return $query->where('is_kids', false);
     }
 
     /**

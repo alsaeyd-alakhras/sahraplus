@@ -20,27 +20,37 @@ class ProfileController extends Controller
 
     public function verifyPin(Request $request, UserProfile $profile)
     {
+        // التحقق من أن البروفايل يخص المستخدم الحالي
+        if ($profile->user_id !== Auth::id()) {
+            return response()->json(['message' => 'غير مصرح'], 403);
+        }
+
         $request->validate([
-            'pin_code' => 'required|string|max:6',
+            'pin_code' => 'nullable|string|max:6',
+            'password' => 'nullable|string',
         ]);
 
         if ($profile->is_child_profile) {
             // تحقق من PIN
-            if ($profile->pin_code === $request->pin_code) {
-                return response()->json(['valid' => true]);
+            if (!$request->has('pin_code')) {
+                return response()->json(['message' => 'يجب إدخال رمز PIN'], 400);
             }
-            return response()->json(['valid' => false], 403);
+            
+            if ($profile->pin_code === $request->pin_code) {
+                return response()->json(['valid' => true, 'message' => 'تم التحقق بنجاح']);
+            }
+            return response()->json(['valid' => false, 'message' => 'رمز PIN غير صحيح'], 403);
         }
 
         // للبروفايلات العادية (لو طلبوا التحقق بكلمة سر الـ User)
         if ($request->has('password')) {
-            if (Hash::check($request->password, Auth::guard('web')->user()->password)) {
-                return response()->json(['valid' => true]);
+            if (Hash::check($request->password, Auth::user()->password)) {
+                return response()->json(['valid' => true, 'message' => 'تم التحقق بنجاح']);
             }
-            return response()->json(['valid' => false], 403);
+            return response()->json(['valid' => false, 'message' => 'كلمة المرور غير صحيحة'], 403);
         }
 
-        return response()->json(['valid' => false], 400);
+        return response()->json(['valid' => false, 'message' => 'يجب إدخال كلمة المرور أو رمز PIN'], 400);
     }
 
     public function resetPin(Request $request, UserProfile $profile)
@@ -74,7 +84,7 @@ class ProfileController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
-            'avatar_url' => 'required|string',
+            'avatar_url' => 'nullable|string',
             'language' => 'nullable|string|max:2',
             // 'is_child_profile' => 'nullable|boolean',
             'pin_code' => 'nullable|string|max:6',
@@ -93,7 +103,7 @@ class ProfileController extends Controller
         $profile = $user->profiles()->create([
             'user_id' => $user->id,
             'name' => $request->name,
-            'avatar_url' => $request->avatar_url,
+            'avatar_url' => $request->avatar_url ?? null,
             'is_default' => false,
             'is_child_profile' => $request->is_child_profile,
             'pin_code' => $request->pin_code ?? null,
@@ -107,11 +117,11 @@ class ProfileController extends Controller
         ]);
     }
 
-    public function update(UserProfile $profile, Request $request)
+    public function update(Request $request , UserProfile $profile)
     {
         $request->validate([
             'name' => 'required|string|max:255',
-            'avatar_url' => 'required|string',
+            'avatar_url' => 'nullable|string',
             'language' => 'nullable|string|max:2',
             // 'is_child_profile' => 'nullable|boolean',
             'pin_code' => 'nullable|string|max:6',
@@ -135,7 +145,7 @@ class ProfileController extends Controller
                 return response()->json(['message' => 'التحقق مطلوب لتعديل ملف الطفل'], 403);
             }
         }
-        $profile = $profile->update([
+        $profile->update([
             'name' => $request->name,
             'avatar_url' => $request->avatar_url,
             'is_default' => false,
@@ -152,7 +162,7 @@ class ProfileController extends Controller
 
     public function destroy(UserProfile $profile)
     {
-        if ($profile->user_id !== Auth::guard('web')->user()->id) {
+        if ($profile->user_id !== Auth::user()->id) {
             abort(403);
         }
 

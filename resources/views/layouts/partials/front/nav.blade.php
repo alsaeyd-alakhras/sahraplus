@@ -6,13 +6,27 @@ class="fixed top-0 right-0 left-0 z-[9999] navbar-initial navbar-inset-shadow tr
         <!-- Logo -->
         <div class="flex items-center space-x-4 rtl:space-x-reverse">
             @php
-            $logo = $settings['logo_url'] ?? null;
+                $locale = app()->getLocale();
+                $siteName = $locale === 'ar'
+                    ? ($settings['site_name_ar'] ?? 'سهرة بلس')
+                    : ($settings['site_name_en'] ?? 'Sahra Plus');
+
+                $logoPath = $settings['logo_url'] ?? null;
+                $logoUrl = null;
+
+                if ($logoPath) {
+                    if (\Illuminate\Support\Str::startsWith($logoPath, ['http://', 'https://'])) {
+                        $logoUrl = $logoPath;
+                    } else {
+                        $logoUrl = asset('storage/' . ltrim($logoPath, '/'));
+                    }
+                }
             @endphp
-            @if($logo)
-                <img src="{{asset('storage/'.$logo)}}" alt="Logo" class="w-32" />
+            @if($logoUrl)
+                <img src="{{ $logoUrl }}" alt="{{ $siteName }}" class="w-32" />
             @else
                 <h1 class="text-3xl font-black text-fire-red font-arabic">
-                    سهرة بلس
+                    {{ $siteName }}
                 </h1>
             @endif
         </div>

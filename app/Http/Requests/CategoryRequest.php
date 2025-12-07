@@ -32,6 +32,7 @@ class CategoryRequest extends FormRequest
             'color'     => ['nullable','regex:/^#?[0-9A-Fa-f]{6}$/'],
             'sort_order'=> ['nullable','integer','min:0'],
             'is_active' => ['sometimes','boolean'],
+            'is_kids' => ['sometimes','boolean'],
         ];
     }
 

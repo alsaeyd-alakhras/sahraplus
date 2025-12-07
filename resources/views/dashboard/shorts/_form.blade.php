@@ -116,11 +116,18 @@
                         </select>
                     </div>
                     <div class="mb-4 col-md-4">
-                        <label class="form-label">{{__('admin.is_featured')}}</label>
-                        <div class="form-check form-switch">
+                        <label class="form-label">خيارات العرض</label>
+                        <div class="form-check form-switch mb-2">
                             <input type="hidden" name="is_featured" value="0">
                             <input class="form-check-input" type="checkbox" name="is_featured" value="1"
                                 @checked(old('is_featured', $short->is_featured))>
+                            <label class="form-check-label">{{__('admin.is_featured')}}</label>
+                        </div>
+                        <div class="form-check form-switch">
+                            <input type="hidden" name="is_kids" value="0">
+                            <input class="form-check-input" type="checkbox" name="is_kids" value="1"
+                                @checked(old('is_kids', $short->is_kids))>
+                            <label class="form-check-label">محتوى للأطفال</label>
                         </div>
                     </div>
                 </div>

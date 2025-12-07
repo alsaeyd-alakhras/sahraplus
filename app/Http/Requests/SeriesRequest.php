@@ -46,6 +46,7 @@ class SeriesRequest extends FormRequest
         'status'   => ['required', Rule::in(['draft','published','archived'])],
         'series_status' => ['nullable', Rule::in(['returning','ended','canceled'])],
         'is_featured' => ['sometimes','boolean'],
+        'is_kids' => ['sometimes','boolean'],
         'view_count'  => ['sometimes','integer','min:0'],
         'tmdb_id'     => ['nullable','string','max:20'],
         'created_by'  => ['nullable','exists:admins,id'],

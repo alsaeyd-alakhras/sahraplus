@@ -21,6 +21,7 @@ use App\Http\Controllers\Dashboard\SeriesController;
 use App\Http\Controllers\Dashboard\SystemSettingsController;
 use App\Http\Controllers\Dashboard\UserRatingController;
 use App\Http\Controllers\Dashboard\DownloadController;
+use App\Http\Controllers\Dashboard\HomeBannerController;
 use Mcamara\LaravelLocalization\Facades\LaravelLocalization;
 
 Route::group([
@@ -96,6 +97,7 @@ Route::group([
         Route::get('short-filters/{column}', [ ShortController::class, 'getFilterOptions'])->name('short.filters');
         Route::get('movie-categories-filters/{column}', [CategoryController::class, 'getFilterOptions'])->name('movie-categories.filters');
         Route::get('series-filters/{column}', [ SeriesController::class, 'getFilterOptions'])->name('series.filters');
+        Route::get('home-banners-filters/{column}', [ HomeBannerController::class, 'getFilterOptions'])->name('home-banners.filters');
 
         Route::resource('seasons', SeasonController::class)->except(['index']);
         Route::resource('episodes', EpisodeController::class)->except(['index']);
@@ -115,6 +117,7 @@ Route::group([
             // 'shorts'    => ShortController::class,
             'movie-categories'    => CategoryController::class,
             'series'    => SeriesController::class,
+            'home-banners' => HomeBannerController::class,
         ]);
     });
 });

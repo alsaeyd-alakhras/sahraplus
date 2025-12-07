@@ -38,5 +38,27 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
-        //
+        // معالجة أخطاء التحقق (Validation) في API routes
+        $exceptions->render(function (\Illuminate\Validation\ValidationException $e, \Illuminate\Http\Request $request) {
+            if ($request->is('api/*')) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => __('validation.validation_failed'),
+                    'errors' => $e->errors(),
+                ], 422);
+            }
+        });
+
+        // معالجة الأخطاء العامة في API routes (يتم تطبيقه فقط إذا لم يتم معالجة الاستثناء مسبقاً)
+        $exceptions->render(function (\Throwable $e, \Illuminate\Http\Request $request) {
+            if ($request->is('api/*') && !($e instanceof \Illuminate\Validation\ValidationException)) {
+                $status = method_exists($e, 'getStatusCode') ? $e->getStatusCode() : 500;
+                $message = $e->getMessage() ?: __('controller.Something_went_wrong');
+                
+                return response()->json([
+                    'status' => 'error',
+                    'message' => $message,
+                ], $status);
+            }
+        });
     })->create();

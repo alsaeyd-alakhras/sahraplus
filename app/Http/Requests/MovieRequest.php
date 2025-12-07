@@ -48,6 +48,7 @@ class MovieRequest extends FormRequest
             'country'          => ['nullable','string','size:2'],
             'status'           => ['required', Rule::in(['draft','published','archived'])],
             'is_featured'      => ['sometimes','boolean'],
+            'is_kids'          => ['sometimes','boolean'],
             // الأفضل ما يجي من الفورم بل من الكود
             'view_count'       => ['nullable','integer','min:0'],
             'tmdb_id'          => ['nullable','string','max:20'],

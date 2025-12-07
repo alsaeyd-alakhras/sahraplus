@@ -98,7 +98,7 @@ class CreateNewUser implements CreatesNewUsers
             'avatar_url' => null,
             'is_default' => false,
             'is_child_profile' => true,
-            'pin_code' => null,
+            'pin_code' => 1234,
             'language' => 'ar',
             'is_active' => true
         ]);

@@ -91,12 +91,18 @@
 
                     {{-- مميز --}}
                     <div class="mb-4 col-md-6">
-                        <label class="form-label d-block">مميز</label>
-                        <div class="form-check form-switch">
+                        <label class="form-label d-block">خيارات العرض</label>
+                        <div class="form-check form-switch mb-2">
                             <input type="hidden" name="is_featured" value="0">
                             <input class="form-check-input" type="checkbox" id="is_featured" name="is_featured"
                                 value="1" @checked(old('is_featured', $movie->is_featured))>
                             <label class="form-check-label" for="is_featured">عرض كفيلم مميز</label>
+                        </div>
+                        <div class="form-check form-switch">
+                            <input type="hidden" name="is_kids" value="0">
+                            <input class="form-check-input" type="checkbox" id="is_kids" name="is_kids"
+                                value="1" @checked(old('is_kids', $movie->is_kids))>
+                            <label class="form-check-label" for="is_kids">محتوى للأطفال</label>
                         </div>
 
                     </div>

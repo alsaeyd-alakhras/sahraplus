@@ -1,4 +1,11 @@
-@include('layouts.partials.front.head', ['title' => "سهرة بلس - تسجيل الدخول" ?? Config::get('app.name'), 'lang' =>  app()->getLocale()])
+@php
+    $locale = app()->getLocale();
+    $siteName = $locale === 'ar'
+        ? ($settings['site_name_ar'] ?? 'سهرة بلس')
+        : ($settings['site_name_en'] ?? config('settings.app_name'));
+    $pageTitle = $siteName . ' - ' . __('admin.login');
+@endphp
+@include('layouts.partials.front.head', ['title' => $pageTitle, 'lang' =>  $locale])
 <style>
     body {
         background: url("{{ asset('assets-site/images/login_banner.jpg') }}");
@@ -119,12 +126,21 @@
                 <div class="flex flex-col justify-center items-center">
                     <div class="flex justify-center items-center mb-4">
                         @php
-                        $logo = $settings['logo_url'] ?? null;
+                            $logoPath = $settings['logo_url'] ?? null;
+                            $logoUrl = null;
+
+                            if ($logoPath) {
+                                if (\Illuminate\Support\Str::startsWith($logoPath, ['http://', 'https://'])) {
+                                    $logoUrl = $logoPath;
+                                } else {
+                                    $logoUrl = asset('storage/' . ltrim($logoPath, '/'));
+                                }
+                            }
                         @endphp
-                        @if($logo)
-                            <img src="{{asset('storage/'.$logo)}}" alt="Logo" class="w-32" />
+                        @if($logoUrl)
+                            <img src="{{ $logoUrl }}" alt="{{ $siteName }}" class="w-32" />
                         @else
-                            <h1 class="text-5xl font-black tracking-wider text-white">سهرة بلس</h1>
+                            <h1 class="text-5xl font-black tracking-wider text-white">{{ $siteName }}</h1>
                         @endif
                     </div>
                     <div class="mx-auto mt-3 w-24 h-1 bg-gradient-to-r from-red-600 to-red-400 rounded-full"></div>

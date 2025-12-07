@@ -27,6 +27,7 @@ class Movie extends Model
         'country',
         'status',
         'is_featured',
+        'is_kids',
         'view_count',
         'tmdb_id',
         'created_by',
@@ -39,6 +40,7 @@ class Movie extends Model
         'duration_minutes' => 'integer',
         'imdb_rating' => 'decimal:1',
         'is_featured' => 'boolean',
+        'is_kids' => 'boolean',
         'view_count' => 'integer',
         'intro_skip_time' => 'integer'
     ];
@@ -209,5 +211,21 @@ class Movie extends Model
         return $query->whereHas('categories', function ($q) use ($categoryId) {
             $q->where('categories.id', $categoryId);
         });
+    }
+
+    /**
+     * سكوب لأفلام الأطفال فقط
+     */
+    public function scopeKids($query)
+    {
+        return $query->where('is_kids', true);
+    }
+
+    /**
+     * سكوب لأفلام الكبار (غير الأطفال)
+     */
+    public function scopeAdults($query)
+    {
+        return $query->where('is_kids', false);
     }
 }
