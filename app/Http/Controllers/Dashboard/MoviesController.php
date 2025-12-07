@@ -176,6 +176,12 @@ class MoviesController extends Controller
         ];
         return view('dashboard.movies.partials._cast_row', compact('i', 'allPeople', 'roleTypes'));
     }
+    public function subRowPartial(Request $request)
+    {
+        $i = $request->i;
+        return view('dashboard.subscription_plans.partials._cast_row', compact('i'));
+    }
+
     public function videoRowPartial(Request $request)
     {
         $i   = (int) $request->get('i', 0);

@@ -98,7 +98,6 @@
                                 value="1" @checked(old('is_featured', $movie->is_featured))>
                             <label class="form-check-label" for="is_featured">عرض كفيلم مميز</label>
                         </div>
-
                     </div>
 
 
@@ -147,7 +146,8 @@
                             </button>
                         </div>
                         <div class="mt-2">
-                            <img src="{{ !empty($movie->poster_full_url) ? $movie->poster_full_url  : asset('imgs/default.png') }}" alt="poster" id="poster_img"
+                            <img src="{{ !empty($movie->poster_full_url) ? $movie->poster_full_url : asset('imgs/default.png') }}"
+                                alt="poster" id="poster_img"
                                 class="{{ !empty($movie->poster_url) ? '' : 'd-none' }}" style="max-height:100px">
                         </div>
                     </div>
@@ -371,7 +371,7 @@
                                     'subtitles',
                                     isset($movie)
                                         ? $movie->subtitles->map
-                                            ->only(['language','id', 'label', 'file_url', 'is_default'])
+                                            ->only(['language', 'id', 'label', 'file_url', 'is_default'])
                                             ->toArray()
                                         : [],
                                 );

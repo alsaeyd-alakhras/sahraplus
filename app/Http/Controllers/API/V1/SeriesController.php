@@ -23,9 +23,10 @@ class SeriesController extends Controller
     }
 
     // GET /api/v1/series/{id}
-    public function show(Series $series)
+    public function show($id)
     {
-        $series->load(['categories','seasons']);
+        $series = Series::findOrFail($id);
+        $series->load(['categories', 'seasons']);
         return new SeriesResource($series);
     }
 }

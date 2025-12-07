@@ -47,7 +47,7 @@ class FrontController extends Controller
                     'backdrop' => $m->backdrop_full_url ?? $m->poster_full_url,
                     'logo' => $m->poster_full_url ?? $m->backdrop_full_url,
                     'tags' => $m->categories?->pluck('name')->toArray() ?? [],
-                    'url' => route('site.movie.show', $m->slug),
+                   // 'url' => route('site.movie.show', $m->slug),
                 ];
             };
             $mapSeries = function (Series $s) {
@@ -104,7 +104,7 @@ class FrontController extends Controller
                                 'poster' => $m->poster_full_url ?? $m->backdrop_full_url,
                                 'backdrop' => $m->backdrop_full_url ?? $m->poster_full_url,
                                 'tags' => $m->categories?->pluck('name')->toArray() ?? [],
-                                'url' => route('site.movie.show', $m->slug),
+                                //'url' => route('site.movie.show', $m->slug),
                             ];
                         }),
                     ];
@@ -150,7 +150,7 @@ class FrontController extends Controller
                 'poster' => $mv->poster_full_url ?? $mv->backdrop_full_url,
                 'backdrop' => $mv->backdrop_full_url ?? $mv->poster_full_url,
                 'view_count' => $mv->view_count,
-                'url' => route('site.movie.show', $mv->slug),
+               // 'url' => route('site.movie.show', $mv->slug),
             ];
             $mapSeries = fn(Series $sr) => [
                 'id' => $sr->id,
@@ -204,7 +204,7 @@ class FrontController extends Controller
                         'title' => $content->title,
                         'poster' => $content->poster_full_url ?? $content->backdrop_full_url,
                         'backdrop' => $content->backdrop_full_url ?? $content->poster_full_url,
-                        'url' => $isMovie ? route('site.movie.show', $content->slug) : route('site.series.show', $content->slug),
+                      //  'url' => $isMovie ? route('site.movie.show', $content->slug) : route('site.series.show', $content->slug),
                         'time' => gmdate('H:i:s', max(0, (int) $wp->total_seconds)),
                         'progress_pct' => (float) $wp->progress_percentage,
                     ];
@@ -221,7 +221,7 @@ class FrontController extends Controller
                         'title' => $content->title,
                         'poster' => $content->poster_full_url ?? $content->backdrop_full_url,
                         'backdrop' => $content->backdrop_full_url ?? $content->poster_full_url,
-                        'url' => $isMovie ? route('site.movie.show', $content->slug) : route('site.series.show', $content->slug),
+                       // 'url' => $isMovie ? route('site.movie.show', $content->slug) : route('site.series.show', $content->slug),
                     ];
                 })->filter()->values();
 
@@ -236,7 +236,7 @@ class FrontController extends Controller
                         'title' => $content->title,
                         'poster' => $content->poster_full_url ?? $content->backdrop_full_url,
                         'backdrop' => $content->backdrop_full_url ?? $content->poster_full_url,
-                        'url' => $isMovie ? route('site.movie.show', $content->slug) : route('site.series.show', $content->slug),
+                      //  'url' => $isMovie ? route('site.movie.show', $content->slug) : route('site.series.show', $content->slug),
                     ];
                 })->filter()->values();
             }
@@ -320,14 +320,14 @@ class FrontController extends Controller
         $categories = Category::active()->orderBy('sort_order')->get();
         return view('site.categories.index', compact('categories'));
     }
-    
+
     public function categoryShow(Category $category)
     {
         $category->load([
             'movies' => fn($q) => $q->published()->with('categories')->latest()->limit(50),
             'series' => fn($q) => $q->with('categories')->latest()->limit(50)
         ]);
-        
+
         return view('site.categories.show', compact('category'));
     }
 

@@ -17,9 +17,40 @@ class EpisodeController extends Controller
     }
 
     // GET /api/v1/episodes/{id}
-    public function show(Episode $episode)
+    public function show($id)
     {
-        $episode->load(['videoFiles','subtitles','comments.user']);
-        return new EpisodeResource($episode);
+        $user = auth('sanctum')->user();
+
+        // جلب الحلقة + الموسم + المسلسل
+        $episode = Episode::with(['videoFiles', 'season.series'])
+            ->findOrFail($id);
+
+        $series = $episode->season->series;
+
+        // 1) فحص الاشتراك
+        $subscription = $user->activeSubscription;
+        $hasAccess = false;
+
+        if ($subscription) {
+            $hasAccess = $subscription->plan
+                ->contentAccess()
+                ->where('content_type', 'series')
+                ->where('content_id', $series->id)
+                ->where('access_type', 'allow')
+                ->exists();
+        }
+
+        // 2) لو ما عنده وصول → نحذف روابط الفيديو فقط
+        if (!$hasAccess) {
+            foreach ($episode->videoFiles as $video) {
+                unset($video->file_url);
+            }
+        }
+
+        return response()->json([
+            "success" => true,
+            "status_subscription" => $hasAccess,
+            "episode" => new EpisodeResource($episode),
+        ]);
     }
 }

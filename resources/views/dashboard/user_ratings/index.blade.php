@@ -59,7 +59,7 @@
     </x-slot:extra_nav>
     @php
         $fields = [
-            'user_name' => __('admin.user'),
+            'user_id' => __('admin.user'),
             'rating' => __('admin.rating'),
             'status_trans' => __('admin.status'),
             'stars' => __('admin.stars'),
@@ -69,7 +69,8 @@
     @endphp
     <div class="shadow-lg enhanced-card">
         <div class="table-header-title">
-            <i class="icon ph ph-userRatings me-2"></i>
+            <i class="icon ph ph-star me-2"></i>
+            {{ __('admin.userRatings') }}
         </div>
         <div class="enhanced-card-body">
             <div class="col-12" style="padding: 0;">
@@ -201,7 +202,7 @@
 
             const fields = [
                 '#',
-                'user_name',
+                'user_id',
                 'rating',
                 'status_trans',
                 'stars',
@@ -215,8 +216,8 @@
                     class: 'text-center'
                 }, // عمود الترقيم التلقائي
                 {
-                    data: 'user_name',
-                    name: 'user_name',
+                    data: 'user_id',
+                    name: 'user_id',
                     orderable: false,
                     render: function(data, type, row) {
                         return data   ?? '';

@@ -121,6 +121,20 @@ $(function() {
         });
     });
 
+    $('#add-cast-sub-row').on('click', function () {
+        castIndex++;
+        $.get(subRowPartial, {
+            i: castIndex
+        }, function (html) {
+            let newRow = $(html);
+            $('#cast-rows').append(newRow);
+            renumberOrdering();
+            refreshSelected();
+            initPersonSelect(newRow);
+        });
+
+    });
+
     // حذف كاست من قاعدة البيانات أو من الواجهة
     $(document).on('click', '.remove-cast-row', function () {
         let row = $(this).closest('.cast-row');
@@ -129,6 +143,37 @@ $(function() {
         if (castId) {
             $.ajax({
                 url: '/dashboard/movies-casts/' + castId,
+                type: 'DELETE',
+                data: {
+                    _token: $('meta[name="csrf-token"]').attr('content')
+                },
+                success: function (res) {
+                    if (res.status) {
+                        row.remove();
+                        renumberOrdering();
+                        refreshSelected();
+                    } else {
+                        alert(res.message);
+                    }
+                },
+                error: function () {
+                    alert('حدث خطأ أثناء الحذف!');
+                }
+            });
+        } else {
+            row.remove();
+            renumberOrdering();
+            refreshSelected();
+        }
+    });
+
+    $(document).on('click', '.remove-cast-sub-row', function () {
+        let row = $(this).closest('.cast-row');
+        let castId = row.find('.cast-id').val();
+        alert(castId)
+        if (castId) {
+            $.ajax({
+                url: '/dashboard/sub-plans-delete/' + castId,
                 type: 'DELETE',
                 data: {
                     _token: $('meta[name="csrf-token"]').attr('content')

@@ -63,6 +63,8 @@
     <script src="{{ asset('assets/js/config.js') }}"></script>
 
     <link href="{{ asset('css/plugins/toastr.min.css') }}" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@1.4.2/src/phosphor.css">
+
     <style>
         .avatar img {
             object-fit: cover;

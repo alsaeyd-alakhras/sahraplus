@@ -72,7 +72,8 @@
     @endphp
     <div class="shadow-lg enhanced-card">
         <div class="table-header-title">
-            <i class="icon ph ph-userRatings me-2"></i>
+            <i class="icon ph ph-download me-2"></i>
+            {{ __('admin.downloads') }}
         </div>
         <div class="enhanced-card-body">
             <div class="col-12" style="padding: 0;">
