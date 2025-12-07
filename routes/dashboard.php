@@ -104,6 +104,7 @@ Route::group([
         Route::get('live-tv-channels-filters/{column}', [LiveTvChannelController::class, 'getFilterOptions'])->name('live-tv-channels.filters');
         Route::get('live-tv-channels/export', [LiveTvChannelController::class, 'export'])->name('live-tv-channels.export');
         Route::post('live-tv-channels/test-stream', [LiveTvChannelController::class, 'testStream'])->name('live-tv-channels.test-stream');
+        Route::post('live-tv-channels/epg-channel-details', [LiveTvChannelController::class, 'getEpgChannelDetails'])->name('live-tv-channels.epg-channel-details');
         Route::get('channel-programs-filters/{column}', [ChannelProgramController::class, 'getFilterOptions'])->name('channel-programs.filters');
         Route::get('channel-programs/export', [ChannelProgramController::class, 'export'])->name('channel-programs.export');
 

@@ -60,7 +60,12 @@ class LiveTvChannelController extends Controller
         $channel = new LiveTvChannel();
         $categories = LiveTvCategory::active()->ordered()->get();
         $countries = Country::where('is_active', true)->orderBy('name_ar')->get();
-        return view('dashboard.live-tv-channels.create', compact('channel', 'categories', 'countries'));
+        
+        // Get available EPG channels
+        $epgService = app(\App\Services\EPGService::class);
+        $epgChannels = $epgService->getAvailableChannels();
+        
+        return view('dashboard.live-tv-channels.create', compact('channel', 'categories', 'countries', 'epgChannels'));
     }
 
     /**
@@ -102,8 +107,13 @@ class LiveTvChannelController extends Controller
         $channel = $liveTvChannel;
         $categories = LiveTvCategory::active()->ordered()->get();
         $countries = Country::where('is_active', true)->orderBy('name_ar')->get();
+        
+        // Get available EPG channels
+        $epgService = app(\App\Services\EPGService::class);
+        $epgChannels = $epgService->getAvailableChannels();
+        
         $btn_label = __('admin.Edit');
-        return view('dashboard.live-tv-channels.edit', compact('channel', 'categories', 'countries', 'btn_label'));
+        return view('dashboard.live-tv-channels.edit', compact('channel', 'categories', 'countries', 'epgChannels', 'btn_label'));
     }
 
     /**
@@ -203,5 +213,37 @@ class LiveTvChannelController extends Controller
                 'message' => $e->getMessage()
             ], 422);
         }
+    }
+
+    /**
+     * Get EPG channel details by ID
+     */
+    public function getEpgChannelDetails(Request $request)
+    {
+        $this->authorize('create', LiveTvChannel::class);
+        
+        $channelId = $request->input('channel_id');
+        
+        if (!$channelId) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Channel ID is required'
+            ], 400);
+        }
+
+        $epgService = app(\App\Services\EPGService::class);
+        $channelDetails = $epgService->getChannelDetails($channelId);
+
+        if (!$channelDetails) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Channel not found'
+            ], 404);
+        }
+
+        return response()->json([
+            'success' => true,
+            'data' => $channelDetails
+        ]);
     }
 }

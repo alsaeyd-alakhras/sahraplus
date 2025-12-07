@@ -324,4 +324,90 @@ class EPGService
 
         return $deleted;
     }
+
+    /**
+     * Get list of all available channels from EPG XML
+     *
+     * @return array List of channels with id and display-name
+     */
+    public function getAvailableChannels(): array
+    {
+        try {
+            $epgUrl = config('services.epg.url');
+            
+            // Return empty array if no EPG URL configured
+            if (empty($epgUrl)) {
+                Log::warning('EPGService: No EPG URL configured');
+                return [];
+            }
+            
+            // Try to get from cache first (cache for 24 hours)
+            $cacheKey = 'epg_available_channels';
+            
+            return cache()->remember($cacheKey, 86400, function () use ($epgUrl) {
+                $xmlContent = $this->fetchEPGFromUrl($epgUrl, 'xmltv');
+                $xml = simplexml_load_string($xmlContent);
+
+                if ($xml === false) {
+                    throw new \Exception('Invalid XML format');
+                }
+
+                $channels = [];
+
+                foreach ($xml->channel as $channel) {
+                    $channelId = (string) $channel['id'];
+                    
+                    // Get display names
+                    $displayNames = [];
+                    foreach ($channel->{'display-name'} as $name) {
+                        $displayNames[] = (string) $name;
+                    }
+                    
+                    // Get icon URL if available
+                    $iconUrl = null;
+                    if (isset($channel->icon['src'])) {
+                        $iconUrl = (string) $channel->icon['src'];
+                    }
+
+                    $channels[] = [
+                        'id' => $channelId,
+                        'name' => $displayNames[0] ?? $channelId,
+                        'display_names' => $displayNames,
+                        'icon' => $iconUrl,
+                    ];
+                }
+
+                Log::info('EPGService: Retrieved available channels', [
+                    'count' => count($channels),
+                ]);
+
+                return $channels;
+            });
+        } catch (\Exception $e) {
+            Log::error('EPGService: Failed to get available channels', [
+                'error' => $e->getMessage(),
+            ]);
+
+            return [];
+        }
+    }
+
+    /**
+     * Get channel details from EPG by channel ID
+     *
+     * @param string $channelId EPG channel ID
+     * @return array|null Channel details or null if not found
+     */
+    public function getChannelDetails(string $channelId): ?array
+    {
+        $channels = $this->getAvailableChannels();
+        
+        foreach ($channels as $channel) {
+            if ($channel['id'] === $channelId) {
+                return $channel;
+            }
+        }
+        
+        return null;
+    }
 }

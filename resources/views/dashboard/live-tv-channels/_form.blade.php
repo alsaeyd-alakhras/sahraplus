@@ -3,6 +3,29 @@
         <div class="mb-3 border shadow card border-1">
             <div class="pt-4 card-body">
                 <div class="row">
+                    {{-- EPG Channel Selector (Only for Create) --}}
+                    @if(!$channel->exists)
+                    <div class="mb-4 col-md-12">
+                        <div class="alert alert-info">
+                            <i class="ph ph-info me-2"></i>
+                            <strong>{{ __('admin.EPG_Channel_Import') }}:</strong>
+                            {{ __('admin.epg_channel_import_hint') }}
+                        </div>
+                        <label class="form-label">{{ __('admin.Import_from_EPG') }}</label>
+                        <select id="epg-channel-selector" class="form-control">
+                            <option value="">{{ __('admin.select_epg_channel_or_manual') }}</option>
+                            @foreach($epgChannels as $epgChannel)
+                            <option value="{{ $epgChannel['id'] }}" 
+                                    data-name="{{ $epgChannel['name'] }}"
+                                    data-icon="{{ $epgChannel['icon'] ?? '' }}">
+                                {{ $epgChannel['name'] }} ({{ $epgChannel['id'] }})
+                            </option>
+                            @endforeach
+                        </select>
+                        <small class="text-muted">{{ __('admin.epg_selector_hint') }}</small>
+                    </div>
+                    @endif
+
                     <div class="mb-4 col-md-6">
                         <x-form.input label="{{ __('admin.Name_ar') }}" :value="$channel->name_ar" name="name_ar"
                             placeholder="{{ __('admin.name_ar_placeholder') }}" required autofocus />
@@ -229,6 +252,79 @@
             preview.style.display = 'none';
         }
     }
+    
+    // EPG Channel Import
+    @if(!$channel->exists)
+    document.addEventListener('DOMContentLoaded', function() {
+        const epgSelector = document.getElementById('epg-channel-selector');
+        
+        if (epgSelector) {
+            epgSelector.addEventListener('change', async function() {
+                const channelId = this.value;
+                
+                if (!channelId) {
+                    return;
+                }
+                
+                // Show loading state
+                const originalHtml = this.innerHTML;
+                this.disabled = true;
+                
+                try {
+                    const response = await fetch('{{ route('dashboard.live-tv-channels.epg-channel-details') }}', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                            'Accept': 'application/json'
+                        },
+                        body: JSON.stringify({ channel_id: channelId })
+                    });
+                    
+                    const result = await response.json();
+                    
+                    if (result.success && result.data) {
+                        const channel = result.data;
+                        
+                        // Fill in the form fields
+                        const nameEn = channel.display_names[0] || channel.name;
+                        
+                        // Set English name
+                        document.querySelector('input[name="name_en"]').value = nameEn;
+                        
+                        // Set EPG ID
+                        document.querySelector('input[name="epg_id"]').value = channel.id;
+                        
+                        // If icon URL exists, you can optionally set it
+                        if (channel.icon) {
+                            // You can add logic here to download and set the logo
+                            console.log('Channel icon URL:', channel.icon);
+                        }
+                        
+                        // Show success message
+                        const alertDiv = document.createElement('div');
+                        alertDiv.className = 'alert alert-success alert-dismissible fade show mt-2';
+                        alertDiv.innerHTML = `
+                            <i class="ph ph-check-circle me-2"></i>
+                            <strong>{{ __('admin.Success') }}!</strong> 
+                            {{ __('admin.epg_channel_imported') }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        `;
+                        epgSelector.parentElement.appendChild(alertDiv);
+                        
+                        // Auto-remove after 5 seconds
+                        setTimeout(() => alertDiv.remove(), 5000);
+                    }
+                } catch (error) {
+                    console.error('Error fetching EPG channel details:', error);
+                    alert('{{ __('admin.Error_loading_channel_details') }}');
+                } finally {
+                    this.disabled = false;
+                }
+            });
+        }
+    });
+    @endif
     
     // Test Flussonic Stream
     document.addEventListener('DOMContentLoaded', function() {
