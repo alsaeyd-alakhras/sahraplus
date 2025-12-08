@@ -37,6 +37,7 @@ class CouponController extends Controller
 
     public function create()
     {
+
         $this->authorize('create', Coupon::class);
         $coupon = new Coupon();
         $subscription_plans = $this->subscription_plans;
@@ -46,8 +47,9 @@ class CouponController extends Controller
 
     public function store(CouponRequest $request)
     {
-     //   return $request;
+
         $this->authorize('create', Coupon::class);
+
         $this->service->save($request->validated());
         return redirect()->route('dashboard.coupons.index')->with('success', 'تم إضافة تصنيف');
     }
@@ -62,7 +64,7 @@ class CouponController extends Controller
     {
         $this->authorize('update', Coupon::class);
 
-          $coupon = Coupon::findOrFail($id);
+        $coupon = Coupon::findOrFail($id);
         $subscription_plans = $this->subscription_plans;
 
         $btn_label = "تعديل";
@@ -71,13 +73,16 @@ class CouponController extends Controller
 
     public function update(CouponRequest $request, $id)
     {
+        //return $request;
         $this->authorize('update', Coupon::class);
+
         $this->service->update($request->validated(), $id);
         return redirect()->route('dashboard.coupons.index')->with('success', 'تم تعديل التصنيف');
     }
 
-    public function destroy(Coupon $plan)
+    public function destroy($id)
     {
+        $plan = Coupon::findOrFail($id);
         $this->authorize('delete', Coupon::class);
         $this->service->deleteById($plan->id);
 

@@ -14,6 +14,7 @@ class Kernel extends ConsoleKernel
     {
         // أمر حذف Watchlists القديمة يوميًا
         $schedule->command('watchlists:cleanup')->dailyAt('00:00');
+        $schedule->command('currency:convert-daily')->dailyAt('10:00');
     }
 
     /**

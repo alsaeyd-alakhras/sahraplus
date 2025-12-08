@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\Country;
 use App\Models\SubscriptionPlan;
 use App\Repositories\SubscriptionPlanRepository;
 use Illuminate\Http\Request;
@@ -74,7 +75,13 @@ class SubscriptionPlanService
             $nameForSlug = $data['name_en'] ?? $data['name_ar'] ?? '';
             if ($nameForSlug) $data['slug'] = $this->uniqueSlug($nameForSlug);
             $sub   = $data['cast']   ?? [];
+            $country   = $data['countryPrices']   ?? [];
+            $data['currency'] = 'SAR';
+            $data['is_customize'] = $data['is_customize'] == 1 ? 1 : 0;
             $cat = $this->repo->save($data);
+            if ($cat->is_customize == 1) {
+                $this->syncCountryPrice($cat, $country ?? []);
+            }
             $this->syncPlanLimitation($cat, $sub ?? []);
 
             DB::commit();
@@ -93,8 +100,13 @@ class SubscriptionPlanService
             $nameForSlug = $data['name_en'] ?? $data['name_ar'] ?? '';
             if ($nameForSlug) $data['slug'] = $this->uniqueSlug($nameForSlug);
             $sub   = $data['cast']   ?? [];
-
+            $country   = $data['countryPrices']   ?? [];
+            $data['currency'] = 'SAR';
+            $data['is_customize'] = $data['is_customize'] == 1 ? 1 : 0;
             $cat = $this->repo->update($data, $id);
+            if ($cat->is_customize == 1) {
+                $this->syncCountryPrice($cat, $country ?? [], true);
+            }
             $this->syncPlanLimitation($cat, $sub ?? [], true);
 
             DB::commit();
@@ -131,6 +143,35 @@ class SubscriptionPlanService
             $sub_plan->limitations()->createMany($payload);
         }
     }
+
+    private function syncCountryPrice(SubscriptionPlan $sub_plan, array $subs, bool $replace = false): void
+    {
+        if ($replace) {
+            $sub_plan->countryPrices()->delete();
+        }
+        $payload = [];
+
+        foreach ($subs as $row) {
+            $country = Country::find($row['country_id']) ?? null;
+
+            $payload[] = [
+                'plan_id'           => $sub_plan->id ?? '',
+                'country_id'           => $country->id ?? '',
+                'currency' => $country->currency ?? null,
+                'price_sar' => $row['price_sar'] ?? null,
+                'price_currency' => $row['price_currency'] ?? null,
+            ];
+        }
+
+        if (empty($subs)) {
+            $sub_plan->countryPrices()->delete();
+        }
+
+        if (!empty($payload)) {
+            $sub_plan->countryPrices()->createMany($payload);
+        }
+    }
+
 
 
     public function deleteById(int $id)

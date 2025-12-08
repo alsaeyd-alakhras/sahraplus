@@ -17,6 +17,7 @@ class SystemSettingService
         'site_email',
         'site_phone',
         'site_address',
+        'site_tax',
         // واجهة
         'logo_url',
         'favicon_url',

@@ -78,16 +78,13 @@
                     </div>
 
                     <div class="mb-4 col-md-6">
-                        <x-form.input type="date" label="{{ __('admin.starts') }}"
-                        :value="$coupon->starts_at ? $coupon->starts_at->format('Y-m-d') : ''"
+                        <x-form.input type="date" label="{{ __('admin.starts') }}" :value="$coupon->starts_at ? $coupon->starts_at->format('Y-m-d') : ''"
                             name="starts_at" placeholder="{{ __('admin.starts') }}" />
                     </div>
 
                     <div class="mb-4 col-md-6">
                         <x-form.input type="date" label="{{ __('admin.expires_at') }}" name="expires_at"
-                            :value="$coupon->expires_at ? $coupon->expires_at->format('Y-m-d') : ''"
-
-                            placeholder="{{ __('admin.expires_at') }}" />
+                            :value="$coupon->expires_at ? $coupon->expires_at->format('Y-m-d') : ''" placeholder="{{ __('admin.expires_at') }}" />
                     </div>
 
                     <div class="mb-4 col-md-6">
@@ -105,8 +102,9 @@
                             name="times_used" placeholder="{{ __('admin.times_used') }}" required />
                     </div>
                     <div class="mb-4 col-md-6">
-                        <x-form.input label="{{ __('admin.metadata') }}" :value="$coupon->metadata" name="metadata"
+                        <x-form.input label="{{ __('admin.metadata') }}" :value="$coupon->metadata['coupon_info'] ?? ''" name="coupon_info"
                             placeholder="{{ __('admin.metadata') }}" />
+
                     </div>
                 </div>
             </div>

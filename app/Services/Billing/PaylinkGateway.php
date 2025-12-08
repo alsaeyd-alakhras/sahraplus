@@ -2,7 +2,7 @@
 
 namespace App\Services\Billing;
 
-use App\Models\Payment;
+use App\Models\Payments;
 use App\Services\Billing\Contracts\PaymentGatewayInterface;
 use App\Models\User;
 use App\Models\SubscriptionPlan;
@@ -93,8 +93,11 @@ class PaylinkGateway implements PaymentGatewayInterface
             $payload = [
                 'orderNumber'  => (string) $orderNumber,
                 'amount'       => (float) $subscription->total_amount,
-                'callBackUrl'  => config('app.url') . '/api/v1/billing/paylink/webhook',
-                'cancelUrl'    => config('app.url') . '/api/v1/billing/cancel',
+                // 'callBackUrl'  => config('app.url') . '/api/v1/billing/paylink/webhook',
+                // 'cancelUrl'    => config('app.url') . '/api/v1/billing/cancel',
+                'callBackUrl'  => 'https://unattended-lucila-nonprosaically.ngrok-free.dev/api/v1/billing/paylink/webhook',
+                'cancelUrl'    => 'https://unattended-lucila-nonprosaically.ngrok-free.dev/api/v1/billing/cancel',
+
 
                 'clientName' => $user->first_name ?? $user->name ?? 'Customer ' . $user->id,
                 'clientMobile' => $user->phone ?? '',
@@ -139,7 +142,7 @@ class PaylinkGateway implements PaymentGatewayInterface
                 //     'transaction_id' => $transactionId,
                 //     'total_amount' => $subscription->total_amount,
                 // ]);
-              Payment::create([
+                Payments::create([
                     'user_id'                => $subscription->user_id,
                     'subscription_id'        => $subscription->id,
                     'payment_reference'      => 'PAYLINK_' . uniqid(),
@@ -155,8 +158,6 @@ class PaylinkGateway implements PaymentGatewayInterface
                     'gateway_response'       => json_encode(request()->all()),
                     'processed_at'           => now(),
                 ]);
-
-
             } catch (\Throwable $e) {
                 Log::warning('Failed to update subscription with paylink data', ['err' => $e->getMessage()]);
             }

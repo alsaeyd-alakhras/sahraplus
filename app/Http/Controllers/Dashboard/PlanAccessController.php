@@ -83,8 +83,9 @@ class PlanAccessController extends Controller
         return redirect()->route('dashboard.plan_access.index')->with('success', 'تم تعديل التصنيف');
     }
 
-    public function destroy(PlanContentAccess $plan)
+    public function destroy( $id)
     {
+        $plan = PlanContentAccess::findOrFail($id);
         $this->authorize('delete', PlanContentAccess::class);
         $this->service->deleteById($plan->id);
 

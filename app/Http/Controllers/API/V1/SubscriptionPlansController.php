@@ -17,8 +17,13 @@ class SubscriptionPlansController extends Controller
     public function index()
     {
         $plans = SubscriptionPlan::where('is_active', true)
+            ->with(['countryPrices', 'contentAccess'])
             ->orderByDesc('sort_order')
             ->get();
+
+        if ($plans->isEmpty()) {
+            return $this->error("Plans Not Found", 404);
+        }
 
         return $this->success([
             "items" => SubscriptionPlanResource::collection($plans),
@@ -29,7 +34,7 @@ class SubscriptionPlansController extends Controller
     // GET /api/v1/subscription_plan/{id}
     public function show($id)
     {
-        $plan = SubscriptionPlan::with("limitations")->find($id);
+        $plan = SubscriptionPlan::with(['limitations', 'countryPrices', 'contentAccess'])->find($id);
 
         if (!$plan) {
             return $this->error("Plan Not Found", 404);

@@ -42,6 +42,8 @@ class SubscriptionPlanResource extends JsonResource
 
             // Relationship
             "limitations"       => PlanLimitationResource::collection($this->whenLoaded("limitations")),
+            "countryPrices"       => $this->whenLoaded("countryPrices"),
+            "contentAccess"       => $this->whenLoaded("contentAccess"),
         ];
     }
 }

@@ -34,7 +34,7 @@ class CouponUsage extends Model
     // العلاقات
     public function coupon()
     {
-        return $this->belongsTo(DiscountCoupon::class, 'coupon_id');
+        return $this->belongsTo(Coupon::class, 'coupon_id');
     }
 
     public function user()
@@ -49,7 +49,7 @@ class CouponUsage extends Model
 
     public function payment()
     {
-        return $this->belongsTo(Payment::class, 'payment_id');
+        return $this->belongsTo(Payments::class, 'payment_id');
     }
 
     // Accessors

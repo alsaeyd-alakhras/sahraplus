@@ -51,8 +51,9 @@ class UserSubscriptionController extends Controller
         return redirect()->route('dashboard.users_subscription.index')->with('success', 'تم إضافة تصنيف');
     }
 
-    public function show(UserSubscription $sub)
+    public function show($id)
     {
+        $sub=UserSubscription::where('id',$id)->with(['plan', 'user'])->first();
         $this->authorize('show', UserSubscription::class);
         return view('dashboard.users_subscription.show', compact('sub'));
     }

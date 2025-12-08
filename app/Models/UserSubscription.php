@@ -54,7 +54,7 @@ class UserSubscription extends Model
 
     public function payments()
     {
-        return $this->hasMany(Payment::class, 'subscription_id');
+        return $this->hasMany(Payments::class, 'subscription_id');
     }
 
     public function couponUsages()

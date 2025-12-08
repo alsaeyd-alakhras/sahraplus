@@ -283,7 +283,7 @@
                     orderable: false,
                     render: function(data, type, row) {
                         // نلوّن الشارة حسب القيمة
-                        const active = (data === 'نشط');
+                        const active = (data === '1' || data === 1 || data === true || data === 'true');
                         return `<span class="badge ${active ? 'bg-success' : 'bg-secondary'}">
                 ${active ? 'نشط' : 'غير نشط'}
               </span>`;

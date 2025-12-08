@@ -32,7 +32,7 @@ class SubscriptionPlanRequest extends FormRequest
             'description_en' => ['nullable', 'string'],
 
             'price'          => ['required', 'numeric', 'min:2'],
-            'currency'       => ['required', 'string', 'max:3'],
+            'currency'       => ['required', 'string', 'in:SAR'],
 
             'billing_period' => ['required', 'in:monthly,quarterly,yearly'],
             'video_quality'  => ['required', 'in:sd,hd,uhd'],
@@ -50,8 +50,15 @@ class SubscriptionPlanRequest extends FormRequest
             'live_tv_enabled'  => ['boolean'],
             'is_popular'       => ['boolean'],
             'is_active'        => ['boolean'],
+            'is_customize'        => ['boolean'],
 
             'cast'           => ['nullable', 'array'],
+            'countryPrices' => ['nullable', 'array'],
+            'countryPrices.*.price_currency' => ['required_if:is_customize,1', 'numeric', 'min:0'],
+            'countryPrices.*.price_sar' => ['required_if:is_customize,1', 'numeric', 'min:0'],
+            'countryPrices.*.currency' => ['required_if:is_customize,1', 'string'],
+            'countryPrices.*.country_id' => ['required_if:is_customize,1', 'integer', 'exists:countries,id'],
+
 
             // نوع التقييد (string max 50)
             'cast.*.limitation_type' => ['required', 'string', 'max:50'],

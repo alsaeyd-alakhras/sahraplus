@@ -33,7 +33,7 @@ class CouponRequest extends FormRequest
             'expires_at' => ['nullable', 'date'],
             'usage_limit' => ['nullable', 'integer'],
             'times_used' => ['required', 'integer'],
-            'metadata' => ['nullable', 'json'],
+            'coupon_info' => ['nullable', 'string'],
             'usage_limit_per_user' => ['required', 'integer'],
 
         ];

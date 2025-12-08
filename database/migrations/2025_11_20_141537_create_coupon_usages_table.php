@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('coupon_usage', function (Blueprint $table) {
             $table->id(); // المعرف الفريد
-            $table->foreignId('coupon_id')->constrained('discount_coupons')->cascadeOnDelete(); // معرف القسيمة
+            $table->foreignId('coupon_id')->constrained('coupons')->cascadeOnDelete(); // معرف القسيمة
             $table->foreignId('user_id')->constrained('users')->cascadeOnDelete(); // معرف المستخدم
             $table->foreignId('subscription_id')->nullable()->constrained('user_subscriptions')->nullOnDelete(); // معرف الاشتراك
             $table->foreignId('payment_id')->nullable()->constrained('payments')->nullOnDelete(); // معرف الدفعة

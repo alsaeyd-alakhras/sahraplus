@@ -40,6 +40,8 @@ use App\Http\Controllers\API\V1\EPGController;
 use App\Http\Controllers\API\V1\LiveTvController;
 use App\Http\Controllers\API\V1\BillingController;
 use App\Http\Controllers\API\V1\CouponController;
+use App\Http\Controllers\API\V1\MangeDevicesController;
+use App\Http\Controllers\API\V1\PaymentController;
 
 /*
 |--------------------------------------------------------------------------
@@ -190,22 +192,27 @@ Route::prefix('v1')->name('api.v1.')->group(function () {
 
     Route::middleware(['auth:sanctum'])->group(function () {
 
+        Route::get('subscriptions/check-quality', [UserSubscriptionController::class, 'checkQuality']);
         Route::get('user_subscription/me', [UserSubscriptionController::class, 'index']);
 
         Route::post('user_subscription', [UserSubscriptionController::class, 'store']);
 
         Route::post('user_subscription/confirm', [UserSubscriptionController::class, 'confirmPayment']);
 
-        Route::post('user_subscription/cancel', [UserSubscriptionController::class, 'cancel_user_subscription']);
+        Route::post('user_subscription/cancel/{user_sub_id}', [UserSubscriptionController::class, 'cancel_user_subscription']);
 
-        Route::get('/billing/{gateway}/test-payment/{subscription_id}', [BillingController::class, 'testPayment'])->name('api.billing.test-payment');
 
-        Route::post('billing/checkout', [BillingController::class, 'checkout'])->name('api.billing.checkout');
+        //Route::post('billing/checkout', [BillingController::class, 'checkout'])->name('api.billing.checkout');
 
         Route::post('/coupons/validate', [CouponController::class, 'validateCoupon']);
+        Route::post('billing/checkout', [PaymentController::class, 'initiateCheckout']);
+        Route::post('billing/webhook', [PaymentController::class, 'handleTelrWebhook']);
+
+        Route::post('register-device', [MangeDevicesController::class, 'registerDevice']);
+        Route::post('heartbeat-device', [MangeDevicesController::class, 'heartbeat']);
     });
 
-    Route::post('/billing/{gateway}/webhook', [BillingController::class, 'webhook'])->name('api.billing.webhook');
+
 
     // Route::post('/billing/success/{subscription_id}', [BillingController::class, 'successPayment'])->name('payment.success');
 

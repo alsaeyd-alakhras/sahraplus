@@ -20,8 +20,7 @@ class MoviesController extends Controller
             ->when($q, fn($qr)=>$qr->where('title_ar','like',"%$q%")->orWhere('title_en','like',"%$q%"))
             ->when($category, fn($qr)=>$qr->whereHas('categories', fn($c)=>$c->where('slug',$category)))
             ->when($year, fn($qr)=>$qr->whereYear('release_date', $year))
-            // ->orderByDesc('release_date')
-            ->published()
+            ->orderByDesc('release_date')
             ->paginate(20);
 
         return MovieResource::collection($movies);
@@ -32,10 +31,16 @@ class MoviesController extends Controller
     public function show($id)
     {
         $user = auth('sanctum')->user();
+        if(!$user){
+            return response()->json([
+                "success" => false,
+                "message" => "User Not Auth"
+            ], 401);
+        }
         $movie = Movie::with(['categories', 'cast', 'videoFiles', 'subtitles'])->findOrFail($id);
 
         // 1) فحص الاشتراك
-        $subscription = $user?->activeSubscription;
+        $subscription = $user->activeSubscription;
         $hasAccess = false;
 
         if ($subscription) {
@@ -50,13 +55,14 @@ class MoviesController extends Controller
         // 2) لو ما عنده وصول → نحذف روابط الفيديو فقط
         if (!$hasAccess) {
             foreach ($movie->videoFiles as $video) {
-                unset($video->file_url); // حذف الرابط
+               // unset($video->file_url); // حذف الرابط
+                $video->file_url = $hasAccess ? $video->file_url : null;
             }
         }
 
         return response()->json([
             "success" => true,
-            "status_supsecribtion" => $hasAccess,
+            "status_subscription" => $hasAccess ? "Access granted" : "Upgrade your plan to watch this movie",
             "movie" => new MovieResource($movie),
         ]);
     }

@@ -77,7 +77,10 @@ class CouponService
     {
         DB::beginTransaction();
         try {
-
+            $data['metadata'] = [
+                'coupon_info' => $data['coupon_info'] ?? null,
+            ];
+            unset($data['coupon_info']);
             $cat = $this->repo->save($data);
 
             DB::commit();
@@ -92,6 +95,10 @@ class CouponService
     {
         DB::beginTransaction();
         try {
+            $data['metadata'] = [
+                'coupon_info' => $data['coupon_info'] ?? null,
+            ];
+            unset($data['coupon_info']);
             $cat = $this->repo->update($data, $id);
             DB::commit();
             return $cat;

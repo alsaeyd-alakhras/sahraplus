@@ -132,10 +132,25 @@ public function downloads()
     public function activeSubscription()
     {
         return $this->hasOne(UserSubscription::class)
-            ->whereIn('status', ['active', 'trial'])
-            ->where('starts_at', '<=', now())
-            ->where('ends_at', '>=', now());
+            ->where(function ($q) {
+                $q->where('status', 'trial')
+                    ->where('trial_ends_at', '>=', now())
+                    ->orWhere(function ($q2) {
+                        $q2->where('status', 'active')
+                            ->where('starts_at', '<=', now())
+                            ->where('ends_at', '>=', now());
+                    });
+            })
+            ->latest('ends_at');
     }
+
+
+
+    public function latestSubscription()
+    {
+        return $this->hasOne(UserSubscription::class)->latestOfMany();
+    }
+
 
     public function currentPlan()
     {
@@ -147,7 +162,7 @@ public function downloads()
             'id',           // primary key of users
             'plan_id'       // foreign key on user_subscriptions table
         )
-            ->whereIn('user_subscriptions.status', ['active', 'trial'])
+           // ->whereIn('user_subscriptions.status', ['active', 'trial'])
             ->where('user_subscriptions.starts_at', '<=', now())
             ->where('user_subscriptions.ends_at', '>=', now());
     }
@@ -156,6 +171,5 @@ public function downloads()
         $plan = $this->currentPlan()->with('contentAccess')->first();
 
         return $plan ? $plan->contentAccess : collect([]);
-
     }
 }

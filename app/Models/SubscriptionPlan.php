@@ -32,6 +32,7 @@ class SubscriptionPlan extends Model
         'live_tv_enabled',
         'is_popular',
         'is_active',
+        'is_customize',
     ];
 
 
@@ -47,6 +48,7 @@ class SubscriptionPlan extends Model
         'sort_order' => 'integer',
         'is_popular' => 'boolean',
         'is_active' => 'boolean',
+        'is_customize' => 'boolean',
     ];
 
     public function limitations()
@@ -67,5 +69,20 @@ class SubscriptionPlan extends Model
     public function coupons()
     {
         return $this->hasMany(Coupon::class, 'plan_id');
+    }
+
+    // جميع الأسعار المخصصة للدول
+    public function countryPrices()
+    {
+        return $this->hasMany(PlanCountryPrice::class, 'plan_id');
+    }
+
+    // دالة للحصول على السعر حسب الدولة
+    public function priceForCountryCode($countryCode)
+    {
+        $price = $this->countryPrices()->whereHas('country', function ($q) use ($countryCode) {
+            $q->where('code', $countryCode);
+        })->first();
+        return $price ? $price->price_sar : $this->price;
     }
 }

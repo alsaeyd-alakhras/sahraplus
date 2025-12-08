@@ -180,10 +180,12 @@
             // urls
             const _token = "{{ csrf_token() }}";
             const urlIndex = `{{ route('dashboard.sub_plans.index') }}`;
+            const urlDelete = '{{ route('dashboard.sub_plans.destroy', ':id') }}';
+
             const urlFilters = `{{ route('dashboard.sub_plans.filters', ':column') }}`; // ← صححنا اسم الراوت
+
             const urlCreate = '{{ route('dashboard.sub_plans.create') }}';
             const urlEdit = '{{ route('dashboard.sub_plans.edit', ':id') }}';
-            const urlDelete = '{{ route('dashboard.sub_plans.destroy', ':id') }}';
 
             // ability
             const abilityCreate = "{{ Auth::guard('admin')->user()->can('create', 'App\\Models\\SubscriptionPlan') }}";

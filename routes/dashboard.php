@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Dashboard\ActiveDevicesController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Dashboard\HomeController;
 
@@ -27,6 +28,8 @@ use App\Http\Controllers\Dashboard\PlanLimitationController;
 use App\Http\Controllers\Dashboard\CouponController;
 use App\Http\Controllers\Dashboard\TaxController;
 use App\Http\Controllers\Dashboard\UserSubscriptionController;
+use App\Http\Controllers\Dashboard\PaymentsController;
+use App\Models\Payments;
 use Mcamara\LaravelLocalization\Facades\LaravelLocalization;
 
 Route::group([
@@ -92,9 +95,9 @@ Route::group([
 
 
         Route::get('series/castRowPartial', [SeriesController::class, 'castRowPartial'])
-        ->name('series.castRowPartial');
+            ->name('series.castRowPartial');
 
-         Route::get('episodes/videoRowPartial', [EpisodeController::class, 'videoRowPartial'])->name('episodes.videoRowPartial');
+        Route::get('episodes/videoRowPartial', [EpisodeController::class, 'videoRowPartial'])->name('episodes.videoRowPartial');
         Route::get('episodes/subtitleRowPartial', [EpisodeController::class, 'subtitleRowPartial'])->name('episodes.subtitleRowPartial');
 
 
@@ -109,21 +112,24 @@ Route::group([
         Route::get('sub_plans-filters/{column}', [SubscriptionPlanController::class, 'getFilterOptions'])->name('sub_plans.filters');
         Route::get('taxes-filters/{column}', [TaxController::class, 'getFilterOptions'])->name('taxes.filters');
         Route::delete('sub-plans-delete/{id}', [SubscriptionPlanController::class, 'deleteCast'])->name('movies.video-files.delete');
+        Route::delete('country-delete/{id}', [SubscriptionPlanController::class, 'delete_country']);
 
         Route::get('users_subscription-filters/{column}', [UserSubscriptionController::class, 'getFilterOptions'])->name('users_subscription.filters');
 
-        Route::get('movies-filters/{column}', [ MoviesController::class, 'getFilterOptions'])->name('movies.filters');
-        Route::get('people-filters/{column}', [ PeopleController::class, 'getFilterOptions'])->name('people.filters');
-        Route::get('short-filters/{column}', [ ShortController::class, 'getFilterOptions'])->name('short.filters');
+        Route::get('movies-filters/{column}', [MoviesController::class, 'getFilterOptions'])->name('movies.filters');
+        Route::get('people-filters/{column}', [PeopleController::class, 'getFilterOptions'])->name('people.filters');
+        Route::get('short-filters/{column}', [ShortController::class, 'getFilterOptions'])->name('short.filters');
         Route::get('coupons-filters/{column}', [CouponController::class, 'getFilterOptions'])->name('coupons.filters');
         Route::get('movie-categories-filters/{column}', [CategoryController::class, 'getFilterOptions'])->name('movie-categories.filters');
-        Route::get('series-filters/{column}', [ SeriesController::class, 'getFilterOptions'])->name('series.filters');
+        Route::get('series-filters/{column}', [SeriesController::class, 'getFilterOptions'])->name('series.filters');
         Route::get('plan_access-filters/{column}', [PlanAccessController::class, 'getFilterOptions'])->name('plan_access.filters');
         Route::get('plan_access/get-contents', [PlanAccessController::class, 'getContents'])->name('plan_access.getContents');
 
         Route::resource('seasons', SeasonController::class)->except(['index']);
         Route::resource('episodes', EpisodeController::class)->except(['index']);
         Route::resource('shorts', ShortController::class)->parameters(['shorts' => 'short'])->names('shorts');
+
+        Route::get('payments-filters/{column}', [PaymentsController::class, 'getFilterOptions'])->name('payments.filters');
 
         // resources
         Route::resources([
@@ -139,11 +145,24 @@ Route::group([
             'coupons' => CouponController::class,
             'taxes' => TaxController::class,
             'users_subscription' => UserSubscriptionController::class,
+            'active_devices' => ActiveDevicesController::class,
             'movies'    => MoviesController::class,
+            'payments'    => PaymentsController::class,
             'people'    => PeopleController::class,
             // 'shorts'    => ShortController::class,
             'movie-categories'    => CategoryController::class,
             'series'    => SeriesController::class,
+        ]);
+
+        Route::get('countryPrice/countryRowPartial', [SubscriptionPlanController::class, 'countryRowPartial'])->name('countryPrice.countryRowPartial');
+        Route::get('limitations/limitationsRowPartial', [SubscriptionPlanController::class, 'limitationsRowPartial'])->name('limitations.limitationsRowPartial');
+    });
+
+    Route::get('/countries/{id}/currency', function ($id) {
+        $country = \App\Models\Country::find($id);
+
+        return response()->json([
+            'currency' => $country?->currency ?? ''
         ]);
     });
 });

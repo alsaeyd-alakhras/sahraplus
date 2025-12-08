@@ -46,7 +46,7 @@ class PaymentGatewayManager
     /**
      * Handle webhook
      */
-    public function handleWebhook(Request $request, ?string $gatewayName = null): array
+    public function handleWebhook(Request $request, ?string $gatewayName = null)
     {
         if ($gatewayName) {
             $gateway = $this->resolveGateway($gatewayName);
@@ -72,4 +72,3 @@ class PaymentGatewayManager
         return $this->testMode;
     }
 }
-

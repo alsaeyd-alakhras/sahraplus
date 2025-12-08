@@ -87,7 +87,7 @@
             <li
                 class="menu-item {{ request()->is('dashboard/people') || request()->is('dashboard/people/*') ? 'active' : '' }}">
                 <a href="{{ route('dashboard.people.index') }}" class="menu-link">
-                    <i class="ph ph-people me-2"></i>
+                    <i class="ph ph-users me-2"></i>
                     <div data-i18n="people"> {{ __('admin.Person') }}</div>
                 </a>
             </li>
@@ -158,7 +158,27 @@
             </li>
         @endcan
 
-        @can('view', 'App\\Models\Tax')
+        @can('view', 'App\\Models\Payments')
+            <li
+                class="menu-item {{ request()->is('dashboard/payments') || request()->is('dashboard/payments/*') ? 'active' : '' }}">
+                <a href="{{ route('dashboard.payments.index') }}" class="menu-link">
+                    <i class="ph ph-money me-2"></i>
+                    <div data-i18n="payments"> {{ __('admin.payments') }}</div>
+                </a>
+            </li>
+        @endcan
+
+        @can('view', 'App\\Models\UserActiveDevice')
+            <li
+                class="menu-item {{ request()->is('dashboard/active_devices') || request()->is('dashboard/active_devices/*') ? 'active' : '' }}">
+                <a href="{{ route('dashboard.active_devices.index') }}" class="menu-link">
+                    <i class="ph ph-money me-2"></i>
+                    <div data-i18n="active_devices"> {{ __('admin.active_devices') }}</div>
+                </a>
+            </li>
+        @endcan
+
+        {{-- @can('view', 'App\\Models\Tax')
             <li
                 class="menu-item {{ request()->is('dashboard/taxes') || request()->is('dashboard/taxes/*') ? 'active' : '' }}">
                 <a href="{{ route('dashboard.taxes.index') }}" class="menu-link">
@@ -166,7 +186,7 @@
                     <div data-i18n="taxes"> {{ __('admin.taxes') }}</div>
                 </a>
             </li>
-        @endcan
+        @endcan --}}
 
         <li class="menu-header small">
             <span class="menu-header-text" data-i18n="Apps &amp; Pages">الإعدادات</span>

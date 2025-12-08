@@ -55,13 +55,11 @@
             'user_id' => __('admin.user_id'),
             'status' => __('admin.status'),
             'amount' => __('admin.amount'),
-            'tax_amount' => __('admin.tax_amount'),
-            'discount_amount' => __('admin.discount_amount'),
             'total_amount' => __('admin.total_amount'),
             'currency' => __('admin.currency'),
             'starts_at' => __('admin.starts_at'),
             'ends_at' => __('admin.ends_at'),
-            'plan_id' => __('admin.sub_plan')
+            'plan_id' => __('admin.sub_plan'),
         ];
     @endphp
 
@@ -174,10 +172,13 @@
             const _token = "{{ csrf_token() }}";
             const urlIndex = `{{ route('dashboard.users_subscription.index') }}`;
             const urlFilters = `{{ route('dashboard.users_subscription.filters', ':column') }}`; // ← صححنا اسم الراوت
-
+            const urlShow = '{{ route('dashboard.users_subscription.show', ':id') }}';
+            const abilityShow = "{{ Auth::guard('admin')->user()->can('show', 'App\\Models\\UserSubscription') }}";
 
             // أسماء الحقول للفلترة في الهيدر
-            const fields = ['#', 'user_id', 'status', 'amount','tax_amount','discount_amount','total_amount', 'currency', 'starts_at', 'ends_at', 'plan_id'];
+            const fields = ['#', 'user_id', 'status', 'amount', 'total_amount', 'currency',
+                'starts_at', 'ends_at', 'plan_id'
+            ];
 
             // أعمدة الداتا تيبل: نستخدم status_label الراجعة من السيرفس
             const columnsTable = [{
@@ -204,18 +205,7 @@
                     orderable: false,
                     render: (d) => d ?? ''
                 },
-                   {
-                    data: 'tax_amount',
-                    name: 'tax_amount',
-                    orderable: false,
-                    render: (d) => d ?? ''
-                },
-                   {
-                    data: 'discount_amount',
-                    name: 'discount_amount',
-                    orderable: false,
-                    render: (d) => d ?? ''
-                },   {
+                {
                     data: 'total_amount',
                     name: 'total_amount',
                     orderable: false,
@@ -245,6 +235,22 @@
                     orderable: false,
                     render: (d) => d ?? ''
                 },
+                {
+                    data: 'edit',
+                    name: 'edit',
+                    orderable: false,
+                    searchable: false,
+                    render: function(data, type, row) {
+                        let linkshow = ``;
+                        if (abilityShow) {
+                            linkshow =
+                                `<a href="${urlShow.replace(':id',  row.id)}" class="action-btn btn-show" title="عرض"><i class="fas fa-eye"></i></a>`;
+                        }
+                        return `<div class="d-flex align-items-center justify-content-evenly">
+                                    ${linkshow}
+                                </div>`;
+                    }
+                }
 
             ];
         </script>
