@@ -20,7 +20,8 @@ class MoviesController extends Controller
             ->when($q, fn($qr)=>$qr->where('title_ar','like',"%$q%")->orWhere('title_en','like',"%$q%"))
             ->when($category, fn($qr)=>$qr->whereHas('categories', fn($c)=>$c->where('slug',$category)))
             ->when($year, fn($qr)=>$qr->whereYear('release_date', $year))
-            ->orderByDesc('release_date')
+            // ->orderByDesc('release_date')
+            ->published()
             ->paginate(20);
 
         return MovieResource::collection($movies);
@@ -34,7 +35,7 @@ class MoviesController extends Controller
         $movie = Movie::with(['categories', 'cast', 'videoFiles', 'subtitles'])->findOrFail($id);
 
         // 1) فحص الاشتراك
-        $subscription = $user->activeSubscription;
+        $subscription = $user?->activeSubscription;
         $hasAccess = false;
 
         if ($subscription) {
