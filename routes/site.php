@@ -27,12 +27,13 @@ Route::group([
         // 'middleware' => ['auth'],
     ], function () {
         Route::get('/',[FrontController::class,'index'])->name('home');
+        Route::get('/home',[FrontController::class,'index'])->name('home');
         Route::get('/live',[FrontController::class,'live'])->name('live');
         Route::get('/categories',[FrontController::class,'categories'])->name('categories');
         Route::get('/categories/{category}',[FrontController::class,'categoryShow'])->name('categories.show');
         Route::get('/actors',[FrontController::class,'actors'])->name('actors');
         Route::get('/shorts',[FrontController::class,'shorts'])->name('shorts');
-        
+
         Route::get('/cast/{id}',[FrontController::class,'cast'])->name('cast');
 
         // Movie routes
@@ -82,11 +83,11 @@ Route::group([
         Route::get('/watchlist', function () {
             return view('site.watchlist');
         })->name('watchlist');
-        
+
         Route::get('/favorites', function () {
             return view('site.favorites');
         })->name('favorites');
-        
+
         Route::get('/history', function () {
             return view('site.history');
         })->name('history');

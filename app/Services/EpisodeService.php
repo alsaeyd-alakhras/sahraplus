@@ -87,123 +87,139 @@ class EpisodeService
 
     private function syncVideoFiles(Episode $episode, array $files, bool $replace = false): void
     {
-        $payload = [];
-        $seen = [];
 
+        if ($replace) {
+            $episode->videoFiles()->delete();
+        }
+
+        $payload = [];
+        $usedTypes = [];
+        $usedQualities = [];
         foreach ($files as $f) {
             $type       = $f['video_type'] ?? null;
             $quality    = $f['quality']    ?? null;
             $sourceType = $f['source_type'] ?? 'url';
-
             if (!$type || !$quality) continue;
 
-            if (empty($f['file']) && empty($f['file_url'])) continue;
+            // التحقق من وجود file أو file_url أولاً
+            if ((!isset($f['file']) || empty($f['file'])) &&
+                (!isset($f['file_url']) || empty($f['file_url']))
+            ) {
+                continue;
+            }
 
-            $key = $type.'_'.$quality;
-            if (isset($seen[$key])) continue;
-            $seen[$key] = true;
+            // الآن نتحقق من التكرار (بعد التأكد من وجود بيانات صالحة)
+            if (in_array($type, $usedTypes) && in_array($quality, $usedQualities)) {
+                continue; // تجاهل المكرر
+            }
 
-            $fileUrl = null;
-            $format  = $f['format'] ?? null;
+            // إضافة للمصفوفات فقط إذا كان العنصر صالح للتخزين
+            $usedTypes[] = $type;
+            $usedQualities[] = $quality;
+            $fileUrl = isset($f['file_url']) ? $f['file_url'] : null;
+            $format  = $f['format']   ?? 'mp4';
             $size    = null;
-
-            if ($sourceType === 'file' && isset($f['file']) && $f['file'] instanceof \Illuminate\Http\UploadedFile) {
+            // لو رُفع ملف
+            if ($sourceType == 'file') {
                 if ($replace) {
                     $episode->videoFiles()->where('video_type', $type)->where('quality', $quality)->delete();
                 }
-                $path    = $f['file']->store('video_files/episodes', 'public');
-                $fileUrl = Storage::url($path);
-                $format  = $format ?: strtolower($f['file']->getClientOriginalExtension());
-                $size    = $f['file']->getSize();
-            } else {
-                // URL فقط
-                if ($replace) {
-                    $episode->videoFiles()->where('video_type', $type)->where('quality', $quality)->delete();
+                if (isset($f['file']) && $f['file'] instanceof \Illuminate\Http\UploadedFile) {
+                    $path    = $f['file']->store('video_files/movies', 'public');
+                    $fileUrl = Storage::url($path);
+                    $format  = $format ?: strtolower($f['file']->getClientOriginalExtension());
+                    $size    = $f['file']->getSize();
+                } else {
+                    // ما في ملف جديد؟ استخدم الرابط القديم إن وُجد
+                    $fileUrl = $f['existing_url'] ?? null;
                 }
+            } else { // url
                 $fileUrl = $f['file_url'] ?? null;
             }
 
-            if (!$fileUrl) continue;
-
-            // enum format عندك: ['mp4','hls','m3u8','webm'] — نزبطه لو ناقص
-            if (!$format) {
-                $ext = strtolower(pathinfo(parse_url($fileUrl, PHP_URL_PATH) ?? '', PATHINFO_EXTENSION));
-                $map = ['mp4'=>'mp4', 'webm'=>'webm', 'm3u8'=>'m3u8', 'hls'=>'hls'];
-                $format = $map[$ext] ?? 'mp4';
+            // لو ما في لا ملف ولا رابط → تجاهل هذا الصف
+            if (!$fileUrl) {
+                continue;
             }
 
             $payload[] = [
-                'content_type'     => 'episode',
+                'content_type'     => 'movie',
                 'content_id'       => $episode->id,
                 'video_type'       => $type,
                 'quality'          => $quality,
                 'format'           => $format,
                 'file_url'         => $fileUrl,
                 'file_size'        => $size,
-                'duration_seconds' => null,
+                'duration_seconds' => null,      // ممكن نحسبها لاحقاً بـ ffmpeg
                 'is_downloadable'  => false,
                 'is_active'        => true,
             ];
+            if ($type == 'trailer') {
+                $episode->trailer_url = $fileUrl;
+                $episode->save();
+            }
         }
-
         if (empty($files)) {
             $episode->videoFiles()->delete();
         }
 
         if (!empty($payload)) {
-            $episode->videoFiles()->createMany($payload);
+            $episode->videoFiles()->createMany($payload); // morphMany يملأ content_type/id تلقائيًا
         }
     }
 
     private function syncSubtitles(Episode $episode, array $subs, bool $replace = false): void
     {
+        if ($replace) {
+            $episode->subtitles()->delete();
+        }
+
         $payload = [];
-        $seenPairs = [];
+        $seenLangs  = [];
+        $seenLabels = [];
 
         foreach ($subs as $s) {
             $lang  = isset($s['language']) ? strtolower(trim($s['language'])) : null;
-            $label = isset($s['label']) ? trim($s['label']) : null;
-            $src   = $s['source_type'] ?? 'url';
+            $label = isset($s['label'])    ? trim($s['label'])               : null;
 
             if (!$lang || !$label) continue;
 
-            $pairKey = $lang.'|'.$label;
-            if (isset($seenPairs[$pairKey])) continue;
-            $seenPairs[$pairKey] = true;
-
-            $fileUrl = null;
-
-            if ($src === 'file' && isset($s['file']) && $s['file'] instanceof \Illuminate\Http\UploadedFile) {
-                if ($replace) {
-                    $episode->subtitles()->where('language', $lang)->where('label', $label)->delete();
-                }
-                $path    = $s['file']->store('subtitle_files/episodes', 'public');
-                $fileUrl = Storage::url($path);
-            } else {
-                if ($replace) {
-                    $episode->subtitles()->where('language', $lang)->where('label', $label)->delete();
-                }
-                // ملاحظة: عندك بالجدول اسم الحقل file_url — فلو الفورم يرسل 'url' نحوله
-                $fileUrl = $s['url'] ?? $s['file_url'] ?? null;
+            // منع تكرار اللغة / الليبل على مستوى السيرفر (حماية إضافية)
+            if (in_array($lang, $seenLangs, true) && in_array($label, $seenLabels, true)) {
+                continue;
             }
 
-            if (!$fileUrl) continue;
+            $sourceType = $s['source_type'] ?? 'url';
+            $url = null;
 
-            // format enum عندك: vtt|srt|ass
-            $ext = strtolower(pathinfo(parse_url($fileUrl, PHP_URL_PATH) ?? '', PATHINFO_EXTENSION));
-            $fmt = in_array($ext, ['vtt','srt','ass']) ? $ext : 'vtt';
+            // إذا مرفوع ملف
+            if ($sourceType === 'file') {
+                if ($replace) {
+                    $episode->subtitles()->where('language', $lang)->where('label', $label)->delete();
+                }
+                if (isset($s['file']) && $s['file'] instanceof \Illuminate\Http\UploadedFile) {
+                    $path = $s['file']->store('subtitle_files/movies', 'public');
+                    $url  = Storage::url($path);
+                } else {
+                    $url  = $s['existing_url'] ?? null;
+                }
+            } else { // url
+                $url = $s['url'] ?? null;
+            }
+
+            if (!$url) continue; // لا تضف صف فاضي
 
             $payload[] = [
-                'content_type' => 'episode',
+                'content_type' => 'movie',
                 'content_id'   => $episode->id,
-                'language'     => $lang,
-                'label'        => $label,
-                'file_url'     => $fileUrl,  // 👈 مطابق لاسم الحقل في migration
-                'format'       => $fmt,
-                'is_default'   => !empty($s['is_default']),
-                'is_forced'    => !empty($s['is_forced']),
-                'is_active'    => true,
+                'language'   => $lang,
+                'label'      => $label,
+                'file_url'        => $url,
+                'is_default' => !empty($s['is_default']),
             ];
+
+            $seenLangs[]  = $lang;
+            $seenLabels[] = $label;
         }
 
         if (empty($subs)) {
@@ -211,12 +227,15 @@ class EpisodeService
         }
 
         if (!empty($payload)) {
-            // واحد فقط افتراضي
-            $defaultSeen = false;
+            // فرض "واحد فقط افتراضي": نخلي أول واحد true والباقي false إن وجد أكثر من واحد
+            $defaultFound = false;
             foreach ($payload as &$row) {
                 if ($row['is_default']) {
-                    if ($defaultSeen) $row['is_default'] = false;
-                    else $defaultSeen = true;
+                    if ($defaultFound) {
+                        $row['is_default'] = false;
+                    } else {
+                        $defaultFound = true;
+                    }
                 }
             }
             unset($row);

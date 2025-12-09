@@ -177,11 +177,40 @@ $(function() {
         });
     });
 
-    // حذف صف
-    $(document).on('click', '.remove-video-row', function() {
-        $(this).closest('.video-row').remove();
-        enforceUniqueVideoCombo();
+    // حذف صف الفيديو
+    $(document).on('click', '.remove-video-row', function () {
+        let row = $(this).closest('.video-row');
+        let videoId = row.find('.video-id').val();
+        if (videoId) {
+           // alert('test')
+            // إذا الفيديو موجود مسبقًا في DB → نرسل طلب حذف
+            $.ajax({
+
+                url: '/dashboard/video-files/' + videoId,
+                type: 'DELETE',
+                data: {
+                    _token: $('meta[name="csrf-token"]').attr('content')
+                },
+                success: function (res) {
+                    if (res.status) {
+                        row.remove();
+                        enforceUniqueVideoCombo(); // إعادة فحص الجودة بعد الحذف
+                    } else {
+                        alert(res.message);
+                    }
+                },
+                error: function () {
+                    alert('حدث خطأ أثناء الحذف!');
+                }
+            });
+        } else {
+            // الفيديو جديد ولم يُحفظ بعد → نحذفه مباشرة من الواجهة
+            row.remove();
+            enforceUniqueVideoCombo();
+        }
     });
+
+
     $(document).on('change', '.source-toggle', function(){
         const $row   = $(this).closest('.video-row');
         const source = $(this).val();

@@ -11,7 +11,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class Watchlist extends Model
 {
     use HasFactory;
-    // use SoftDeletes;
+    use SoftDeletes;
 
     protected $fillable = [
         'user_id',

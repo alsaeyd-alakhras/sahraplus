@@ -2,10 +2,148 @@
 
 return [
 
+    'price_sar' => 'السعر بالريال',
+    'price_currency' => 'السعر بالعملة',
     'Home' => 'الرئيسية',
+    'active_devices' => 'الأجهزة النشطة',
     'user' => 'المستخدم',
+    'profile' => 'بروفايل',
+    'device' => 'الجهاز',
+    'details' => 'التفاصيل',
+    'last_activity' => 'اخر التفاعل',
+    'ip_address' => 'IP عنوان',
     'rating' => 'التقييم',
+    'de' => 'التقييم',
+    'payments' => 'سجلات الدفع',
     'stars' => 'النجوم',
+    'price' => 'السعر',
+    'payment_reference' => 'رقم عملية الدفع',
+    'pending'           => 'قيد الانتظار',
+    'processing'        => 'جاري المعالجة',
+    'completed'         => 'مكتمل',
+    'failed'            => 'فشل الدفع',
+    'refunded'          => 'مسترجع',
+    'canceled'          => 'ملغي',
+
+
+    'gateway_response'        => 'استجابة بوابة الدفع',
+    'gateway_transaction_id'  => 'معرّف معاملة بوابة الدفع',
+    'gateway'                 => 'بوابة الدفع',
+    'net_amount'              => 'صافي المبلغ',
+    'fee_amount'              => 'رسوم المعاملة',
+    'processed_at'            => 'تاريخ المعالجة',
+    'failed_at'               => 'تاريخ الفشل',
+    'refunded_at'             => 'تاريخ الاسترجاع',
+
+
+    'currency' => 'العملة',
+    'monthly'   => 'شهري',
+    'countryPrices' => 'أسعار الدول',
+    'is_customize' => 'مخصص',
+    'select_country' => 'اختر الدولة',
+    'quarterly' => 'ربع سنوي',
+    'yearly'    => 'سنوي',
+    'sub_plan' => 'خطة الاشتراك',
+    'sub_plans' => 'خطط الاشتراك',
+    'PlanLimitation' => 'حدود الاشتراك',
+    'plan_limitations' => 'حدود الاشتراك',
+
+
+    'id' => 'المعرف',
+    'taxes' => 'الضرائب',
+    'name_ar' => 'الاسم بالعربية',
+    'name_en' => 'الاسم بالإنجليزية',
+    'tax_code' => 'رمز الضريبة',
+    'tax_type' => 'نوع الضريبة',
+    'tax_rate' => 'معدل الضريبة',
+    'applicable_countries' => 'الدول المطبقة عليها',
+    'applicable_plans' => 'الخطط المطبقة عليها',
+    'min_amount' => 'الحد الأدنى للمبلغ',
+    'max_amount' => 'الحد الأقصى للمبلغ',
+    'compound_tax' => 'ضريبة مركبة',
+    'sort_order' => 'ترتيب العرض',
+    'is_active' => 'الحالة (نشط / غير نشط)',
+    'effective_from' => 'تاريخ بداية التطبيق',
+    'effective_until' => 'تاريخ انتهاء التطبيق',
+    'created_at' => 'تاريخ الإنشاء',
+    'updated_at' => 'تاريخ التحديث',
+
+    'access_type' => 'نوع الوصول',
+
+    'discount_value' => 'قيمة الخصم',
+    'discount_type' => 'نوع الخصم',
+    'code' => 'الكود',
+    'fixed' => 'ثابت',
+    'percentage' => 'نسبة',
+    'coupons' => 'قسائم الخصم',
+
+    'usage_limit' => 'الحد الأقصى للاستخدام',
+    'times_used' => 'عدد مرات الاستخدام',
+
+    'metadata' => 'بيانات إضافية',
+
+    'usage_limit_per_user' => 'الحد المسموح لكل مستخدم',
+
+    'content_id' => 'المحتوى المحدد',
+    'PlanContentAccess' => 'وصول المحتوى للخطة',
+
+    'category' => 'التصنيف',
+    'allow' => 'السماح',
+    'deny' => 'المنع',
+
+    'tax_amount' => 'قيمة الضريبة',
+    'discount_amount' => 'قيمة الخصم',
+    'total_amount' => 'المبلغ الإجمالي',
+
+    'payment_method' => 'طريقة الدفع',
+    'users_subscription' => 'اشتراكات المستخدمين',
+
+    'amount' => 'المبلغ',
+    'user_id' => 'اسم المستخدم',
+
+    'starts' => 'تاريخ البداية',
+    'starts_at' => 'بداية الاشتراك',
+    'ends_at' => 'نهاية الاشتراك',
+
+    'movie' => 'فيلم',
+    'series' => 'مسلسل',
+
+    'plan_access' => 'وصول المحتوى حسب الخطة',
+
+    'select_one_plan' => 'اختر خطة واحدة',
+    'content_type' => 'نوع المحتوى',
+    'select_content' => 'اختر المحتوى',
+    'loading' => 'جار التحميل...',
+    'error_loading' => 'حدث خطأ أثناء التحميل',
+    'Save' => 'حفظ',
+    'Delete Confirmation' => 'تأكيد الحذف',
+    'Are you sure?' => 'هل أنت متأكد؟',
+    'upload' => 'رفع',
+    'media' => 'وسائط',
+
+    'limitation_key' => 'مفتاح الحد',
+    'limitation_value' => 'قيمة الحد',
+    'limitation_type' => 'نوع الحد',
+    'limitation_unit' => 'وحدة الحد',
+
+    'select_one_plan' => 'اختر خطة واحدة',
+
+
+    'trial_days'       => 'أيام التجربة',
+    'max_profiles'     => 'عدد البروفايلات القصوى',
+    'max_devices'      => 'عدد الأجهزة القصوى',
+    'download_enabled' => 'تفعيل التحميل',
+    'ads_enabled'      => 'تفعيل الإعلانات',
+    'live_tv_enabled'  => 'تفعيل البث المباشر',
+    'is_popular'       => 'شائع',
+    'is_active'        => 'نشط',
+
+    'billing_period' => 'فترة الدفع',
+    'video_quality' => 'جودة الفيديو',
+    'likes_count' => 'عدد الاعجابات',
+    'comments_count' => 'عدد التعليقات',
+    'shares_count' => 'عدد المشاركات',
+    'aspect_ratio' => 'نسبة العرض إلى الارتفاع',
     'notComplete' => 'لم يكتمل',
     'device_id' => 'الجهاز',
     'duration' => 'المدة',
@@ -16,6 +154,7 @@ return [
     'created' => 'تاريخ انشاء',
     'content_type' => 'نوع المحتوي',
     'content' => 'المحتوي',
+    'video_basic_url' => 'رابط فيديو اساسي',
     'review' => 'التقييم',
     'downloading' => 'نشطة',
     'completed' => 'مكتملة',
@@ -30,10 +169,10 @@ return [
     'helpful_count' => 'عدد الاشخاص الذين وجودها مفيدة',
     'reviewed_at' => 'تاريخ المراجعة',
     'Dashboard' => 'لوحة التحكم',
-    'expires_at'=>'تاريخ  الانتهاء ' ,
-    'expired'=>'تاريخ  الانتهاء ' ,
+    'expires_at' => 'تاريخ  الانتهاء ',
+    'expired' => 'تاريخ  الانتهاء ',
     'completed_at' => 'تاريخ الإكمال',
-    'quality' =>'الجودة',
+    'quality' => 'الجودة',
     'format' => 'تنسيق الملف',
     'Media' => 'الوسائط',
     'Notification' => 'الإشعارات',
@@ -379,7 +518,7 @@ return [
     'subtitle_url_placeholder' => 'https://cdn.example.com/subs.vtt',
     'subtitle_hint' => 'مدعومة ملفات SRT أو VTT. يمكنك رفع ملف أو لصق رابط خارجي.',
     'default'   => 'افتراضي',
-    'delete_row'=> '✕ حذف',
+    'delete_row' => '✕ حذف',
 
     'language_already_used' => '❌ هذه اللغة مستخدمة بالفعل.',
     'label_already_used'    => '❌ هذه التسمية مستخدمة بالفعل.',
@@ -430,6 +569,7 @@ return [
     'nationality'=> 'الجنسية',
     'gender'=> 'الجنس',
 
+    
     // Home Banners
     'HomeBanners' => 'البانرات الرئيسية',
     'AddNewBanner' => 'إضافة بانر جديد',

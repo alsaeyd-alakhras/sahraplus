@@ -10,6 +10,8 @@ use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use App\Repositories\ShortRepository;
+use FFMpeg\FFProbe;
+use Illuminate\Support\Facades\Storage;
 use Yajra\DataTables\Facades\DataTables;
 
 class ShortService
@@ -54,20 +56,61 @@ class ShortService
         return response()->json($uniqueValues);
     }
 
+    // private function getVideoInfo($fileOrUrl)
+    // {
+    //     $isUrl = filter_var($fileOrUrl, FILTER_VALIDATE_URL);
+
+    //     if ($isUrl) {
+    //         // رابط إنترنت → خزّنه مؤقتاً
+    //         $tempDir = storage_path('app/temp_videos');
+    //         if (!file_exists($tempDir)) mkdir($tempDir, 0755, true);
+    //         $tempPath = $tempDir . '/video_' . uniqid() . '.' . pathinfo(parse_url($fileOrUrl, PHP_URL_PATH), PATHINFO_EXTENSION);
+    //         $content = @file_get_contents($fileOrUrl);
+    //         if (!$content) throw new \RuntimeException("Unable to download video from URL: $fileOrUrl");
+    //         file_put_contents($tempPath, $content);
+    //         $filePath = $tempPath;
+    //     } else {
+    //         // ملف محلي → حوله لمسار كامل
+    //         $filePath = $fileOrUrl;
+    //         if (Str::startsWith($fileOrUrl, '/storage')) {
+    //             $filePath = storage_path('app/public' . Str::after($fileOrUrl, '/storage'));
+    //         }
+    //         if (!file_exists($filePath)) {
+    //             throw new \RuntimeException("Local file does not exist: $filePath");
+    //         }
+    //     }
+
+    //     $ffprobe = \FFMpeg\FFProbe::create();
+    //     $stream = $ffprobe->streams($filePath)->videos()->first();
+    //     $height = $stream->get('height');
+    //     $duration = $ffprobe->format($filePath)->get('duration');
+
+    //     // حذف الملف المؤقت لو موجود
+    //     if ($isUrl && file_exists($tempPath)) unlink($tempPath);
+
+    //     $quality = ($height >= 1080) ? '1080p' : (($height >= 720) ? '720p' : '480p');
+    //     $ext = pathinfo(parse_url($fileOrUrl, PHP_URL_PATH), PATHINFO_EXTENSION);
+    //     $format_video = $ext ?: 'mp4';
+    //     return [
+    //         'quality' => $quality,
+    //         'format' => $format_video,
+    //         'duration_seconds' => (int)$duration,
+    //     ];
+    // }
+
     public function save(array $data)
     {
         DB::beginTransaction();
         try {
             $data['created_by'] = $data['created_by'] ?? optional(Auth::guard('admin')->user())->id;
 
-            // ====== جهّز video_path من أول فيديو مُرسل ======
-            $videoRows = $data['video_files'] ?? [];
-            unset($data['video_files']);
-
+            $video_files = $data['video_files'] ?? [];
+            $categoryIds = $data['category_ids'] ?? [];
+            unset($data['video_files'], $data['category_ids']);
             $primaryUrl = null;
-            if (!empty($videoRows)) {
+            if (!empty($video_files)) {
                 // خُذ أول صف (ولو بدك خُذ أول main)
-                $first = collect($videoRows)
+                $first = collect($video_files)
                     ->sortBy('sort_order') // لو عندك ترتيب
                     ->first();
 
@@ -86,47 +129,18 @@ class ShortService
                 }
             }
 
-            // إجبار وجود قيمة بما أن العمود NOT NULL
             if (empty($primaryUrl)) {
-                // ما في ولا فيديو = خلّي الفاليديشن يفشل لاحقًا أو ارمي إستثناء واضح
                 throw new \RuntimeException(__('admin.video_path_required'));
             }
             $data['video_path'] = $primaryUrl;
-
-            // بوستر (نفس منطقك)
             if (!empty($data['poster_path_out'])) {
                 $data['poster_path'] = $data['poster_path_out'];
             }
             unset($data['poster_path_out']);
 
-            // إنشاء الـ Short
             $short = $this->repo->save($data);
-
-            // ====== حفظ بقية ملفات الفيديو في جدول video_files ======
-            foreach ($videoRows as $row) {
-                if (($row['source_type'] ?? 'url') === 'file' && !empty($row['file']) && $row['file'] instanceof UploadedFile) {
-                    $stored = $row['file']->store('shorts/videos', 'public');
-                    $row['file_url'] = asset('storage/' . $stored);
-                }
-
-                if (empty($row['file_url'])) continue;
-
-                // استنتاج الـ format لو مش مرسل
-                if (empty($row['format'])) {
-                    $ext = strtolower(pathinfo(parse_url($row['file_url'], PHP_URL_PATH) ?? '', PATHINFO_EXTENSION));
-                    $row['format'] = in_array($ext, ['mp4', 'webm', 'm3u8']) ? $ext : 'mp4';
-                }
-                $short->videoFiles()->create([
-                    'video_type'       => $row['video_type'] ?? 'main',
-                    'quality'          => $row['quality'] ?? '480p',
-                    'format'           => $row['format'] ?? 'mp4',
-                    'file_url'         => $row['file_url'],
-                    'file_size'        => $row['file_size'] ?? null,
-                    'duration_seconds' => $row['duration_seconds'] ?? null,
-                    'is_downloadable'  => !empty($row['is_downloadable']),
-                    'is_active'        => array_key_exists('is_active', $row) ? (bool)$row['is_active'] : true,
-                ]);
-            }
+            $this->syncCategories($short, $categoryIds ?? []);
+            $this->syncVideoFiles($short, $video_files ?? []);
 
             DB::commit();
             return $short;
@@ -142,61 +156,39 @@ class ShortService
         try {
             $short = $this->repo->getById($id);
 
-            $videoRows = $data['video_files'] ?? [];
-            unset($data['video_files']);
+            $video_files = $data['video_files'] ?? [];
+            $categoryIds = $data['category_ids'] ?? [];
+            unset($data['category_ids'], $data['video_files']);
 
-            // بوستر
-            if (!empty($data['poster_path_out'])) {
-                $data['poster_path'] = $data['poster_path_out'];
-            }
-            unset($data['poster_path_out']);
+            $primaryUrl = null;
+            if (!empty($video_files)) {
+                $first = collect($video_files)
+                    ->sortBy('sort_order') // لو عندك ترتيب
+                    ->first();
 
-            // لو وصل فيديوهات جديدة، حدّث video_path من أول صف
-            if (!empty($videoRows)) {
-                $first = collect($videoRows)->first();
-                $primaryUrl = null;
                 if ($first) {
                     if (($first['source_type'] ?? 'url') === 'file' && !empty($first['file']) && $first['file'] instanceof UploadedFile) {
                         $stored = $first['file']->store('shorts/videos', 'public');
                         $primaryUrl = asset('storage/' . $stored);
                         $first['file_url'] = $primaryUrl;
-                        $videoRows[0] = $first;
                     } else {
                         $primaryUrl = $first['file_url'] ?? null;
                     }
-                }
-                if (!empty($primaryUrl)) {
-                    $data['video_path'] = $primaryUrl;
+                    $videoRows[0] = $first;
                 }
             }
+
+            if (empty($primaryUrl)) {
+                throw new \RuntimeException(__('admin.video_path_required'));
+            }
+            if (!empty($data['poster_path_out'])) {
+                $data['poster_path'] = $data['poster_path_out'];
+            }
+            unset($data['poster_path_out']);
 
             $short = $this->repo->update($data, $id);
-
-            // لو بدك: امسح القديم ثم أعد الإدخال أو اعمل upsert حسب مفاتيحك
-            foreach ($videoRows as $row) {
-                if (($row['source_type'] ?? 'url') === 'file' && !empty($row['file']) && $row['file'] instanceof UploadedFile) {
-                    $stored = $row['file']->store('shorts/videos', 'public');
-                    $row['file_url'] = asset('storage/' . $stored);
-                }
-                if (empty($row['file_url'])) continue;
-
-                if (empty($row['format'])) {
-                    $ext = strtolower(pathinfo(parse_url($row['file_url'], PHP_URL_PATH) ?? '', PATHINFO_EXTENSION));
-                    $row['format'] = in_array($ext, ['mp4', 'webm', 'm3u8']) ? $ext : 'mp4';
-                }
-
-                $short->videoFiles()->create([
-                    'video_type'       => $row['video_type'] ?? 'main',
-                    'quality'          => $row['quality'] ?? '480p',
-                    'format'           => $row['format'] ?? 'mp4',
-                    'file_url'         => $row['file_url'],
-                    'file_size'        => $row['file_size'] ?? null,
-                    'duration_seconds' => $row['duration_seconds'] ?? null,
-                    'is_downloadable'  => !empty($row['is_downloadable']),
-                    'is_active'        => array_key_exists('is_active', $row) ? (bool)$row['is_active'] : true,
-                ]);
-            }
-
+            $this->syncCategories($short, $categoryIds ?? []);
+            $this->syncVideoFiles($short, $video_files ?? [], true);
             DB::commit();
             return $short;
         } catch (\Throwable $e) {
@@ -215,6 +207,95 @@ class ShortService
         } catch (\Throwable $e) {
             DB::rollBack();
             throw $e;
+        }
+    }
+
+    private function syncCategories(Short $short, array $categoryIds): void
+    {
+        $ids = array_filter(array_map('intval', $categoryIds)); // تنظيف
+        $short->categories()->sync($ids); // يضيف ويحذف حسب الحالة
+    }
+
+    private function syncVideoFiles(Short $short, array $files, bool $replace = false): void
+    {
+
+        if ($replace) {
+            $short->videoFiles()->delete();
+        }
+
+        $payload = [];
+        $usedTypes = [];
+        $usedQualities = [];
+        foreach ($files as $f) {
+            $type       = $f['video_type'] ?? null;
+            $quality    = $f['quality']    ?? null;
+            $sourceType = $f['source_type'] ?? 'url';
+            if (!$type || !$quality) continue;
+
+            // التحقق من وجود file أو file_url أولاً
+            if ((!isset($f['file']) || empty($f['file'])) &&
+                (!isset($f['file_url']) || empty($f['file_url']))
+            ) {
+                continue;
+            }
+
+            // الآن نتحقق من التكرار (بعد التأكد من وجود بيانات صالحة)
+            if (in_array($type, $usedTypes) && in_array($quality, $usedQualities)) {
+                continue; // تجاهل المكرر
+            }
+
+            // إضافة للمصفوفات فقط إذا كان العنصر صالح للتخزين
+            $usedTypes[] = $type;
+            $usedQualities[] = $quality;
+            $fileUrl = isset($f['file_url']) ? $f['file_url'] : null;
+            $format  = $f['format']   ?? 'mp4';
+            $size    = null;
+            // لو رُفع ملف
+            if ($sourceType == 'file') {
+                if ($replace) {
+                    $short->videoFiles()->where('video_type', $type)->where('quality', $quality)->delete();
+                }
+                if (isset($f['file']) && $f['file'] instanceof \Illuminate\Http\UploadedFile) {
+                    $path    = $f['file']->store('video_files/shorts', 'public');
+                    $fileUrl = Storage::url($path);
+                    $format  = $format ?: strtolower($f['file']->getClientOriginalExtension());
+                    $size    = $f['file']->getSize();
+                } else {
+                    // ما في ملف جديد؟ استخدم الرابط القديم إن وُجد
+                    $fileUrl = $f['existing_url'] ?? null;
+                }
+            } else { // url
+                $fileUrl = $f['file_url'] ?? null;
+            }
+
+            // لو ما في لا ملف ولا رابط → تجاهل هذا الصف
+            if (!$fileUrl) {
+                continue;
+            }
+
+            $payload[] = [
+                'content_type'     => 'movie',
+                'content_id'       => $short->id,
+                'video_type'       => $type,
+                'quality'          => $quality,
+                'format'           => $format,
+                'file_url'         => $fileUrl,
+                'file_size'        => $size,
+                'duration_seconds' => null,      // ممكن نحسبها لاحقاً بـ ffmpeg
+                'is_downloadable'  => false,
+                'is_active'        => true,
+            ];
+            if ($type == 'trailer') {
+                $short->trailer_url = $fileUrl;
+                $short->save();
+            }
+        }
+        if (empty($files)) {
+            $short->videoFiles()->delete();
+        }
+
+        if (!empty($payload)) {
+            $short->videoFiles()->createMany($payload); // morphMany يملأ content_type/id تلقائيًا
         }
     }
 }

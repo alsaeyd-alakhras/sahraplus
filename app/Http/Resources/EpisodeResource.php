@@ -31,6 +31,7 @@ class EpisodeResource extends JsonResource
             'tmdb_id'         => $this->tmdb_id,
             'created_at'      => $this->created_at?->toDateTimeString(),
             'updated_at'      => $this->updated_at?->toDateTimeString(),
+            'videoFiles' => VideoFileResource::collection($this->whenLoaded('videoFiles')),
         ];
     }
 }

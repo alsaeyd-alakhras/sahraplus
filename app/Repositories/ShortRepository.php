@@ -16,7 +16,7 @@ class ShortRepository
 
     public function getQuery(): Builder
     {
-        return $this->short->query();
+        return $this->short->query()->latest();
     }
 
     public function getById(int $id): ?Short

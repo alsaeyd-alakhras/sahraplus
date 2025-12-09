@@ -48,8 +48,18 @@ class CountryService
                     // دعم حالة is_active كنص عربي/قيمة منطقية
                     if ($fieldName === 'is_active') {
                         $map = [
-                            'نشط' => 1, 'فعال' => 1, 'active' => 1, '1' => 1, 1 => 1, true => 1,
-                            'غير نشط' => 0, 'غير فعال' => 0, 'inactive' => 0, '0' => 0, 0 => 0, false => 0,
+                            'نشط' => 1,
+                            'فعال' => 1,
+                            'active' => 1,
+                            '1' => 1,
+                            1 => 1,
+                            true => 1,
+                            'غير نشط' => 0,
+                            'غير فعال' => 0,
+                            'inactive' => 0,
+                            '0' => 0,
+                            0 => 0,
+                            false => 0,
                         ];
                         $bools = [];
                         foreach ($filteredValues as $v) {
@@ -67,9 +77,9 @@ class CountryService
 
         return DataTables::of($countries)
             ->addIndexColumn() // رقم تسلسلي
-           ->addColumn('is_active', function ($country) {
-    return $country->is_active ? 'نشط' : 'غير نشط';
-})
+            ->addColumn('is_active', function ($country) {
+                return $country->is_active ? 'نشط' : 'غير نشط';
+            })
             ->addColumn('edit', function ($country) {
                 return $country->id;
             })
@@ -100,8 +110,18 @@ class CountryService
                     if (!empty($filteredValues)) {
                         if ($fieldName === 'is_active') {
                             $map = [
-                                'نشط' => 1, 'فعال' => 1, 'active' => 1, '1' => 1, 1 => 1, true => 1,
-                                'غير نشط' => 0, 'غير فعال' => 0, 'inactive' => 0, '0' => 0, 0 => 0, false => 0,
+                                'نشط' => 1,
+                                'فعال' => 1,
+                                'active' => 1,
+                                '1' => 1,
+                                1 => 1,
+                                true => 1,
+                                'غير نشط' => 0,
+                                'غير فعال' => 0,
+                                'inactive' => 0,
+                                '0' => 0,
+                                0 => 0,
+                                false => 0,
                             ];
                             $bools = [];
                             foreach ($filteredValues as $v) {

@@ -13,8 +13,6 @@ class ViewingHistory extends Model
 {
     use HasFactory;
 
-
-
     protected $fillable = [
         'user_id', 'profile_id', 'content_type', 'content_id',
         'watch_duration_seconds', 'completion_percentage', 'device_type',

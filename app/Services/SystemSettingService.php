@@ -19,9 +19,8 @@ class SystemSettingService
         'site_email',
         'site_phone',
         'site_address',
-
-        // الهوية البصرية / الواجهة
-        'logo_url',
+        'site_tax',
+        // الهوية البصرية / الواجهة        'logo_url',
         'favicon_url',
         'primary_color',
         'secondary_color',

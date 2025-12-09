@@ -2,8 +2,7 @@
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}"
     class="light-style layout-navbar-fixed layout-menu-fixed layout-compact"
     dir="{{ str_replace('_', '-', app()->getLocale()) == 'ar' ? 'rtl' : 'ltr' }}" data-theme="theme-default"
-    data-assets-path="{{ asset('assets') }}/"
-    data-template="vertical-menu-template-starter" data-style="light">
+    data-assets-path="{{ asset('assets') }}/" data-template="vertical-menu-template-starter" data-style="light">
 
 <head>
     <meta charset="utf-8" />
@@ -46,6 +45,7 @@
 
     <link rel="stylesheet" href="{{ asset('assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.css') }}" />
 
+    <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <!-- Page CSS -->
 
@@ -63,6 +63,8 @@
     <script src="{{ asset('assets/js/config.js') }}"></script>
 
     <link href="{{ asset('css/plugins/toastr.min.css') }}" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@1.4.2/src/phosphor.css">
+
     <style>
         .avatar img {
             object-fit: cover;

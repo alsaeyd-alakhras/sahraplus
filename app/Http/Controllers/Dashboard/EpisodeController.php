@@ -10,6 +10,8 @@ use App\Http\Controllers\Controller;
 use App\Models\Country;
 use App\Models\Season;
 use App\Models\Series;
+use App\Models\Subtitle;
+use App\Models\VideoFiles;
 use Carbon\Carbon;
 
 class EpisodeController extends Controller
@@ -153,5 +155,35 @@ class EpisodeController extends Controller
         $i = (int) $request->get('i', 0);
         $row = [];
         return view('dashboard.series.episodes.partials._subtitle_row', compact('i', 'row'));
+    }
+    public function deleteVideo($id)
+    {
+        $video = VideoFiles::find($id);
+        if ($video) {
+            $video->delete();
+            return response()->json([
+                'status' => true,
+                'message' => 'تم حذف الفيديو بنجاح'
+            ]);
+        }
+        return response()->json([
+            'status' => false,
+            'message' => 'الفيديو غير موجود'
+        ], 404);
+    }
+    public function deleteSubtitle($id)
+    {
+        $subtitle = Subtitle::find($id);
+        if ($subtitle) {
+            $subtitle->delete();
+            return response()->json([
+                'status' => true,
+                'message' => 'تم حذف الترجمة بنجاح'
+            ]);
+        }
+        return response()->json([
+            'status' => false,
+            'message' => 'الترجمة غير موجودة'
+        ], 404);
     }
 }

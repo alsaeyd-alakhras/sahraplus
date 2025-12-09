@@ -49,6 +49,9 @@ class UserRatingService
         return DataTables::of($users_rating)
             ->addIndexColumn() // رقم تسلسلي
             ->addColumn('edit', fn($user_rating) => $user_rating->id)
+            ->addColumn('user_id', function ($row) {
+                return $row->user ?  $row->user->first_name.' '. $row->user->last_name : 'jj' ;
+            })
             ->make(true);
     }
 

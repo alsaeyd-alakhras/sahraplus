@@ -50,10 +50,10 @@ $(function () {
 });
 
 // Cast
-$(function() {
+$(function () {
     function initPersonSelect(context) {
         $(context).find('.person-select').select2({
-            placeholder: function() {
+            placeholder: function () {
                 return $(this).data('placeholder') || "اكتب للبحث...";
             },
             allowClear: true,
@@ -66,7 +66,7 @@ $(function() {
                 }),
                 processResults: data => {
                     // احذف الأشخاص المختارين من النتائج
-                    let usedIds = $('#cast-rows .person-select').map(function() {
+                    let usedIds = $('#cast-rows .person-select').map(function () {
                         return $(this).val();
                     }).get();
 
@@ -84,9 +84,9 @@ $(function() {
             },
             templateSelection: person => person.text || person.id,
             escapeMarkup: m => m
-        }).on('select2:select', function(e) {
+        }).on('select2:select', function (e) {
             let selectedId = e.params.data.id;
-            let duplicates = $('#cast-rows .person-select').not(this).filter(function() {
+            let duplicates = $('#cast-rows .person-select').not(this).filter(function () {
                 return $(this).val() == selectedId;
             });
 
@@ -97,22 +97,22 @@ $(function() {
             }
 
             refreshSelected();
-        }).on('select2:unselect', function() {
+        }).on('select2:unselect', function () {
             refreshSelected();
         });
     }
     // init للصفوف الجاهزة عند تحميل الصفحة
-    $(function() {
+    $(function () {
         initPersonSelect(document);
     });
     let castIndex = $('#cast-rows .cast-row').length ? $('#cast-rows .cast-row').length - 1 : 0;
 
     // إضافة سطر جديد
-    $('#add-cast-row').on('click', function() {
+    $('#add-cast-row').on('click', function () {
         castIndex++;
         $.get(castRowPartial, {
             i: castIndex
-        }, function(html) {
+        }, function (html) {
             let newRow = $(html);
             $('#cast-rows').append(newRow);
             renumberOrdering();
@@ -121,15 +121,116 @@ $(function() {
         });
     });
 
-    // حذف سطر
-    $(document).on('click', '.remove-cast-row', function() {
-        $(this).closest('.cast-row').remove();
-        renumberOrdering();
-        refreshSelected();
+    $('#add-cast-sub-row').on('click', function () {
+        castIndex++;
+        $.get(subRowPartial, {
+            i: castIndex
+        }, function (html) {
+            let newRow = $(html);
+            $('#cast-rows').append(newRow);
+            renumberOrdering();
+            refreshSelected();
+            initPersonSelect(newRow);
+        });
+
+    });
+
+    // حذف كاست من قاعدة البيانات أو من الواجهة
+    $(document).on('click', '.remove-cast-row', function () {
+        let row = $(this).closest('.cast-row');
+        let castId = row.find('.cast-id').val();
+        // alert(castId)
+        if (castId) {
+            $.ajax({
+                url: '/dashboard/movies-casts/' + castId,
+                type: 'DELETE',
+                data: {
+                    _token: $('meta[name="csrf-token"]').attr('content')
+                },
+                success: function (res) {
+                    if (res.status) {
+                        row.remove();
+                        renumberOrdering();
+                        refreshSelected();
+                    } else {
+                        alert(res.message);
+                    }
+                },
+                error: function () {
+                    alert('حدث خطأ أثناء الحذف!');
+                }
+            });
+        } else {
+            row.remove();
+            renumberOrdering();
+            refreshSelected();
+        }
+    });
+
+    $(document).on('click', '.remove-cast-sub-row', function () {
+        let row = $(this).closest('.cast-row');
+        let castId = row.find('.cast-id').val();
+        //alert(castId)
+        if (castId) {
+            $.ajax({
+                url: '/dashboard/sub-plans-delete/' + castId,
+                type: 'DELETE',
+                data: {
+                    _token: $('meta[name="csrf-token"]').attr('content')
+                },
+                success: function (res) {
+                    if (res.status) {
+                        row.remove();
+                        renumberOrdering();
+                        refreshSelected();
+                    } else {
+                        alert(res.message);
+                    }
+                },
+                error: function () {
+                    alert('حدث خطأ أثناء الحذف!');
+                }
+            });
+        } else {
+            row.remove();
+            renumberOrdering();
+            refreshSelected();
+        }
+    });
+
+    $(document).on('click', '.remove-country-row', function () {
+        let row = $(this).closest('.country-row');
+        let castId = row.find('.countryPrices-id').val();
+        //alert(castId)
+        if (castId) {
+            $.ajax({
+                url: '/dashboard/country-delete/' + castId,
+                type: 'DELETE',
+                data: {
+                    _token: $('meta[name="csrf-token"]').attr('content')
+                },
+                success: function (res) {
+                    if (res.status) {
+                        row.remove();
+                        renumberOrdering();
+                        refreshSelected();
+                    } else {
+                        alert(res.message);
+                    }
+                },
+                error: function () {
+                    alert('حدث خطأ أثناء الحذف!');
+                }
+            });
+        } else {
+            row.remove();
+            renumberOrdering();
+            refreshSelected();
+        }
     });
 
     // مسح الشخص من حقل الإدخال
-    $(document).on('click', '.person-clear', function() {
+    $(document).on('click', '.person-clear', function () {
         let row = $(this).closest('.cast-row');
         row.find('.person-input').val('');
         row.find('.person-id').val('');
@@ -138,7 +239,7 @@ $(function() {
     });
 
     // تحليل اختيار الـ datalist => تعبئة person_id
-    $(document).on('input', '.person-input', function() {
+    $(document).on('input', '.person-input', function () {
         let row = $(this).closest('.cast-row');
         let txt = $(this).val().trim();
         let id = txt.includes('#') ? txt.split('#').pop().trim() : '';
@@ -156,19 +257,19 @@ $(function() {
     });
 
     // تحريك لأعلى/أسفل
-    $(document).on('click', '.move-up', function() {
+    $(document).on('click', '.move-up', function () {
         let row = $(this).closest('.cast-row');
         row.prev('.cast-row').before(row);
         renumberOrdering();
     });
-    $(document).on('click', '.move-down', function() {
+    $(document).on('click', '.move-down', function () {
         let row = $(this).closest('.cast-row');
         row.next('.cast-row').after(row);
         renumberOrdering();
     });
 
     // إزالة من المختار (chip) وإرجاعه للسطر المعني
-    $(document).on('click', '.chip-remove', function() {
+    $(document).on('click', '.chip-remove', function () {
         let id = $(this).closest('.cast-chip').data('id');
         let row = findRowByPersonId(id);
         if (row.length) {
@@ -183,15 +284,27 @@ $(function() {
     // ===== Helpers =====
 
     function renumberOrdering() {
-        $('#cast-rows .cast-row').each(function(index) {
-            $(this).find('input[name*="[sort_order]"]').val(index);
+        // في وضع التعديل لا نلمس ترتيب السطور الموجودة
+        if (form_type === "edit") {
+            return;
+        }
+
+        // في وضع الإضافة فقط نعمل إعادة ترقيم
+        $('#cast-rows .cast-row').each(function (index) {
+            let id = $(this).find('.cast-id').val();
+
+            // للحفاظ على السطور من DB → فقط السطور الجديدة تُرقّم
+            if (!id || id === "" || id === null) {
+                $(this).find('input[name*="[sort_order]"]').val(index);
+            }
         });
     }
 
 
+
     function isDuplicate(personId, currentRow) {
         let dup = false;
-        $('#cast-rows .cast-row').each(function() {
+        $('#cast-rows .cast-row').each(function () {
             if (this === currentRow[0]) return;
             const other = $(this).find('.person-id').val();
             if (other && other === personId) {
@@ -204,7 +317,7 @@ $(function() {
 
     function findRowByPersonId(personId) {
         let found = $();
-        $('#cast-rows .cast-row').each(function() {
+        $('#cast-rows .cast-row').each(function () {
             if ($(this).find('.person-id').val() === personId) {
                 found = $(this);
                 return false;
@@ -219,7 +332,7 @@ $(function() {
         wrap.empty();
 
         let any = false;
-        $('#cast-rows .person-select').each(function() {
+        $('#cast-rows .person-select').each(function () {
             const pid = $(this).val();
             const name = $(this).find('option:selected').text().trim();
             if (pid && name) {
@@ -237,16 +350,16 @@ $(function() {
     }
 
     // init
-    $(function() {
+    $(function () {
         renumberOrdering();
         refreshSelected();
     });
 });
 
 // Video Files
-$(function() {
+$(function () {
     function usedQualities() {
-        return $('#video-rows .video-quality').map(function() {
+        return $('#video-rows .video-quality').map(function () {
             return $(this).val();
         }).get();
     }
@@ -254,7 +367,7 @@ $(function() {
     // منع تكرار الجودة
     function enforceUniqueVideoCombo($changed) {
         const seen = {};
-        $('#video-rows .video-row').each(function() {
+        $('#video-rows .video-row').each(function () {
             const $row = $(this);
             const type = $row.find('.video-type').val();
             const quality = $row.find('.video-quality').val();
@@ -324,23 +437,23 @@ $(function() {
         // المصدر الافتراضي: URL
         toggleSource($row, 'url');
 
-        $row.find('.source-toggle').on('change', function() {
+        $row.find('.source-toggle').on('change', function () {
             toggleSource($row, $(this).val());
             inferFormatFrom($row);
         });
 
-        $row.find('.video-file').on('change', function() {
+        $row.find('.video-file').on('change', function () {
             inferFormatFrom($row);
         });
 
-        $row.find('.video-url').on('input', function() {
+        $row.find('.video-url').on('input', function () {
             inferFormatFrom($row);
         });
 
-        $row.find('.video-quality').on('change', function() {
+        $row.find('.video-quality').on('change', function () {
             enforceUniqueVideoCombo($(this));
         });
-        $row.find('.video-type').on('change', function() {
+        $row.find('.video-type').on('change', function () {
             enforceUniqueVideoCombo($(this));
         });
 
@@ -360,11 +473,11 @@ $(function() {
 
     // زر إضافة صف
     let videoIndex = $('#video-rows .video-row').length ? $('#video-rows .video-row').length - 1 : 0;
-    $('#add-video-row').on('click', function() {
+    $('#add-video-row').on('click', function () {
         videoIndex++;
         $.get(videoRowPartial, {
             i: videoIndex
-        }, function(html) {
+        }, function (html) {
             const $newRow = $(html);
             $('#video-rows').append($newRow);
             initVideoRow($newRow);
@@ -372,15 +485,42 @@ $(function() {
     });
 
     // حذف صف
-    $(document).on('click', '.remove-video-row', function() {
-        $(this).closest('.video-row').remove();
-        enforceUniqueVideoCombo();
+    $(document).on('click', '.remove-video-row', function () {
+        let row = $(this).closest('.video-row');
+        let videoId = row.find('.video-id').val();
+        // alert('test')
+        if (videoId) {
+            //alert('test')
+            // إذا الفيديو موجود مسبقًا في DB → نرسل طلب حذف
+            $.ajax({
+                url: '/dashboard/movies-video-files/' + videoId,
+                type: 'DELETE',
+                data: {
+                    _token: $('meta[name="csrf-token"]').attr('content')
+                },
+                success: function (res) {
+                    if (res.status) {
+                        row.remove();
+                        enforceUniqueVideoCombo(); // إعادة فحص الجودة بعد الحذف
+                    } else {
+                        alert(res.message);
+                    }
+                },
+                error: function () {
+                    alert('حدث خطأ أثناء الحذف!');
+                }
+            });
+        } else {
+            // الفيديو جديد ولم يُحفظ بعد → نحذفه مباشرة من الواجهة
+            row.remove();
+            enforceUniqueVideoCombo();
+        }
     });
-    $(document).on('change', '.source-toggle', function(){
-        const $row   = $(this).closest('.video-row');
+    $(document).on('change', '.source-toggle', function () {
+        const $row = $(this).closest('.video-row');
         const source = $(this).val();
-        const $file  = $row.find('.video-file');
-        const $url   = $row.find('.video-url');
+        const $file = $row.find('.video-file');
+        const $url = $row.find('.video-url');
         let $sourceType = $row.find('.source-type');
 
         if (source === 'file') {
@@ -397,13 +537,13 @@ $(function() {
 
 
     // init للصفوف الحالية
-    $('#video-rows .video-row').each(function() {
+    $('#video-rows .video-row').each(function () {
         initVideoRow($(this));
     });
 });
 
 // Subtitles
-$(function() {
+$(function () {
 
     // خريطة لأسماء اللغات لملء label تلقائيًا إن كان فاضي
     const LANG_LABELS = {
@@ -423,13 +563,13 @@ $(function() {
     };
 
     function usedLangs() {
-        return $('#sub-rows .sub-language').map(function() {
+        return $('#sub-rows .sub-language').map(function () {
             return ($(this).val() || '').trim().toLowerCase();
         }).get().filter(Boolean);
     }
 
     function usedLabels() {
-        return $('#sub-rows .sub-label').map(function() {
+        return $('#sub-rows .sub-label').map(function () {
             return ($(this).val() || '').trim();
         }).get().filter(Boolean);
     }
@@ -437,7 +577,7 @@ $(function() {
     // منع تكرار اللغة
     function enforceUniqueLanguage() {
         const seen = {};
-        $('#sub-rows .sub-row').each(function() {
+        $('#sub-rows .sub-row').each(function () {
             const $row = $(this);
             const lang = ($row.find('.sub-language').val() || '').trim().toLowerCase();
 
@@ -458,7 +598,7 @@ $(function() {
     // منع تكرار label
     function enforceUniqueLabel() {
         const seen = {};
-        $('#sub-rows .sub-row').each(function() {
+        $('#sub-rows .sub-row').each(function () {
             const $row = $(this);
             const lbl = ($row.find('.sub-label').val() || '').trim();
 
@@ -515,20 +655,20 @@ $(function() {
         // مصدر افتراضي: URL
         toggleSource($row, 'url');
 
-        $row.find('.sub-source').on('change', function() {
+        $row.find('.sub-source').on('change', function () {
             toggleSource($row, $(this).val());
         });
 
-        $row.find('.sub-language').on('input', function() {
+        $row.find('.sub-language').on('input', function () {
             autoFillLabel($row);
             enforceUniqueLanguage();
         });
 
-        $row.find('.sub-label').on('input', function() {
+        $row.find('.sub-label').on('input', function () {
             enforceUniqueLabel();
         });
 
-        $row.find('.sub-default').on('change', function() {
+        $row.find('.sub-default').on('change', function () {
             enforceSingleDefault($(this));
         });
 
@@ -541,26 +681,52 @@ $(function() {
     // إضافة صف جديد
     let subIndex = $('#sub-rows .sub-row').length ? $('#sub-rows .sub-row').length - 1 : 0;
 
-    $('#add-sub-row').on('click', function() {
+    $('#add-sub-row').on('click', function () {
         subIndex++;
         $.get(subtitleRowPartial, {
             i: subIndex
-        }, function(html) {
+        }, function (html) {
             const $newRow = $(html);
             $('#sub-rows').append($newRow);
             initSubRow($newRow);
         });
     });
 
-    // حذف صف
-    $(document).on('click', '.remove-sub-row', function() {
-        $(this).closest('.sub-row').remove();
-        enforceUniqueLanguage();
-        enforceUniqueLabel();
+
+    // حذف ترجمة من قاعدة البيانات أو من الواجهة
+    $(document).on('click', '.remove-sub-row', function () {
+        let row = $(this).closest('.sub-row');
+        let subId = row.find('.sub-id').val();
+        if (subId) {
+            $.ajax({
+                url: '/dashboard/movies-subtitles/' + subId,
+                type: 'DELETE',
+                data: {
+                    _token: $('meta[name="csrf-token"]').attr('content')
+                },
+                success: function (res) {
+                    if (res.status) {
+                        row.remove();
+                        enforceUniqueLanguage();
+                        enforceUniqueLabel();
+                    } else {
+                        alert(res.message);
+                    }
+                },
+                error: function () {
+                    alert('حدث خطأ أثناء الحذف!');
+                }
+            });
+        } else {
+            row.remove();
+            enforceUniqueLanguage();
+            enforceUniqueLabel();
+        }
     });
 
+
     // init للصفوف الموجودة
-    $('#sub-rows .sub-row').each(function() {
+    $('#sub-rows .sub-row').each(function () {
         initSubRow($(this));
     });
 

@@ -10,8 +10,8 @@
                         <label for="upload" class="mb-4 btn btn-primary me-3" tabindex="0">
                             <span class="d-none d-sm-block">رفع صورة جديدة</span>
                             <i class="ti ti-upload d-block d-sm-none"></i>
-                            <input type="file" name="avatarUpload" id="upload" class="account-file-input"
-                                hidden accept="image/png, image/jpeg" />
+                            <input type="file" name="avatarUpload" id="upload" class="account-file-input" hidden
+                                accept="image/png, image/jpeg" />
                         </label>
                         <div>مسموح JPG, GIF or PNG.</div>
                     </div>
@@ -23,29 +23,36 @@
             <div class="pt-4 card-body">
                 <div class="row">
                     <div class="mb-4 col-md-6">
-                        <x-form.input label="{{ __('admin.Name') }}" :value="$admin->name" name="name" placeholder="{{ __('admin.Name_placeholder') }}" required
-                            autofocus />
+                        <x-form.input label="{{ __('admin.Name') }}" :value="$admin->name" name="name"
+                            placeholder="{{ __('admin.Name_placeholder') }}" required autofocus />
                     </div>
                     <div class="mb-4 col-md-6">
                         <x-form.input type="email" label="{{ __('admin.Email') }}" :value="$admin->email" name="email"
                             placeholder="{{ __('admin.Email_placeholder') }}" required />
                     </div>
                     <div class="mb-4 col-md-6">
-                        <x-form.input label=" {{ __('admin.Username') }}" :value="$admin->username" name="username" placeholder="{{ __('admin.Username_placeholder') }}"
-                            />
+                        <x-form.input label=" {{ __('admin.Username') }}" :value="$admin->username" name="username"
+                            placeholder="{{ __('admin.Username_placeholder') }}" />
                     </div>
+
+                    <div class="mb-4 col-md-6">
+                        <x-form.input label=" {{ __('admin.tax') }}" :value="$admin->tax" name="tax"
+                            placeholder="{{ __('admin.tax') }}" />
+                    </div>
+
                     <div class="mb-4 col-md-6">
                         @if (isset($btn_label))
-                            <x-form.input type="password" min="6" label="{{ __('admin.Password') }}" name="password" placeholder="****" />
+                            <x-form.input type="password" min="6" label="{{ __('admin.Password') }}"
+                                name="password" placeholder="****" />
                         @else
-                            <x-form.input type="password" min="6" label="{{ __('admin.Password') }}" name="password" placeholder="****"
-                                required />
+                            <x-form.input type="password" min="6" label="{{ __('admin.Password') }}"
+                                name="password" placeholder="****" required />
                         @endif
                     </div>
                     <div class="mb-4 col-md-6">
                         @if (!isset($btn_label))
-                            <x-form.input type="password" min="6" label="{{ __('admin.Confirm_password') }}" name="confirm_password"
-                                    placeholder="****" required />
+                            <x-form.input type="password" min="6" label="{{ __('admin.Confirm_password') }}"
+                                name="confirm_password" placeholder="****" required />
                         @endif
                     </div>
                 </div>
@@ -61,7 +68,8 @@
             </div>
         </div>
         @if (!isset($settings_profile))
-            <div class="mb-3 border shadow card border-1" id="permissions-box" style="display: {{$admin->admin_type == 'admin' || $admin->admin_type == 'vendor' || $admin->admin_type == null ? 'block' : 'none' }};">
+            <div class="mb-3 border shadow card border-1" id="permissions-box"
+                style="display: {{ $admin->admin_type == 'admin' || $admin->admin_type == 'vendor' || $admin->admin_type == null ? 'block' : 'none' }};">
                 <div class="card-body">
                     <div class="row">
                         <div class="table-responsive text-nowrap">

@@ -16,7 +16,7 @@ class MovieRepository
 
     public function getQuery(): Builder
     {
-        return $this->movie->query();
+        return $this->movie->query()->latest();
     }
 
     public function getById(int $id): ?Movie

@@ -187,6 +187,7 @@
                                         ? $short->videoFiles
                                             ->map(function ($vf) {
                                                 return [
+                                                    'id' => $vf->id,
                                                     'video_type' => $vf->video_type,
                                                     'quality' => $vf->quality,
                                                     'file_url' => $vf->file_url,

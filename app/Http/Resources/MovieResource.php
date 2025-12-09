@@ -36,7 +36,10 @@ class MovieResource extends JsonResource
             'is_featured' => $this->is_featured,
             'view_count' => $this->view_count,
             'tmdb_id' => $this->tmdb_id,
-            'created_by' => $this->created_by
+            'created_by' => $this->created_by,
+            'categories' => CategoryResource::collection($this->whenLoaded('categories')),
+            'videoFiles' => VideoFileResource::collection($this->whenLoaded('videoFiles')),
+            'subtitles' => SubtitleResource::collection($this->whenLoaded('subtitles')),
         ];
     }
 }

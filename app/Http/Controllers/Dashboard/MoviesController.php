@@ -10,6 +10,9 @@ use App\Models\Category;
 use App\Services\MovieService;
 use App\Http\Requests\MovieRequest;
 use App\Http\Controllers\Controller;
+use App\Models\MovieCast;
+use App\Models\Subtitle;
+use App\Models\VideoFiles;
 
 class MoviesController extends Controller
 {
@@ -173,6 +176,12 @@ class MoviesController extends Controller
         ];
         return view('dashboard.movies.partials._cast_row', compact('i', 'allPeople', 'roleTypes'));
     }
+    public function subRowPartial(Request $request)
+    {
+        $i = $request->i;
+        return view('dashboard.subscription_plans.partials._cast_row', compact('i'));
+    }
+
     public function videoRowPartial(Request $request)
     {
         $i   = (int) $request->get('i', 0);
@@ -183,5 +192,54 @@ class MoviesController extends Controller
     {
         $i = $request->i;
         return view('dashboard.movies.partials._subtitle_row', compact('i'));
+    }
+    public function deleteVideo($id)
+    {
+        $video = VideoFiles::find($id);
+        if ($video) {
+            $video->delete();
+            return response()->json([
+                'status' => true,
+                'message' => 'تم حذف الفيديو بنجاح'
+            ]);
+        }
+        return response()->json([
+            'status' => false,
+            'message' => 'الفيديو غير موجود'
+        ], 404);
+    }
+    // حذف كاست
+    public function deleteCast($id)
+    {
+        $cast = MovieCast::find($id);
+        // افترض اسم الموديل Cast
+        if ($cast) {
+            $cast->delete();
+            return response()->json([
+                'status' => true,
+                'message' => 'تم حذف الممثل بنجاح'
+            ]);
+        }
+        return response()->json([
+            'status' => false,
+            'message' => 'الممثل غير موجود'
+        ], 404);
+    }
+
+    // حذف ترجمة
+    public function deleteSubtitle($id)
+    {
+        $subtitle = Subtitle::find($id);
+        if ($subtitle) {
+            $subtitle->delete();
+            return response()->json([
+                'status' => true,
+                'message' => 'تم حذف الترجمة بنجاح'
+            ]);
+        }
+        return response()->json([
+            'status' => false,
+            'message' => 'الترجمة غير موجودة'
+        ], 404);
     }
 }

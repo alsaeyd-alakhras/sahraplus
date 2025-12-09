@@ -50,5 +50,41 @@ class MoviesController extends Controller
 
         $movie->load(['categories','cast','videoFiles','subtitles','comments.user']);
         return new MovieResource($movie);
+
+        // $user = auth('sanctum')->user();
+        // if(!$user){
+        //     return response()->json([
+        //         "success" => false,
+        //         "message" => "User Not Auth"
+        //     ], 401);
+        // }
+        // $movie = Movie::with(['categories', 'cast', 'videoFiles', 'subtitles'])->findOrFail($id);
+
+        // // 1) فحص الاشتراك
+        // $subscription = $user->activeSubscription;
+        // $hasAccess = false;
+
+        // if ($subscription) {
+        //     $hasAccess = $subscription->plan
+        //         ->contentAccess()
+        //         ->where('content_type', 'movie')
+        //         ->where('content_id', $movie->id)
+        //         ->where('access_type', 'allow')
+        //         ->exists();
+        // }
+
+        // // 2) لو ما عنده وصول → نحذف روابط الفيديو فقط
+        // if (!$hasAccess) {
+        //     foreach ($movie->videoFiles as $video) {
+        //        // unset($video->file_url); // حذف الرابط
+        //         $video->file_url = $hasAccess ? $video->file_url : null;
+        //     }
+        // }
+
+        // return response()->json([
+        //     "success" => true,
+        //     "status_subscription" => $hasAccess ? "Access granted" : "Upgrade your plan to watch this movie",
+        //     "movie" => new MovieResource($movie),
+        // ]);
     }
 }

@@ -11,7 +11,7 @@ class EpisodeRepository
 
     public function getQuery(): Builder
     {
-        return $this->episode->query();
+        return $this->episode->query()->latest();
     }
 
     public function getById(int $id): ?Episode

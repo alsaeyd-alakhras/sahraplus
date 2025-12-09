@@ -105,13 +105,14 @@
                             <label class="form-check-label" for="is_kids">محتوى للأطفال</label>
                         </div>
 
+
                     </div>
 
 
-                    
+
                     <div class="mb-4 col-md-4">
                         <x-form.input type="number" label="وقت تخطي المقدمة " :value="$movie->intro_skip_time" name="intro_skip_time"
-                             min="0" />
+                            min="0" />
 
                     </div>
 
@@ -133,7 +134,7 @@
 
                         @php
                             $poster_url = Str::startsWith($movie->poster_url, ['http', 'https']);
-                            $poster_url_out = ($poster_url ? $movie->poster_url : null);
+                            $poster_url_out = $poster_url ? $movie->poster_url : null;
                         @endphp
                         <x-form.input type="url" label="رابط البوستر" :value="$poster_url_out" name="poster_url_out"
                             placeholder="أو اختر من الوسائط" />
@@ -153,7 +154,8 @@
                             </button>
                         </div>
                         <div class="mt-2">
-                            <img src="{{ $movie->poster_full_url }}" alt="poster" id="poster_img"
+                            <img src="{{ !empty($movie->poster_full_url) ? $movie->poster_full_url : asset('imgs/default.png') }}"
+                                alt="poster" id="poster_img"
                                 class="{{ !empty($movie->poster_url) ? '' : 'd-none' }}" style="max-height:100px">
                         </div>
                     </div>
@@ -162,7 +164,7 @@
 
                         @php
                             $backdrop_url = Str::startsWith($movie->backdrop_url, ['http', 'https']);
-                            $backdrop_url_out = ($backdrop_url ? $movie->backdrop_url : null);
+                            $backdrop_url_out = $backdrop_url ? $movie->backdrop_url : null;
                         @endphp
                         <x-form.input type="url" label="رابط الخلفية" :value="$backdrop_url_out" name="backdrop_url_out"
                             placeholder="أو اختر من الوسائط" />
@@ -226,14 +228,15 @@
                         {{-- الحاوية للكل --}}
 
                         <div id="category-badges" class="flex-wrap gap-2 d-flex">
-                        @foreach($allCategories as $category)
-                            <label class="px-3 py-1 mb-2 btn btn-outline-primary rounded-pill" data-id="{{ $category->id }}">
-                                <input type="checkbox" class="d-none"
-                                        name="category_ids[]" value="{{ $category->id }}"
+                            @foreach ($allCategories as $category)
+                                <label class="px-3 py-1 mb-2 btn btn-outline-primary rounded-pill"
+                                    data-id="{{ $category->id }}">
+                                    <input type="checkbox" class="d-none" name="category_ids[]"
+                                        value="{{ $category->id }}"
                                         {{ in_array($category->id, old('category_ids', $movie->categories->pluck('id')->toArray() ?? [])) ? 'checked' : '' }}>
-                                {{ $category->name_ar }}
-                            </label>
-                        @endforeach
+                                    {{ $category->name_ar }}
+                                </label>
+                            @endforeach
                         </div>
 
 
@@ -243,7 +246,7 @@
             </div>
         </div>
 
-        
+
         <div class="mb-3 border shadow card border-1">
             <div class="pt-4 card-body">
                 <div class="row">
@@ -276,18 +279,19 @@
                                                     'role_type' => $p->pivot->role_type,
                                                     'character_name' => $p->pivot->character_name,
                                                     'sort_order' => $p->pivot->sort_order,
+                                                    'id' => $p->pivot->id,
                                                 ];
                                             })
                                             ->toArray()
                                         : [],
                                 );
                                 $roleTypes = [
-                                    'actor'           => __('admin.actor'),
-                                    'director'        => __('admin.director'),
-                                    'writer'          => __('admin.writer'),
-                                    'producer'        => __('admin.producer'),
+                                    'actor' => __('admin.actor'),
+                                    'director' => __('admin.director'),
+                                    'writer' => __('admin.writer'),
+                                    'producer' => __('admin.producer'),
                                     'cinematographer' => __('admin.cinematographer'),
-                                    'composer'        => __('admin.composer'),
+                                    'composer' => __('admin.composer'),
                                 ];
                             @endphp
 
@@ -331,6 +335,7 @@
                                         ? $movie->videoFiles
                                             ->map(function ($vf) {
                                                 return [
+                                                    'id' => $vf->id,
                                                     'video_type' => $vf->video_type,
                                                     'quality' => $vf->quality,
                                                     'file_url' => $vf->file_url,
@@ -374,7 +379,7 @@
                                     'subtitles',
                                     isset($movie)
                                         ? $movie->subtitles->map
-                                            ->only(['language', 'label', 'url', 'is_default'])
+                                            ->only(['language', 'id', 'label', 'file_url', 'is_default'])
                                             ->toArray()
                                         : [],
                                 );
@@ -422,7 +427,8 @@
                 <form id="uploadForm" enctype="multipart/form-data" class="mb-3">
                     <input type="hidden" name="_token" value="{{ csrf_token() }}">
                     <input type="file" name="image" id="imageInputMedia" class="mb-2 form-control">
-                    <button type="button" id="uploadFormBtn" class="btn btn-primary">{{ __('admin.upload') }}</button>
+                    <button type="button" id="uploadFormBtn"
+                        class="btn btn-primary">{{ __('admin.upload') }}</button>
                 </form>
                 <div id="mediaGrid" class="masonry">
                     {{-- الصور ستُملأ تلقائيًا عبر jQuery --}}
@@ -440,13 +446,13 @@
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">{{__('admin.Delete Confirmation')}}</h5>
+                <h5 class="modal-title">{{ __('admin.Delete Confirmation') }}</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" id="closeDeleteModal">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
             <div class="modal-body">
-               {{ __('admin.Are you sure?') }}
+                {{ __('admin.Are you sure?') }}
             </div>
             <div class="modal-footer">
 
@@ -462,7 +468,7 @@
 @push('scripts')
     <script>
         let person_duplicate = "{{ __('admin.person_duplicate') }}";
-        const form_type = "{{ isset($btn_label)}}";
+        const form_type = "{{ isset($btn_label) }}";
         const urlPeopleSearch = "{{ route('dashboard.people.search') }}";
         const castRowPartial = "{{ route('dashboard.movies.castRowPartial') }}";
         const videoRowPartial = "{{ route('dashboard.movies.videoRowPartial') }}";

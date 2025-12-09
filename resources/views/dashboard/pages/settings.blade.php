@@ -180,6 +180,13 @@
                                             :value="$setting['site_phone'] ?? ''"
                                             placeholder="966501234567+" />
                                     </div>
+                                       <div class="mb-3 col-md-6">
+                                        <x-form.input
+                                            label="{{ __('admin.taxes') }}"
+                                            name="site_tax"
+                                            :value="$setting['site_tax'] ?? ''"
+                                           />
+                                    </div>
                                     <div class="mb-3 col-md-12">
                                         <x-form.input
                                             label="{{ __('admin.site_address') }}"

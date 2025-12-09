@@ -94,9 +94,9 @@
 
                 <div class="row ">
 
-                 <div class="mb-4 col-md-4">
+                    <div class="mb-4 col-md-4">
                         <x-form.input type="number" label="وقت تخطي المقدمة " :value="$episode->intro_skip_time" name="intro_skip_time"
-                             min="0" />
+                            min="0" />
 
                     </div>
 
@@ -142,6 +142,7 @@
                                         ? $episode->videoFiles
                                             ->map(function ($vf) {
                                                 return [
+                                                    'id' => $vf->id,
                                                     'video_type' => $vf->video_type,
                                                     'quality' => $vf->quality,
                                                     'file_url' => $vf->file_url,
@@ -188,7 +189,7 @@
                                     'subtitles',
                                     isset($episode)
                                         ? $episode->subtitles->map
-                                            ->only(['language', 'label', 'url', 'is_default'])
+                                            ->only(['language','id',  'label', 'file_url', 'is_default'])
                                             ->toArray()
                                         : [],
                                 );

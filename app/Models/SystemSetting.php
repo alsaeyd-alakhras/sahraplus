@@ -18,4 +18,16 @@ class SystemSetting extends Model
     {
         return static::updateOrCreate(['key' => $key], ['value' => $value ?? '']);
     }
+
+    public function getValueAttribute($value)
+    {
+        $decoded = json_decode($value, true);
+        return $decoded ?? $value;
+    }
+
+    public function setValueAttribute($value)
+    {
+        $this->attributes['value'] = is_array($value) ? json_encode($value) : $value;
+    }
+
 }

@@ -11,8 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('shorts', function (Blueprint $table) {
-            $table->string('video_basic_url');
+        Schema::table('plan_country_prices', function (Blueprint $table) {
+            $table->decimal('price_currency', 15, 2);
         });
     }
 
@@ -21,8 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('shorts', function (Blueprint $table) {
-             $table->dropColumn(['video_basic_url']);
+        Schema::table('plan_country_prices', function (Blueprint $table) {
+            $table->dropColumn('price_currency');
         });
     }
 };

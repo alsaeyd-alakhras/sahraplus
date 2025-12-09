@@ -1,5 +1,10 @@
+@php
+    $id_cast = $row['id'] ?? '';
+@endphp
 <div class="p-3 mb-3 rounded border shadow-sm cast-row card">
   <div class="row g-3 align-items-end">
+            <input type="hidden" name="cast[{{ $i }}][id]" class="cast-id" value="{{ $id_cast }}">
+
     <div class="col-md-4">
       <label class="form-label small fw-bold">{{ __('admin.person') }}</label>
       <select class="form-select person-select"
@@ -34,7 +39,7 @@
     </div>
 
     <div class="col-md-2">
-      <label class="form-label small fw-bold">{{ __('admin.ordering') }}</label>
+      <label class="form-label small fw-bold">{{ __('admin.ordering') }} </label>
       <div class="input-group">
         <input type="number" min="0" class="form-control" name="cast[{{ $i }}][sort_order]"
                value="{{ $row['sort_order'] ?? 0 }}"

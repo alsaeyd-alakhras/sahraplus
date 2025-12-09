@@ -87,7 +87,7 @@
             <li
                 class="menu-item {{ request()->is('dashboard/people') || request()->is('dashboard/people/*') ? 'active' : '' }}">
                 <a href="{{ route('dashboard.people.index') }}" class="menu-link">
-                    <i class="ph ph-user me-2"></i>
+                    <i class="ph ph-users me-2"></i>
                     <div data-i18n="people"> {{ __('admin.Person') }}</div>
                 </a>
             </li>
@@ -97,7 +97,7 @@
             <li
                 class="menu-item {{ request()->is('dashboard/userRatings') || request()->is('dashboard/userRatings/*') ? 'active' : '' }}">
                 <a href="{{ route('dashboard.userRatings.index') }}" class="menu-link">
-                    <i class="ph ph-user me-2"></i>
+                    <i class="ph ph-star me-2"></i>
                     <div data-i18n="userRatings"> {{ __('admin.userRatings') }}</div>
                 </a>
             </li>
@@ -105,14 +105,88 @@
 
         @can('view', 'App\\Models\Download')
             <li
-                class="menu-item {{ request()->is('dashboard/downloads') || request()->is('dashboard/userRatings/*') ? 'active' : '' }}">
+                class="menu-item {{ request()->is('dashboard/downloads') || request()->is('dashboard/downloads/*') ? 'active' : '' }}">
                 <a href="{{ route('dashboard.downloads.index') }}" class="menu-link">
-                    <i class="ph ph-user me-2"></i>
+                    <i class="ph ph-download me-2"></i>
                     <div data-i18n="downloads"> {{ __('admin.downloads') }}</div>
                 </a>
             </li>
         @endcan
 
+        <li class="menu-header small">
+            <span class="menu-header-text" data-i18n="Apps &amp; Pages">الاشتراكات</span>
+        </li>
+
+        @can('view', 'App\\Models\SubscriptionPlan')
+            <li
+                class="menu-item {{ request()->is('dashboard/sub_plans') || request()->is('dashboard/sub_plans/*') ? 'active' : '' }}">
+                <a href="{{ route('dashboard.sub_plans.index') }}" class="menu-link">
+                    <i class="ph ph-lock-key me-2"></i>
+                    <div data-i18n="sub_plans"> {{ __('admin.sub_plans') }}</div>
+                </a>
+            </li>
+        @endcan
+
+
+        @can('view', 'App\\Models\PlanContentAccess')
+            <li
+                class="menu-item {{ request()->is('dashboard/plan_access') || request()->is('dashboard/plan_access/*') ? 'active' : '' }}">
+                <a href="{{ route('dashboard.plan_access.index') }}" class="menu-link">
+                    <i class="ph ph-lock-key me-2"></i>
+                    <div data-i18n="plan_access"> {{ __('admin.plan_access') }}</div>
+                </a>
+            </li>
+        @endcan
+
+        @can('view', 'App\\Models\UserSubscription')
+            <li
+                class="menu-item {{ request()->is('dashboard/users_subscription') || request()->is('dashboard/users_subscription/*') ? 'active' : '' }}">
+                <a href="{{ route('dashboard.users_subscription.index') }}" class="menu-link">
+                    <i class="ph ph-users me-2"></i>
+                    <div data-i18n="users_subscription"> {{ __('admin.users_subscription') }}</div>
+                </a>
+            </li>
+        @endcan
+
+        @can('view', 'App\\Models\Coupon')
+            <li
+                class="menu-item {{ request()->is('dashboard/coupons') || request()->is('dashboard/coupons/*') ? 'active' : '' }}">
+                <a href="{{ route('dashboard.coupons.index') }}" class="menu-link">
+                    <i class="ph ph-ticket me-2"></i>
+                    <div data-i18n="coupons"> {{ __('admin.coupons') }}</div>
+                </a>
+            </li>
+        @endcan
+
+        @can('view', 'App\\Models\Payments')
+            <li
+                class="menu-item {{ request()->is('dashboard/payments') || request()->is('dashboard/payments/*') ? 'active' : '' }}">
+                <a href="{{ route('dashboard.payments.index') }}" class="menu-link">
+                    <i class="ph ph-money me-2"></i>
+                    <div data-i18n="payments"> {{ __('admin.payments') }}</div>
+                </a>
+            </li>
+        @endcan
+
+        @can('view', 'App\\Models\UserActiveDevice')
+            <li
+                class="menu-item {{ request()->is('dashboard/active_devices') || request()->is('dashboard/active_devices/*') ? 'active' : '' }}">
+                <a href="{{ route('dashboard.active_devices.index') }}" class="menu-link">
+                    <i class="ph ph-money me-2"></i>
+                    <div data-i18n="active_devices"> {{ __('admin.active_devices') }}</div>
+                </a>
+            </li>
+        @endcan
+
+        {{-- @can('view', 'App\\Models\Tax')
+            <li
+                class="menu-item {{ request()->is('dashboard/taxes') || request()->is('dashboard/taxes/*') ? 'active' : '' }}">
+                <a href="{{ route('dashboard.taxes.index') }}" class="menu-link">
+                    <i class="ph ph-ticket me-2"></i>
+                    <div data-i18n="taxes"> {{ __('admin.taxes') }}</div>
+                </a>
+            </li>
+        @endcan --}}
 
         <li class="menu-header small">
             <span class="menu-header-text" data-i18n="Apps &amp; Pages">الإعدادات</span>

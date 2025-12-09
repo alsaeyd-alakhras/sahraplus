@@ -123,4 +123,53 @@ public function downloads()
     {
         return $query->where('is_banned', false);
     }
+
+    public function subscriptions()
+    {
+        return $this->hasMany(UserSubscription::class);
+    }
+
+    public function activeSubscription()
+    {
+        return $this->hasOne(UserSubscription::class)
+            ->where(function ($q) {
+                $q->where('status', 'trial')
+                    ->where('trial_ends_at', '>=', now())
+                    ->orWhere(function ($q2) {
+                        $q2->where('status', 'active')
+                            ->where('starts_at', '<=', now())
+                            ->where('ends_at', '>=', now());
+                    });
+            })
+            ->latest('ends_at');
+    }
+
+
+
+    public function latestSubscription()
+    {
+        return $this->hasOne(UserSubscription::class)->latestOfMany();
+    }
+
+
+    public function currentPlan()
+    {
+        return $this->hasOneThrough(
+            SubscriptionPlan::class,
+            UserSubscription::class,
+            'user_id',      // foreign key on user_subscriptions table
+            'id',           // primary key of subscription_plans
+            'id',           // primary key of users
+            'plan_id'       // foreign key on user_subscriptions table
+        )
+           // ->whereIn('user_subscriptions.status', ['active', 'trial'])
+            ->where('user_subscriptions.starts_at', '<=', now())
+            ->where('user_subscriptions.ends_at', '>=', now());
+    }
+    public function currentContentAccess()
+    {
+        $plan = $this->currentPlan()->with('contentAccess')->first();
+
+        return $plan ? $plan->contentAccess : collect([]);
+    }
 }

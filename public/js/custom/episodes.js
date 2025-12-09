@@ -83,10 +83,38 @@ $(function() {
     });
   });
 
-  $(document).on('click','.remove-video-row', function(){
-    $(this).closest('.video-row').remove();
-    enforceUnique();
-  });
+    // حذف صف
+    $(document).on('click', '.remove-video-row', function () {
+        let row = $(this).closest('.video-row');
+        let videoId = row.find('.video-id').val();
+        alert('test')
+        if (videoId) {
+            alert('test')
+            // إذا الفيديو موجود مسبقًا في DB → نرسل طلب حذف
+            $.ajax({
+                url: '/dashboard/episodes-video-files/' + videoId,
+                type: 'DELETE',
+                data: {
+                    _token: $('meta[name="csrf-token"]').attr('content')
+                },
+                success: function (res) {
+                    if (res.status) {
+                        row.remove();
+                        enforceUniqueVideoCombo(); // إعادة فحص الجودة بعد الحذف
+                    } else {
+                        alert(res.message);
+                    }
+                },
+                error: function () {
+                    alert('حدث خطأ أثناء الحذف!');
+                }
+            });
+        } else {
+            // الفيديو جديد ولم يُحفظ بعد → نحذفه مباشرة من الواجهة
+            row.remove();
+            enforceUniqueVideoCombo();
+        }
+    });
 
   // init
   $('#video-rows .video-row').each(function(){ initVideoRow($(this)); });
@@ -166,10 +194,35 @@ $(function(){
     });
   });
 
-  $(document).on('click','.remove-sub-row', function(){
-    $(this).closest('.sub-row').remove();
-    enforceUniqueLanguage(); enforceUniqueLabel();
-  });
+    $(document).on('click', '.remove-sub-row', function () {
+        let row = $(this).closest('.sub-row');
+        let subId = row.find('.sub-id').val();
+        if (subId) {
+            $.ajax({
+                url: '/dashboard/episodes-subtitles/' + subId,
+                type: 'DELETE',
+                data: {
+                    _token: $('meta[name="csrf-token"]').attr('content')
+                },
+                success: function (res) {
+                    if (res.status) {
+                        row.remove();
+                        enforceUniqueLanguage();
+                        enforceUniqueLabel();
+                    } else {
+                        alert(res.message);
+                    }
+                },
+                error: function () {
+                    alert('حدث خطأ أثناء الحذف!');
+                }
+            });
+        } else {
+            row.remove();
+            enforceUniqueLanguage();
+            enforceUniqueLabel();
+        }
+    });
 
   // init
   $('#sub-rows .sub-row').each(function(){ initSubRow($(this)); });

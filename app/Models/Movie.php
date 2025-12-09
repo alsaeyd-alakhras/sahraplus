@@ -45,7 +45,7 @@ class Movie extends Model
         'intro_skip_time' => 'integer'
     ];
 
-    protected $appends = ['poster_full_url', 'backdrop_full_url','trailer_full_url', 'is_favorite'];
+    protected $appends = ['poster_full_url', 'backdrop_full_url', 'trailer_full_url', 'is_favorite'];
 
     public function getIsFavoriteAttribute()
     {
@@ -58,7 +58,7 @@ class Movie extends Model
     public function categories()
     {
         return $this->belongsToMany(Category::class, 'category_movie_pivot', 'movie_id', 'category_id')
-        ->withTimestamps();
+            ->withTimestamps();
     }
 
     /** الطاقم (pivot: movie_cast) */
@@ -70,7 +70,8 @@ class Movie extends Model
                 'role_type',
                 'character_name',
                 'sort_order',
-                ])
+                'id',
+            ])
             ->withTimestamps();
     }
 

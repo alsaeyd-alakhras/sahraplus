@@ -35,4 +35,29 @@ return [
         ],
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Payment Gateway Services (Phase 4)
+    |--------------------------------------------------------------------------
+    */
+
+    'paylink' => [
+        'api_url' => env('PAYLINK_API_URL'),
+        'sandbox_url' => env('PAYLINK_SANDBOX_URL'),
+        'api_key' => env('PAYLINK_API_KEY'),
+        'secret_key' => env('PAYLINK_SECRET_KEY'),
+    ],
+
+    'telr' => [
+        'api_url'      => env('TELR_API_URL'),
+        'store_id'     => env('TELR_STORE_ID'),
+        'auth_key'     => env('TELR_AUTH_KEY'),
+        'test_mode'    => env('TELR_TEST_MODE', true)
+    ],
+
+    'currencyfreaks' => [
+        'key' => env('CURRENCYFREAKS_KEY'),
+    ],
+
+
 ];
