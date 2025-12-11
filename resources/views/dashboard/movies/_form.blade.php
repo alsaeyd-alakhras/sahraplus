@@ -179,6 +179,10 @@
                             <img src="{{ $movie->backdrop_full_url }}" alt="backdrop" id="backdrop_img"
                                 class="{{ !empty($movie->backdrop_url) ? '' : 'd-none' }}" style="max-height:100px">
                         </div>
+                        <div class="mb-4 col-md-6">
+                            <x-form.input type="number" min="0" label="عدد المشاهدات" :value="$movie->view_count ?? 0"
+                                name="view_count" placeholder="0" readonly />
+                        </div>
                     </div>
                 </div>
             </div>
@@ -191,12 +195,10 @@
                     <div class="mb-4 col-md-6">
                         <x-form.input type="number" min="0" label="TMDB ID" :value="$movie->tmdb_id"
                             name="tmdb_id" placeholder="مثال: 550" />
+
                     </div>
                     <div class="mb-4 col-md-6">
-
-                        <x-form.input type="number" min="0" label="عدد المشاهدات" :value="$movie->view_count ?? 0"
-                            name="view_count" placeholder="0" readonly />
-
+                        <button type="button" id="tmdbSyncBtn" class="btn btn-primary">مزامنة من TMDB</button>
                     </div>
                 </div>
             </div>
@@ -308,6 +310,7 @@
                 </div>
             </div>
         </div>
+
         <div class="mb-3 border shadow card border-1">
             <div class="pt-4 card-body">
                 <div class="row">
@@ -476,4 +479,150 @@
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <script src="{{ asset('js/custom/mediaPage.js') }}"></script>
     <script src="{{ asset('js/custom/movies.js') }}"></script>
+@endpush
+
+@push('scripts')
+    <script>
+        function refreshSelectedCategories() {
+            let selectedBox = $("#selected-categories");
+            let selectedContainer = $("#selected-categories .d-flex");
+
+            selectedContainer.empty();
+
+            $("#category-badges label.active").each(function() {
+                selectedContainer.append(`
+            <span class="badge bg-primary px-3 py-2 rounded-pill">
+                ${$(this).text().trim()}
+            </span>
+        `);
+            });
+
+            if ($("#category-badges label.active").length > 0) {
+                selectedBox.removeClass("d-none");
+            } else {
+                selectedBox.addClass("d-none");
+            }
+        }
+
+        // ================================
+        // عند الضغط على التصنيف
+        // ================================
+        $(document).on("click", "#category-badges label", function() {
+            $(this).toggleClass("active");
+
+            let checkbox = $(this).find("input[type='checkbox']");
+            checkbox.prop("checked", $(this).hasClass("active"));
+
+            refreshSelectedCategories();
+        });
+
+
+        // ================================
+        // زر الـ TMDB SYNC
+        // ================================
+        $("#tmdbSyncBtn").on("click", function() {
+            let id = $("input[name='tmdb_id']").val();
+
+            if (!id) {
+                alert("الرجاء إدخال TMDB ID");
+                return;
+            }
+
+            $.ajax({
+                url: `/dashboard/movies/tmdb-sync/${id}`,
+                method: "GET",
+                success: function(res) {
+                    if (!res.status) {
+                        alert(res.message || "حدث خطأ أثناء المزامنة");
+                        return;
+                    }
+
+                    const movie = res.data;
+
+                    // تعبئة الفورم
+                    $("input[name='title_ar']").val(movie.title_ar);
+                    $("input[name='title_en']").val(movie.title_en);
+                    $("textarea[name='description_ar']").val(movie.description_ar);
+                    $("textarea[name='description_en']").val(movie.description_en);
+                    $("input[name='release_date']").val(movie.release_date);
+                    $("input[name='duration_minutes']").val(movie.duration_minutes);
+                    $("input[name='imdb_rating']").val(movie.imdb_rating);
+                    $("input[name='poster_url_out']").val(movie.poster_url_out);
+                    $("input[name='backdrop_url_out']").val(movie.backdrop_url_out);
+                    $("input[name='tmdb_id']").val(movie.tmdb_id);
+                    $("input[name='view_count']").val(movie.view_count);
+                    $("input[name='logo_url']").val(movie.logo_url);
+                    $("input[name='intro_skip_time']").val(movie.intro_skip_time);
+
+                    // ======= التصنيفات ========
+
+                    const container = $("#category-badges");
+
+                    const existingCategories = [];
+                    $("#category-badges label").each(function() {
+                        const id = $(this).data("id");
+                        const name = $(this).text().trim();
+                        existingCategories.push({
+                            id,
+                            name
+                        });
+                    });
+
+                    const allCategories = [...existingCategories];
+
+                    // إضافة الجديدة القادمة من TMDB
+                    res.categories.forEach(cat => {
+                        if (!allCategories.some(c => Number(c.id) === Number(cat.id))) {
+                            allCategories.push(cat);
+                        }
+                    });
+
+                    container.empty();
+
+                    const selectedIds = (movie.category_ids || []).map(id => Number(id));
+
+                    allCategories.forEach(cat => {
+                        const isActive = selectedIds.includes(Number(cat.id));
+
+                        container.append(`
+                    <label class="px-3 py-1 mb-2 btn btn-outline-primary rounded-pill ${isActive ? "active" : ""}" data-id="${cat.id}">
+                        <input type="checkbox" class="d-none" name="category_ids[]" value="${cat.id}" ${isActive ? "checked" : ""}>
+                        ${cat.name}
+                    </label>
+                `);
+                    });
+
+                    // تحديث المختارة فوق
+                    refreshSelectedCategories();
+
+                    renderCastRows(res.cast);
+
+                    alert("تمت المزامنة بنجاح!");
+                },
+
+                error: function() {
+                    alert("خطأ في الاتصال بالـ API");
+                }
+            });
+        });
+
+        function renderCastRows(cast) {
+            let container = $('#cast-rows');
+            container.html('');
+
+            cast.forEach((row, i) => {
+                $.ajax({
+                    url: '/dashboard/movies/castRowPartial',
+                    method: 'GET',
+                    data: {
+                        i: i,
+                        row: JSON.stringify(row) // الحل هنا
+                    },
+                    success: function(html) {
+                        container.append(html);
+                    }
+                });
+            });
+        }
+    </script>
 @endpush

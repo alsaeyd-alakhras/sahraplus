@@ -17,7 +17,7 @@
                             placeholder="{{ __('admin.title_en_placeholder') }}" />
                     </div>
 
-                     <div class="col-md-6">
+                    <div class="col-md-6">
                         <x-form.input label="Logo Url" :value="$series->logo_url" name="logo_url"
                             placeholder="https://example.com" />
                     </div>
@@ -242,7 +242,7 @@
                     <div class="mb-4 col-md-6">
                         @php
                             $poster_url = Str::startsWith($series->poster_url, ['http', 'https']);
-                            $poster_url_out = ($poster_url ? $series->poster_url : null);
+                            $poster_url_out = $poster_url ? $series->poster_url : null;
                         @endphp
                         <x-form.input type="url" label="{{ __('admin.poster_url') }}" :value="$poster_url_out"
                             name="poster_url_out" placeholder="{{ __('admin.poster_url_placeholder') }}" />
@@ -270,7 +270,7 @@
                     <div class="mb-4 col-md-6">
                         @php
                             $backdrop_url = Str::startsWith($series->backdrop_url, ['http', 'https']);
-                            $backdrop_url_out = ($backdrop_url ? $series->backdrop_url : null);
+                            $backdrop_url_out = $backdrop_url ? $series->backdrop_url : null;
                         @endphp
                         <x-form.input type="url" label="{{ __('admin.backdrop_url') }}" :value="$backdrop_url_out"
                             name="backdrop_url_out" placeholder="{{ __('admin.backdrop_url_placeholder') }}" />

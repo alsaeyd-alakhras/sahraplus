@@ -81,8 +81,10 @@ Route::group([
         Route::get('movies/castSubRowPartial', [MoviesController::class, 'subRowPartial'])->name('movies.subRowPartial');
         Route::get('movies/videoRowPartial', [MoviesController::class, 'videoRowPartial'])->name('movies.videoRowPartial');
         Route::get('movies/subtitleRowPartial', [MoviesController::class, 'subtitleRowPartial'])->name('movies.subtitleRowPartial');
-        Route::get('people/search', [PeopleController::class, 'search'])->name('people.search');
+        Route::get('movies/popular', [MoviesController::class, 'fetchFromTMDB']);
+        Route::get('movies/tmdb-sync/{id}', [MoviesController::class, 'syncFromTmdb'])->name('movies.tmdb.sync');
 
+        Route::get('people/search', [PeopleController::class, 'search'])->name('people.search');
 
         Route::get('shorts/videoRowPartial', [ShortController::class, 'videoRowPartial'])->name('shorts.videoRowPartial');
         Route::delete('video-files/{id}', [ShortController::class, 'deleteVideo'])->name('shorts.video-files.delete');
