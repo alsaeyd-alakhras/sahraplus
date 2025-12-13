@@ -24,7 +24,7 @@ class MoviesController extends Controller
         $category = $request->query('category');
         $year = $request->query('year');
 
-        $query = Movie::with(['categories','cast'])
+        $query = Movie::with(['categories','cast'])->published()
             ->when($q, fn($qr)=>$qr->where('title_ar','like',"%$q%")->orWhere('title_en','like',"%$q%"))
             ->when($category, fn($qr)=>$qr->whereHas('categories', fn($c)=>$c->where('slug',$category)))
             ->when($year, fn($qr)=>$qr->whereYear('release_date', $year));
@@ -60,8 +60,8 @@ class MoviesController extends Controller
         // }
         // $movie = Movie::with(['categories', 'cast', 'videoFiles', 'subtitles'])->findOrFail($id);
 
-        // // 1) فحص الاشتراك
-        // $subscription = $user->activeSubscription;
+        // 1) فحص الاشتراك
+        // $subscription = $user?->activeSubscription;
         // $hasAccess = false;
 
         // if ($subscription) {

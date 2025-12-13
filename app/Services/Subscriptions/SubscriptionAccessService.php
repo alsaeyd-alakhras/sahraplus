@@ -118,10 +118,7 @@ class SubscriptionAccessService
             ];
         }
 
-        // Get max concurrent streams from limitations
-        $maxStreams = $subscription->plan->limitations()
-            ->where('limitation_key', 'max_concurrent_streams')
-            ->first();
+        $maxStreams = $subscription->plan->max_devices;
 
         if (!$maxStreams) {
             return ['allowed' => true];
@@ -134,11 +131,11 @@ class SubscriptionAccessService
             ->where('device_id', '!=', $deviceId)
             ->count();
 
-        if ($activeDevicesCount >= (int)$maxStreams->limitation_value) {
+        if ($activeDevicesCount >= (int)$maxStreams) {
             return [
                 'allowed' => false,
                 'reason' => 'max_concurrent_streams_reached',
-                'max_allowed' => (int)$maxStreams->limitation_value,
+                'max_allowed' => $maxStreams,
                 'current_count' => $activeDevicesCount,
             ];
         }

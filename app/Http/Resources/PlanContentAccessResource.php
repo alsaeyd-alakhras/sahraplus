@@ -5,19 +5,15 @@ namespace App\Http\Resources;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class PlanLimitationResource extends JsonResource
+class PlanContentAccessResource extends JsonResource
 {
     public function toArray(Request $request): array
     {
         return [
             "id"                => $this->id,
-            "limitation_key"    => $this->limitation_key,
-            "limitation_value"  => $this->limitation_value,
-            "limitation_type"   => $this->limitation_type,
-            "limitation_unit"   => $this->limitation_unit,
-
-            "description_ar"    => $this->description_ar,
-            "description_en"    => $this->description_en,
+            "content_type"    => $this->content_type,
+            "content_id"  => $this->content_id,
+            "access_type" => $this->access_type,
 
             "created_at" => $this->created_at ? $this->created_at->format('Y-m-d') : null,
             "updated_at" => $this->updated_at ? $this->updated_at->format('Y-m-d') : null,

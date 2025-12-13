@@ -41,9 +41,8 @@ class SubscriptionPlanResource extends JsonResource
             "updated_at" => $this->updated_at ? $this->updated_at->format('Y-m-d') : null,
 
             // Relationship
-            "limitations"       => PlanLimitationResource::collection($this->whenLoaded("limitations")),
+            "contentAccess"       => PlanContentAccessResource::collection($this->whenLoaded("contentAccess")),
             "countryPrices"       => $this->whenLoaded("countryPrices"),
-            "contentAccess"       => $this->whenLoaded("contentAccess"),
         ];
     }
 }

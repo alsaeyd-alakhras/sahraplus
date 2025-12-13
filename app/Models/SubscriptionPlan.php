@@ -51,11 +51,6 @@ class SubscriptionPlan extends Model
         'is_customize' => 'boolean',
     ];
 
-    public function limitations()
-    {
-        return $this->hasMany(PlanLimitation::class, 'plan_id');
-    }
-
     public function contentAccess()
     {
         return $this->hasMany(PlanContentAccess::class, 'plan_id');

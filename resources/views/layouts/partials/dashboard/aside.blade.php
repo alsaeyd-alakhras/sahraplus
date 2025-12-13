@@ -127,17 +127,6 @@
             </li>
         @endcan
 
-
-        @can('view', 'App\\Models\PlanContentAccess')
-            <li
-                class="menu-item {{ request()->is('dashboard/plan_access') || request()->is('dashboard/plan_access/*') ? 'active' : '' }}">
-                <a href="{{ route('dashboard.plan_access.index') }}" class="menu-link">
-                    <i class="ph ph-lock-key me-2"></i>
-                    <div data-i18n="plan_access"> {{ __('admin.plan_access') }}</div>
-                </a>
-            </li>
-        @endcan
-
         @can('view', 'App\\Models\UserSubscription')
             <li
                 class="menu-item {{ request()->is('dashboard/users_subscription') || request()->is('dashboard/users_subscription/*') ? 'active' : '' }}">

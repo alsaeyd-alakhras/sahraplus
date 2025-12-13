@@ -1,6 +1,3 @@
-@php
-    $rates = $rates;
-@endphp
 <script>
     window.currencyRates = @json($rates);
 </script>

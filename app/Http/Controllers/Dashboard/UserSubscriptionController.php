@@ -6,7 +6,6 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Services\UserSubscriptionService;
 use App\Http\Requests\PlanLimitationRequest;
-use App\Models\PlanLimitation;
 use App\Models\SubscriptionPlan;
 use App\Models\UserSubscription;
 

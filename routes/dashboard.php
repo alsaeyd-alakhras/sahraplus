@@ -24,7 +24,6 @@ use App\Http\Controllers\Dashboard\UserRatingController;
 use App\Http\Controllers\Dashboard\DownloadController;
 use App\Http\Controllers\Dashboard\PlanAccessController;
 use App\Http\Controllers\Dashboard\SubscriptionPlanController;
-use App\Http\Controllers\Dashboard\PlanLimitationController;
 use App\Http\Controllers\Dashboard\CouponController;
 use App\Http\Controllers\Dashboard\TaxController;
 use App\Http\Controllers\Dashboard\UserSubscriptionController;
@@ -122,7 +121,6 @@ Route::group([
         Route::get('short-filters/{column}', [ShortController::class, 'getFilterOptions'])->name('short.filters');
         Route::get('coupons-filters/{column}', [CouponController::class, 'getFilterOptions'])->name('coupons.filters');
         Route::get('movie-categories-filters/{column}', [CategoryController::class, 'getFilterOptions'])->name('movie-categories.filters');
-        Route::get('plan_access-filters/{column}', [PlanAccessController::class, 'getFilterOptions'])->name('plan_access.filters');
         Route::get('plan_access/get-contents', [PlanAccessController::class, 'getContents'])->name('plan_access.getContents');
         Route::get('home-banners-filters/{column}', [ HomeBannerController::class, 'getFilterOptions'])->name('home-banners.filters');
         Route::get('series-filters/{column}', [ SeriesController::class, 'getFilterOptions'])->name('series.filters');
@@ -143,7 +141,6 @@ Route::group([
             'userRatings' => UserRatingController::class,
             'downloads' => DownloadController::class,
             'sub_plans' => SubscriptionPlanController::class,
-            'plan_access' => PlanAccessController::class,
             'coupons' => CouponController::class,
             'taxes' => TaxController::class,
             'users_subscription' => UserSubscriptionController::class,
@@ -159,7 +156,7 @@ Route::group([
 
 
         Route::get('countryPrice/countryRowPartial', [SubscriptionPlanController::class, 'countryRowPartial'])->name('countryPrice.countryRowPartial');
-        Route::get('limitations/limitationsRowPartial', [SubscriptionPlanController::class, 'limitationsRowPartial'])->name('limitations.limitationsRowPartial');
+        Route::get('planAccess/planAccessRowPartial', [SubscriptionPlanController::class, 'planAccessRowPartial'])->name('planAccess.planAccessRowPartial');
     });
 
     Route::get('/countries/{id}/currency', function ($id) {

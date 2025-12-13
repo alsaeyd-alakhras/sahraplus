@@ -117,17 +117,6 @@ class UserSubscription extends Model
             ->where('access_type', 'allow')
             ->exists();
     }
-
-    // public function canUseQuality($quality)
-    // {
-    //     $allowed = $this->plan->limitations()->where('limitation_key', 'allowed_qualities')->first();
-    //     if (!$allowed) {
-    //         return true;
-    //     }
-
-    //     return in_array($quality, explode(',', $allowed->limitation_value));
-    // }
-
     public function canDownload()
     {
         return $this->plan->download_enabled;

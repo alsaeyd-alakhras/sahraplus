@@ -34,7 +34,7 @@ class SubscriptionPlansController extends Controller
     // GET /api/v1/subscription_plan/{id}
     public function show($id)
     {
-        $plan = SubscriptionPlan::with(['limitations', 'countryPrices', 'contentAccess'])->find($id);
+        $plan = SubscriptionPlan::with(['countryPrices', 'contentAccess'])->find($id);
 
         if (!$plan) {
             return $this->error("Plan Not Found", 404);

@@ -52,35 +52,17 @@ class SubscriptionPlanRequest extends FormRequest
             'is_active'        => ['boolean'],
             'is_customize'        => ['boolean'],
 
-            'cast'           => ['nullable', 'array'],
             'countryPrices' => ['nullable', 'array'],
             'countryPrices.*.price_currency' => ['required_if:is_customize,1', 'numeric', 'min:0'],
             'countryPrices.*.price_sar' => ['required_if:is_customize,1', 'numeric', 'min:0'],
             'countryPrices.*.currency' => ['required_if:is_customize,1', 'string'],
             'countryPrices.*.country_id' => ['required_if:is_customize,1', 'integer', 'exists:countries,id'],
 
-
-            // نوع التقييد (string max 50)
-            'cast.*.limitation_type' => ['required', 'string', 'max:50'],
-            // مفتاح التقييد يجب أن يكون فريد لكل plan_id
-            'cast.*.limitation_key' => [
-                'required',
-                'string',
-                'max:100',
-                Rule::unique('plan_limitations')
-                    ->where(fn($query) => $query->where('plan_id', $this->plan_id))
-                    ->ignore($id),
-            ],
-            // القيمة (string max 100)
-            'cast.*.limitation_value' => ['required', 'string', 'max:100'],
-
-            // الوحدة اختيارية
-            'cast.*.limitation_unit' => ['nullable', 'string', 'max:20'],
-
-            // الوصف العربي والإنجليزي اختياري
-            'cast.*.description_ar' => ['nullable', 'string'],
-            'cast.*.description_en' => ['nullable', 'string'],
-
+            'planAccess'           => ['nullable', 'array'],
+            'planAccess.*.id' => ['nullable', 'integer', 'exists:plan_content_access,id'],
+            'planAccess.*.content_type' => ['sometimes', 'in:category,movie,series'],
+            'planAccess.*.content_id' => ['sometimes', 'integer'],
+            'planAccess.*.access_type' => ['sometimes', 'in:allow,deny'],
         ];
     }
 

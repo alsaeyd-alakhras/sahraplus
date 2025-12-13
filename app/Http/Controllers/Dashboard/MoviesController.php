@@ -77,11 +77,10 @@ class MoviesController extends Controller
         $allPeople     = Person::select('id','name_ar','name_en')->orderBy('name_ar')->get();
         $contentRatingOptions = $this->contentRatingOptions;
         $languageOptions = $this->languageOptions;
-        $countries = Country::select('code', 'name_ar', 'name_en')->get()->map(function ($country) {
-            return [
-                $country->code => app()->getLocale() == 'ar' ? $country->name_ar : $country->name_en,
-            ];
-        });
+        $countries = Country::select('code', 'name_ar', 'name_en')->get()->pluck(
+            app()->getLocale() == 'ar' ? 'name_ar' : 'name_en',
+            'code'
+        )->toArray();
         $statusOptions = $this->statusOptions;
 
         return view('dashboard.movies.create', compact('movie', 'contentRatingOptions', 'languageOptions', 'countries', 'statusOptions', 'allCategories', 'allPeople'));
@@ -123,11 +122,10 @@ class MoviesController extends Controller
         $contentRatingOptions = $this->contentRatingOptions;
 
         $languageOptions = $this->languageOptions;
-        $countries = Country::select('code', 'name_ar', 'name_en')->get()->map(function ($country) {
-            return [
-                $country->code => app()->getLocale() == 'ar' ? $country->name_ar : $country->name_en,
-            ];
-        });
+        $countries = Country::select('code', 'name_ar', 'name_en')->get()->pluck(
+            app()->getLocale() == 'ar' ? 'name_ar' : 'name_en',
+            'code'
+        )->toArray();
         $allCategories = Category::select('id','name_ar','name_en')->orderBy('name_ar')->get();
         $allPeople     = Person::select('id','name_ar','name_en')->orderBy('name_ar')->get();
         $statusOptions = $this->statusOptions;

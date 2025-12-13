@@ -74,7 +74,7 @@ class SubscriptionPlanService
         try {
             $nameForSlug = $data['name_en'] ?? $data['name_ar'] ?? '';
             if ($nameForSlug) $data['slug'] = $this->uniqueSlug($nameForSlug);
-            $sub   = $data['cast']   ?? [];
+            $planAccess   = $data['planAccess']   ?? [];
             $country   = $data['countryPrices']   ?? [];
             $data['currency'] = 'SAR';
             $data['is_customize'] = $data['is_customize'] == 1 ? 1 : 0;
@@ -82,7 +82,7 @@ class SubscriptionPlanService
             if ($cat->is_customize == 1) {
                 $this->syncCountryPrice($cat, $country ?? []);
             }
-            $this->syncPlanLimitation($cat, $sub ?? []);
+            $this->syncPlanContentAccess($cat, $planAccess ?? [], true);
 
             DB::commit();
             return $cat;
@@ -99,16 +99,15 @@ class SubscriptionPlanService
         try {
             $nameForSlug = $data['name_en'] ?? $data['name_ar'] ?? '';
             if ($nameForSlug) $data['slug'] = $this->uniqueSlug($nameForSlug);
-            $sub   = $data['cast']   ?? [];
             $country   = $data['countryPrices']   ?? [];
+            $planAccess   = $data['planAccess']   ?? [];
             $data['currency'] = 'SAR';
             $data['is_customize'] = $data['is_customize'] == 1 ? 1 : 0;
             $cat = $this->repo->update($data, $id);
             if ($cat->is_customize == 1) {
                 $this->syncCountryPrice($cat, $country ?? [], true);
             }
-            $this->syncPlanLimitation($cat, $sub ?? [], true);
-
+            $this->syncPlanContentAccess($cat, $planAccess ?? [], true);
             DB::commit();
             return $cat;
         } catch (\Throwable $e) {
@@ -117,30 +116,27 @@ class SubscriptionPlanService
         }
     }
 
-    private function syncPlanLimitation(SubscriptionPlan $sub_plan, array $subs, bool $replace = false): void
+    private function syncPlanContentAccess(SubscriptionPlan $sub_plan, array $planAccess, bool $replace = false): void
     {
         if ($replace) {
-            $sub_plan->limitations()->delete();
+            $sub_plan->contentAccess()->delete();
         }
         $payload = [];
 
-        foreach ($subs as $row) {
+        foreach ($planAccess as $row) {
             $payload[] = [
-                'limitation_type'           => $row['limitation_type'] ?? '',
-                'limitation_key'           => $row['limitation_key'] ?? '',
-                'limitation_value' => $row['limitation_value'] ?? null,
-                'limitation_unit'       => $row['limitation_unit']   ?? null,
-                'description_ar'       => $row['description_ar']   ?? null,
-                'description_en'       => $row['description_en']   ?? null,
+                'content_type'           => $row['content_type'] ?? '',
+                'content_id'           => $row['content_id'] ?? '',
+                'access_type' => $row['access_type'] ?? 'allow',
             ];
         }
 
-        if (empty($subs)) {
-            $sub_plan->limitations()->delete();
+        if (empty($planAccess)) {
+            $sub_plan->contentAccess()->delete();
         }
 
         if (!empty($payload)) {
-            $sub_plan->limitations()->createMany($payload);
+            $sub_plan->contentAccess()->createMany($payload);
         }
     }
 
@@ -178,6 +174,9 @@ class SubscriptionPlanService
     {
         DB::beginTransaction();
         try {
+            $sub_plan = SubscriptionPlan::findOrFail($id);
+            $sub_plan->contentAccess()->delete();
+            $sub_plan->countryPrices()->delete();
             $deleted = $this->repo->delete($id);
             DB::commit();
             return $deleted;
