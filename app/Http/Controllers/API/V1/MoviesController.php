@@ -6,15 +6,20 @@ use App\Http\Controllers\Controller;
 use App\Models\Movie;
 use App\Http\Resources\MovieResource;
 use App\Services\ProfileContextService;
+use App\Services\PlanContentAccessContextService;
 use Illuminate\Http\Request;
 
 class MoviesController extends Controller
 {
     protected ProfileContextService $profileContextService;
+    protected PlanContentAccessContextService $planContentAccessService;
 
-    public function __construct(ProfileContextService $profileContextService)
-    {
+    public function __construct(
+        ProfileContextService $profileContextService,
+        PlanContentAccessContextService $planContentAccessService
+    ) {
         $this->profileContextService = $profileContextService;
+        $this->planContentAccessService = $planContentAccessService;
     }
 
     // GET /api/v1/movies
@@ -49,7 +54,15 @@ class MoviesController extends Controller
         }
 
         $movie->load(['categories','cast','videoFiles','subtitles','comments.user']);
-        return new MovieResource($movie);
+        
+        // فحص الوصول حسب الخطط
+        $accessResult = $this->planContentAccessService->checkMovieAccess($movie, $request);
+        $movie = $accessResult['movie'];
+        $hasAccess = $accessResult['has_access'];
+        
+        return (new MovieResource($movie))->additional([
+            'has_access' => $hasAccess
+        ]);
 
         // $user = auth('sanctum')->user();
         // if(!$user){

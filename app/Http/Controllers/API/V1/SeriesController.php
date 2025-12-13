@@ -6,15 +6,20 @@ use App\Http\Controllers\Controller;
 use App\Models\Series;
 use App\Http\Resources\SeriesResource;
 use App\Services\ProfileContextService;
+use App\Services\PlanContentAccessContextService;
 use Illuminate\Http\Request;
 
 class SeriesController extends Controller
 {
     protected ProfileContextService $profileContextService;
+    protected PlanContentAccessContextService $planContentAccessService;
 
-    public function __construct(ProfileContextService $profileContextService)
-    {
+    public function __construct(
+        ProfileContextService $profileContextService,
+        PlanContentAccessContextService $planContentAccessService
+    ) {
         $this->profileContextService = $profileContextService;
+        $this->planContentAccessService = $planContentAccessService;
     }
 
     // GET /api/v1/series
@@ -44,7 +49,15 @@ class SeriesController extends Controller
             }
         }
 
-        $series->load(['categories','seasons']);
-        return new SeriesResource($series);
+        $series->load(['categories','seasons.episodes']);
+        
+        // فحص الوصول حسب الخطط
+        $accessResult = $this->planContentAccessService->checkSeriesAccess($series, $request);
+        $series = $accessResult['series'];
+        $hasAccess = $accessResult['has_access'];
+        
+        return (new SeriesResource($series))->additional([
+            'has_access' => $hasAccess
+        ]);
     }
 }
