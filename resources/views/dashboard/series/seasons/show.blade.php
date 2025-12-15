@@ -93,7 +93,7 @@
                         <li class="mb-3 d-flex align-items-center">
                             <i class="ti ti-video ti-lg"></i>
                             <span class="mx-2 fw-medium">{{ __('admin.episode_count') }}:</span>
-                            <span>{{ $season->episodes()->count() }}</span>
+                            <span>{{ $season->episode_count }}</span>
                         </li>
                         <li class="mb-3 d-flex align-items-center">
                             <i class="ti ti-eye ti-lg"></i>
@@ -116,7 +116,7 @@
             <div class="flex-wrap gap-4 card-header d-flex justify-content-between">
                 <div class="mb-0 card-title me-1">
                     <h5 class="mb-0">{{ __('admin.episodes') }}</h5>
-                    <p class="mb-0">{{ __('admin.total_episodes') }} : {{ $season->episodes()->count() }}</p>
+                    <p class="mb-0">{{ __('admin.total_episodes') }} : {{ $season->episode_count }}</p>
                 </div>
                 <div class="d-flex justify-content-md-end align-items-center column-gap-6">
                     {{-- <select class="form-select">

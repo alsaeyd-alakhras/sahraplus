@@ -156,6 +156,11 @@ Route::group([
             'series'    => SeriesController::class,
         ]);
 
+        Route::get('series/tmdb-sync/{id}', [SeriesController::class, 'syncSeriesFromTmdb'])->name('series.tmdb.sync');
+        //Route::get('episodes/tmdb-sync/{id}', [EpisodeController::class, 'syncEpisodeFromTmdb'])->name('series.tmdb.sync');
+        Route::get('episodes/tmdb-sync/{tmdbId}/{seasonNumber}/{episodeNumber}', [EpisodeController::class, 'syncEpisodeFromTmdb']);
+
+
         Route::get('countryPrice/countryRowPartial', [SubscriptionPlanController::class, 'countryRowPartial'])->name('countryPrice.countryRowPartial');
         Route::get('limitations/limitationsRowPartial', [SubscriptionPlanController::class, 'limitationsRowPartial'])->name('limitations.limitationsRowPartial');
     });

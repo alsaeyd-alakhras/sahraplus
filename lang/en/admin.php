@@ -389,9 +389,9 @@ return [
 
     // مسلسلات
     'series' => 'Series',
-    'ongoing_series' => 'Ongoing Series',
-    'ended_series' => 'Ended Series',
-    'canceled_series' => 'Canceled Series',
+    'ongoing_series' => 'Series Ongoing',
+    'ended_series' => 'Series Ended',
+    'canceled_series' => 'Series Canceled',
     'series_details' => 'Series Details',
     'series_statistics' => 'Series Statistics',
     // 'series'

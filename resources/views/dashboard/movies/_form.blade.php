@@ -46,7 +46,7 @@
                     </div>
                     <div class="col-md-6">
                         <x-form.textarea label="الوصف (En)" name="description_en" rows="2" :value="$movie->description_en"
-                            placeholder="نبذة عن الفيلم..." />
+                            placeholder="نبذة عن الفيلم. .." />
                     </div>
                 </div>
             </div>
@@ -70,7 +70,7 @@
                             name="imdb_rating" placeholder="7.8" min="0" max="10" />
                     </div>
 
-                    {{-- التصنيف/اللغة/الدولة --}}
+                    {{-- التصنيف/اللغة/ الدولة --}}
                     <div class="mb-4 col-md-4">
 
                         <x-form.selectkey label="التصنيف العمري" name="content_rating" :selected="$movie->content_rating ?? 'G'"
@@ -109,7 +109,7 @@
                     </div>
 
                     <div class="col-md-6">
-                        <x-form.input label="Logo Url" :value="$movie->logo_url" name="logo_url"
+                        <x-form.input label="Logo Url" :value="$movie->logo_url" name="logo_url" required
                             placeholder="https://example.com" />
                     </div>
 
@@ -121,7 +121,7 @@
         <div class="mb-3 border shadow card border-1">
             <div class="pt-4 card-body">
                 <div class="row">
-                    {{-- الروابط/الرفع: بوستر وخلفية --}}
+                    {{-- الروابط / الرفع: بوستر وخلفية --}}
                     <div class="mb-4 col-md-6">
 
                         @php
@@ -188,7 +188,7 @@
             </div>
         </div>
 
-        {{-- TMDB وعداد المشاهدات (اختياري) --}}
+        {{-- TMDB و عداد المشاهدات (اختياري) --}}
         <div class="mb-3 border shadow card border-1">
             <div class="pt-4 card-body">
                 <div class="row">
@@ -624,5 +624,13 @@
                 });
             });
         }
+
+        $(document).on('select2:select', '.person-select', function(e) {
+            let data = e.params.data;
+
+            let wrapper = $(this).closest('.cast-row');
+
+            wrapper.find('.person-name-input').val(data.text);
+        });
     </script>
 @endpush

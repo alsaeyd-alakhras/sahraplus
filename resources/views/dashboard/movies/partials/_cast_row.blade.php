@@ -1,5 +1,8 @@
 @php
     $id_cast = $row['id'] ?? '';
+
+    $oldPersonId = old("cast.$i.person_id", $row['person_id'] ?? null);
+    $oldPersonName = old("cast.$i.person_name", $row['person_name'] ?? '');
 @endphp
 <div class="p-3 mb-3 rounded border shadow-sm cast-row card">
 
@@ -10,13 +13,15 @@
         <div class="col-md-4">
             <label class="form-label small fw-bold">{{ __('admin.person') }}</label>
             <select class="form-select person-select" name="cast[{{ $i }}][person_id]"
-                data-placeholder="{{ __('admin.person_placeholder') }}">
-                @if (!empty($row['person_id']))
-                    <option value="{{ $row['person_id'] }}" selected>
-                        {{ $row['person_name'] ?? '—' }}
+                data-index="{{ $i }}">
+                @if ($oldPersonId)
+                    <option value="{{ $oldPersonId }}" selected>
+                        {{ $oldPersonName }}
                     </option>
                 @endif
             </select>
+            <input type="hidden" name="cast[{{ $i }}][person_name]" class="person-name-input"
+                value="{{ $oldPersonName }}">
         </div>
 
         <!-- الدور -->
