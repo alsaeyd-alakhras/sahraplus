@@ -6,7 +6,7 @@
     "keywords": ["laravel", "framework"],
     "license": "MIT",
     "require": {
-        "php": "^8.2",
+        "php": "^8.3",
         "alkoumi/laravel-arabic-numbers": "^1.1",
         "carlos-meneses/laravel-mpdf": "^2.1",
         "laravel/fortify": "^1.29",
