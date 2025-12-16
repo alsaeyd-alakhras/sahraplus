@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Movie;
+use App\Models\TmdbSyncLog;
 use App\Repositories\MovieRepository;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
@@ -118,6 +119,19 @@ class MovieService
             $this->syncCast($movie, $cast ?? []);
             $this->syncVideoFiles($movie, $video_files ?? []);
             $this->syncSubtitles($movie, $subtitles ?? []);
+
+            if($data['tmdb_id']){
+                TmdbSyncLog::create([
+                    'content_type' => 'movie',
+                    'content_id' => $movie->id,
+                    'tmdb_id' => $data['tmdb_id'],
+                    'action' => 'sync',
+                    'status' => 'success',
+                    'synced_data' => json_encode($data),
+                    'error_message' => null,
+                    'synced_at' => now(),
+                ]);
+            }
             DB::commit();
             return $movie;
         } catch (\Throwable $e) {
@@ -139,7 +153,7 @@ class MovieService
             $video_files   = $data['video_files']   ?? [];
             $subtitles   = $data['subtitles']   ?? [];
             unset($data['category_ids'], $data['cast'], $data['video_files'], $data['subtitles']);
-            // الصور: نفضل *_out إذا وُجدت وغير فارغة، وإلا نحافظ على القيمة السابقة
+
             if (array_key_exists('poster_url_out', $data) && $data['poster_url_out'] !== null && $data['poster_url_out'] !== '') {
                 $data['poster_url'] = $data['poster_url_out'];
             } else {

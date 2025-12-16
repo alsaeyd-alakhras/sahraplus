@@ -88,12 +88,12 @@
                         <li class="mb-3 d-flex align-items-center">
                             <i class="ti ti-stack ti-lg"></i>
                             <span class="mx-2 fw-medium">{{ __('admin.seasons_count') }}:</span>
-                            <span>{{ $series->seasons()->count() }}</span>
+                            <span>{{ $series->season_number }}</span>
                         </li>
                         <li class="mb-3 d-flex align-items-center">
                             <i class="ti ti-video ti-lg"></i>
                             <span class="mx-2 fw-medium">{{ __('admin.episodes_count') }}:</span>
-                            <span>{{ $series->episodes()->count() }}</span>
+                            <span>{{ $series->episode_count}}</span>
                         </li>
                         <li class="mb-3 d-flex align-items-center">
                             <i class="ti ti-star ti-lg text-warning"></i>
@@ -115,7 +115,7 @@
             <div class="flex-wrap gap-4 card-header d-flex justify-content-between">
                 <div class="mb-0 card-title me-1">
                     <h5 class="mb-0">{{ __('admin.seasons') }}</h5>
-                    <p class="mb-0">{{ __('admin.total_seasons') }} : {{ $series->seasons()->count() }}</p>
+                    <p class="mb-0">{{ __('admin.total_seasons') }} : {{ $series->season_number }}</p>
                 </div>
                 <div class="d-flex justify-content-md-end align-items-center column-gap-6">
                     {{-- <select class="form-select">
@@ -151,7 +151,7 @@
                                     <p class="mb-1 d-flex align-items-center">
                                         <i class="ti ti-video ti-lg"></i>
                                         <span class="mx-2 fw-medium">{{ __('admin.episodes_count') }}:</span>
-                                        <span>{{ $season->episodes()->count() }}</span>
+                                        <span>{{ $season->episode_count }}</span>
                                     </p>
                                     <div
                                         class="flex-wrap gap-4 d-flex flex-column flex-md-row text-nowrap flex-md-nowrap flex-lg-wrap flex-xxl-nowrap">

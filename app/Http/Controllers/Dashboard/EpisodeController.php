@@ -12,7 +12,10 @@ use App\Models\Season;
 use App\Models\Series;
 use App\Models\Subtitle;
 use App\Models\VideoFiles;
+use App\Services\TMDBService;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 
 class EpisodeController extends Controller
 {
@@ -185,5 +188,51 @@ class EpisodeController extends Controller
             'status' => false,
             'message' => 'الترجمة غير موجودة'
         ], 404);
+    }
+
+    public function syncEpisodeFromTmdb($tmdbId, $seasonNumber, $episodeNumber)
+    {
+        try {
+            $tmdb = new TMDBService();
+            $data = $tmdb->get("tv/{$tmdbId}/season/{$seasonNumber}/episode/{$episodeNumber}", [
+                'append_to_response' => 'credits,images,videos'
+            ]);
+
+            if (!$data || (isset($data['success']) && $data['success'] === false)) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'المعرف غير صحيح أو غير موجود في TMDB'
+                ]);
+            }
+
+            // =============================
+            // بيانات الحلقة
+            // =============================
+            $episodeData = [
+                'title_ar'        => $data['name'] ?? '',
+                'title_en'        => $data['name'] ?? '',
+                'description_ar'  => $data['overview'] ?? '',
+                'description_en'  => $data['overview'] ?? '',
+                'status'  => $data['status'] ?? '',
+                'air_date'        => $data['air_date'] ?? null,
+                'episode_number'  => $data['episode_number'] ?? null,
+                'duration_minutes' => $data['runtime'] ?? null,
+                'imdb_rating'     => $data['vote_average'] ?? null,
+                'tmdb_id'         => $data['id'] ?? null,
+                'thumbnail_url'   => !empty($data['still_path'])
+                    ? 'https://image.tmdb.org/t/p/w500' . $data['still_path']
+                    : null,
+            ];
+
+            return response()->json([
+                'status' => true,
+                'data'   => $episodeData,
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => false,
+                'message' => $e->getMessage()
+            ], 500);
+        }
     }
 }

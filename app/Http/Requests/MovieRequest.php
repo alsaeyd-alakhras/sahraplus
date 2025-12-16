@@ -54,7 +54,7 @@ class MovieRequest extends FormRequest
             'tmdb_id'          => ['nullable','string','max:20'],
              'intro_skip_time'         => ['required'],
              'logo_url'         => ['required'],
-             
+
             // التصنيفات
             'category_ids'   => ['nullable', 'array'],
             'category_ids.*' => ['nullable', 'integer', 'exists:categories,id'],

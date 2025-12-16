@@ -13,6 +13,7 @@
     @endif
     <div class="col-md-12">
         <input type="hidden" name="season_id" value="{{ $season->id }}">
+        <input type="hidden" name="season_number" value="{{ $season->season_number }}">
         <input type="hidden" name="view_count" value="{{ $episode->view_count ?? 0 }}">
         {{-- القسم الأول: العناوين --}}
         <div class="mb-3 border shadow card border-1">
@@ -100,6 +101,11 @@
 
                     </div>
 
+                    <div class="col-md-6">
+                        <x-form.input label="{{ __('admin.imdb_rating') }}" name="imdb_rating" type="number"
+                            step="0.1" max="10" placeholder="8.5" />
+                    </div>
+
                 </div>
             </div>
         </div>
@@ -107,16 +113,13 @@
         {{-- القسم الخامس: التصنيفات --}}
         <div class="mb-3 border shadow card border-1">
             <div class="pt-4 card-body">
-                <div class="row">
-                    <!-- تقييم IMDb -->
+                <div class="div row">
                     <div class="col-md-6">
-                        <x-form.input label="{{ __('admin.imdb_rating') }}" name="imdb_rating" type="number"
-                            step="0.1" max="10" placeholder="8.5" />
+                        <x-form.input type="number" min="0" label="{{ __('admin.tmdb_id') }}"
+                            :value="$episode->tmdb_id" name="tmdb_id" placeholder="مثال: 1412" />
                     </div>
-                    <!-- ID TMDB -->
-                    <div class="col-md-6">
-                        <x-form.input label="{{ __('admin.tmdb_id') }}" name="tmdb_id" type="number"
-                            placeholder="1412" />
+                    <div class="col-md-6 mb-4 ">
+                        <button type="button" id="tmdbSyncBtn" class="btn btn-primary">مزامنة من TMDB</button>
                     </div>
                 </div>
             </div>
@@ -189,7 +192,7 @@
                                     'subtitles',
                                     isset($episode)
                                         ? $episode->subtitles->map
-                                            ->only(['language','id',  'label', 'file_url', 'is_default'])
+                                            ->only(['language', 'id', 'label', 'file_url', 'is_default'])
                                             ->toArray()
                                         : [],
                                 );
@@ -363,11 +366,57 @@
             });
         });
     </script>
-
-
     <script>
         const episodeVideoRowPartial = "{{ route('dashboard.episodes.videoRowPartial') }}";
         const episodeSubtitleRowPartial = "{{ route('dashboard.episodes.subtitleRowPartial') }}";
     </script>
     <script src="{{ asset('js/custom/episodes.js') }}"></script>
+@endpush
+
+@push('scripts')
+    <script>
+        $("#tmdbSyncBtn").on("click", function() {
+
+            let tmdbId = $("input[name='tmdb_id']").val();
+            let seasonNumber = $("input[name='season_number']").val();
+            let episodeNumber = $("input[name='episode_number']").val();
+
+            console.log("TMDB ID:", tmdbId , 'seasonNumber:', seasonNumber, 'episodeNumber:' , episodeNumber);
+            if (!tmdbId || !seasonNumber || !episodeNumber) {
+                alert("الرجاء إدخال TMDB ID، رقم الموسم و رقم الحلقة");
+                return;
+            }
+
+            $.ajax({
+                url: `/dashboard/episodes/tmdb-sync/${tmdbId}/${seasonNumber}/${episodeNumber}`,
+                method: "GET",
+                success: function(res) {
+                    if (!res.status) {
+                        alert(res.message || "حدث خطأ أثناء المزامنة");
+                        return;
+                    }
+
+                    const ep = res.data;
+
+                    $("input[name='title_ar']").val(ep.title_ar);
+                    $("input[name='title_en']").val(ep.title_en);
+                    $("textarea[name='description_ar']").val(ep.description_ar);
+                    $("textarea[name='description_en']").val(ep.description_en);
+                    $("input[name='air_date']").val(ep.air_date);
+                    $("input[name='episode_number']").val(ep.episode_number);
+                    $("input[name='tmdb_id']").val(ep.tmdb_id);
+                    $("input[name='duration_minutes']").val(ep.duration_minutes);
+                    $("input[name='imdb_rating']").val(ep.imdb_rating);
+                    $("input[name='intro_skip_time']").val(ep.intro_skip_time);
+                    $("input[name='status']").val(ep.status);
+                    $("input[name='thumbnail_url_out']").val(ep.thumbnail_url);
+
+                    alert("تمت المزامنة بنجاح!");
+                },
+                error: function() {
+                    alert("خطأ في الاتصال بالـ API");
+                }
+            });
+        });
+    </script>
 @endpush

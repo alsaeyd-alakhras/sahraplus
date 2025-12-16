@@ -11,6 +11,10 @@ use App\Services\SeriesService;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\SeriesRequest;
 use App\Models\SeriesCast;
+use App\Models\TmdbSyncLog;
+use App\Services\TMDBService;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 
 class SeriesController extends Controller
 {
@@ -91,10 +95,10 @@ class SeriesController extends Controller
         // جديد: خيارات حالة المسلسل
         $seriesStatusOptions = $this->seriesStatusOptions;
 
-        $allCategories = Category::select('id','name_ar','name_en')->orderBy('name_ar')->get();
-           $allPeople = Person::select('id','name_ar','name_en')->orderBy('name_ar')->get();
+        $allCategories = Category::select('id', 'name_ar', 'name_en')->orderBy('name_ar')->get();
+        $allPeople = Person::select('id', 'name_ar', 'name_en')->orderBy('name_ar')->get();
 
-        return view('dashboard.series.create', compact( 'series', 'contentRatingOptions', 'languageOptions', 'countries', 'statusOptions', 'seriesStatusOptions','allCategories','allPeople'));
+        return view('dashboard.series.create', compact('series', 'contentRatingOptions', 'languageOptions', 'countries', 'statusOptions', 'seriesStatusOptions', 'allCategories', 'allPeople'));
     }
 
     /**
@@ -102,6 +106,7 @@ class SeriesController extends Controller
      */
     public function store(SeriesRequest $request)
     {
+       // return $request;
         $this->authorize('create', Series::class);
         $this->seriesService->save($request->validated());
         return redirect()
@@ -128,20 +133,21 @@ class SeriesController extends Controller
         $btn_label = "تعديل";
         $contentRatingOptions = $this->contentRatingOptions;
         $languageOptions = $this->languageOptions;
-        $countries = Country::select('code', 'name_ar', 'name_en')->get()->map(function ($country) {
-            return [
-                $country->code => app()->getLocale() == 'ar' ? $country->name_ar : $country->name_en,
-            ];
-        });
+        $countries = Country::select('code', 'name_ar', 'name_en')->get()
+            ->mapWithKeys(function ($country) {
+                return [
+                    $country->code => app()->getLocale() == 'ar' ? $country->name_ar : $country->name_en,
+                ];
+            });
         $statusOptions = $this->statusOptions;
         $seriesStatusOptions = $this->seriesStatusOptions;
 
-        $series->load(['categories:id','people']);
+        $series->load(['categories:id', 'people']);
 
-       $allCategories = Category::select('id','name_ar','name_en')->orderBy('name_ar')->get();
-       $allPeople     = Person::select('id','name_ar','name_en')->orderBy('name_ar')->get();
+        $allCategories = Category::select('id', 'name_ar', 'name_en')->orderBy('name_ar')->get();
+        $allPeople     = Person::select('id', 'name_ar', 'name_en')->orderBy('name_ar')->get();
 
-        return view('dashboard.series.edit', compact('series', 'btn_label', 'contentRatingOptions', 'languageOptions', 'countries', 'statusOptions', 'seriesStatusOptions','allCategories','allPeople',));
+        return view('dashboard.series.edit', compact('series', 'btn_label', 'contentRatingOptions', 'languageOptions', 'countries', 'statusOptions', 'seriesStatusOptions', 'allCategories', 'allPeople',));
     }
 
     /**
@@ -173,21 +179,23 @@ class SeriesController extends Controller
     }
 
     public function castRowPartial(Request $request)
-{
-    $i = (int) $request->get('i', 0);
-    $allPeople = Person::select('id','name_ar','name_en')->orderBy('name_ar')->get();
-    $roleTypes = [
-        'actor'           => __('admin.actor'),
-        'director'        => __('admin.director'),
-        'writer'          => __('admin.writer'),
-        'producer'        => __('admin.producer'),
-        'cinematographer' => __('admin.cinematographer'),
-        'composer'        => __('admin.composer'),
-    ];
-    return view('dashboard.series.partials._cast_row', compact('i','allPeople','roleTypes'));
-}
+    {
+        $i = (int) $request->get('i', 0);
+        $row = json_decode($request->row, true);
 
- public function videoRowPartial(Request $request)
+        $allPeople = Person::select('id', 'name_ar', 'name_en')->orderBy('name_ar')->get();
+        $roleTypes = [
+            'actor'           => __('admin.actor'),
+            'director'        => __('admin.director'),
+            'writer'          => __('admin.writer'),
+            'producer'        => __('admin.producer'),
+            'cinematographer' => __('admin.cinematographer'),
+            'composer'        => __('admin.composer'),
+        ];
+        return view('dashboard.series.partials._cast_row', compact('i', 'row', 'allPeople', 'roleTypes'))->render();
+    }
+
+    public function videoRowPartial(Request $request)
     {
         $i = (int) $request->get('i', 0);
         $row = [];
@@ -218,4 +226,163 @@ class SeriesController extends Controller
         ], 404);
     }
 
+    public function syncSeriesFromTmdb($id)
+    {
+        try {
+            $tmdb = new TMDBService();
+            $data = $tmdb->get("tv/{$id}", ['append_to_response' => 'credits,images,videos']);
+
+            if (!$data || (isset($data['success']) && $data['success'] === false)) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'المعرف غير صحيح أو غير موجود في TMDB'
+                ]);
+            }
+
+            // =============================
+            // التصنيفات (Genres)
+            // =============================
+            $categoryIds = [];
+            $categories = [];
+            if (!empty($data['genres'])) {
+                foreach ($data['genres'] as $genre) {
+                    $category = Category::firstOrCreate(
+                        ['name_ar' => $genre['name']],
+                        [
+                            'slug' => Str::slug($genre['name']),
+                            'name_en' => $genre['name']
+                        ]
+                    );
+
+                    $categoryIds[] = $category->id;
+                    $categories[] = [
+                        'id' => $category->id,
+                        'name' => $category->name_ar,
+                    ];
+                }
+            }
+
+            // =============================
+            // بيانات المسلسل
+            // =============================
+            $seriesData = [
+                'title_ar'        => $data['name'] ?? '',
+                'title_en'        => $data['original_name'] ?? '',
+                'slug'            => Str::slug($data['name'] ?? $data['original_name'] ?? 'series-' . $id),
+
+                'description_ar'  => $data['overview'] ?? '',
+                'description_en'  => $data['overview'] ?? '',
+
+                'poster_url'      => !empty($data['poster_url'])
+                    ? 'https://image.tmdb.org/t/p/w500' . $data['poster_url']
+                    : null,
+
+                'backdrop_url'    => !empty($data['backdrop_url'])
+                    ? 'https://image.tmdb.org/t/p/w780' . $data['backdrop_url']
+                    : null,
+
+                'trailer_url'     => !empty($data['videos']['results'][0]['key'])
+                    ? 'https://www.youtube.com/watch?v=' . $data['videos']['results'][0]['key']
+                    : null,
+
+                'first_air_date'  => $data['first_air_date'] ?? null,
+                'last_air_date'   => $data['last_air_date'] ?? null,
+
+                'seasons_count'   => count($data['seasons'] ?? []),
+                'episodes_count'  => $data['number_of_episodes'] ?? 0,
+
+                'imdb_rating'     => $data['vote_average'] ?? null,
+                'content_rating'  => $data['adult'] ? 'R' : 'G',
+
+                'language'        => $data['original_language'] ?? 'ar',
+                'country'         => $data['origin_country'][0] ?? null,
+
+                'status'          => $data['status'],
+                'series_status'   => $data['in_production'] ? 'returning' : 'ended',
+
+                'is_featured'     => false,
+                'view_count'      => $data['popularity'] ?? 0,
+
+                'tmdb_id'         => $id,
+                'category_ids' => $categoryIds,
+
+                'created_by'      => Auth::guard('admin')->id() ?? null,
+            ];
+
+            // =============================
+            // الأشخاص (CAST + CREW)
+            // =============================
+            $castRows = [];
+
+            // ---- CAST (actors)
+            if (!empty($data['credits']['cast'])) {
+                $order = 0;
+                foreach ($data['credits']['cast'] as $c) {
+                    $person = Person::firstOrCreate(
+                        ['tmdb_id' => $c['id']],
+                        [
+                            'name_en' => $c['original_name'] ?? $c['name'],
+                            'name_ar' => $c['name'] ?? $c['original_name'],
+                            'photo_url' => !empty($c['profile_path']) ? 'https://image.tmdb.org/t/p/w300' . $c['profile_path'] : null,
+                            'is_active' => true,
+                        ]
+                    );
+
+                    $castRows[] = [
+                        'person_id' => $person->id,
+                        'person_name' => $person->name_ar ?? $person->name_en,
+                        'role_type' => 'actor',
+                        'character_name' => $c['character'] ?? null,
+                        'sort_order' => $order++,
+                    ];
+                }
+            }
+
+            // ---- CREW (director - writer - producer ..)
+            if (!empty($data['credits']['crew'])) {
+                foreach ($data['credits']['crew'] as $c) {
+                    $person = Person::firstOrCreate(
+                        ['tmdb_id' => $c['id']],
+                        [
+                            'name_en' => $c['original_name'] ?? $c['name'],
+                            'name_ar' => $c['name'] ?? $c['original_name'],
+                            'photo_url' => !empty($c['profile_path']) ? 'https://image.tmdb.org/t/p/w300' . $c['profile_path'] : null,
+                            'is_active' => true,
+                        ]
+                    );
+
+                    $roleType = match (strtolower($c['job'])) {
+                        "director" => "director",
+                        "writer", "screenplay" => "writer",
+                        "producer" => "producer",
+                        "cinematography" => "cinematographer",
+                        "music", "composer" => "composer",
+                        default => null
+                    };
+
+                    if ($roleType) {
+                        $castRows[] = [
+                            'person_id' => $person->id,
+                            'person_name' => $person->name_ar ?? $person->name_en,
+                            'role_type' => $roleType,
+                            'character_name' => null,
+                            'sort_order' => 0,
+                        ];
+                    }
+                }
+            }
+
+            return response()->json([
+                'status' => true,
+                'data' => $seriesData,
+                'categories' => $categories,
+                'cast' => $castRows,
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => false,
+                'message' => $e->getMessage()
+            ], 500);
+        }
+    }
 }

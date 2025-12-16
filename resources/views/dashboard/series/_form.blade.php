@@ -17,7 +17,7 @@
                             placeholder="{{ __('admin.title_en_placeholder') }}" />
                     </div>
 
-                     <div class="col-md-6">
+                    <div class="col-md-6">
                         <x-form.input label="Logo Url" :value="$series->logo_url" name="logo_url"
                             placeholder="https://example.com" />
                     </div>
@@ -49,7 +49,8 @@
                         <x-form.selectkey label="{{ __('admin.status') }}" name="status" :selected="$series->status ?? 'draft'"
                             :options="$statusOptions" />
                     </div>
-                    <div class="col-md-4">
+
+                        <div class="col-md-4">
                         <x-form.selectkey label="{{ __('admin.series_status') }}" name="series_status"
                             :selected="$series->series_status ?? 'returning'" :options="$seriesStatusOptions" />
                     </div>
@@ -99,12 +100,11 @@
                     </div>
                     <div class="col-md-4">
                         <x-form.input type="number" min="0" label="{{ __('admin.view_count') }}"
-                            :value="$series->view_count ?? 0" name="view_count" readonly />
+                            :value="$series->view_count ?? 0" name="view_count" />
                     </div>
                 </div>
             </div>
         </div>
-
 
         {{-- … أعلى الفورم كالمعتاد … --}}
 
@@ -201,9 +201,6 @@
                                 ])
                             @endforelse
                         </div>
-
-
-
                     </div>
                 </div>
             </div>
@@ -232,9 +229,16 @@
                             name="trailer_url" placeholder="https://youtube.com/..." />
                     </div>
                     {{-- TMDB --}}
+
+                </div>
+
+                <div class="div row">
                     <div class="col-md-6">
                         <x-form.input type="number" min="0" label="{{ __('admin.tmdb_id') }}"
                             :value="$series->tmdb_id" name="tmdb_id" placeholder="مثال: 1412" />
+                    </div>
+                    <div class="col-md-6">
+                        <button type="button" id="tmdbSyncBtn" class="btn btn-primary">مزامنة من TMDB</button>
                     </div>
                 </div>
             </div>
@@ -248,7 +252,7 @@
                     <div class="mb-4 col-md-6">
                         @php
                             $poster_url = Str::startsWith($series->poster_url, ['http', 'https']);
-                            $poster_url_out = ($poster_url ? $series->poster_url : null);
+                            $poster_url_out = $poster_url ? $series->poster_url : null;
                         @endphp
                         <x-form.input type="url" label="{{ __('admin.poster_url') }}" :value="$poster_url_out"
                             name="poster_url_out" placeholder="{{ __('admin.poster_url_placeholder') }}" />
@@ -276,7 +280,7 @@
                     <div class="mb-4 col-md-6">
                         @php
                             $backdrop_url = Str::startsWith($series->backdrop_url, ['http', 'https']);
-                            $backdrop_url_out = ($backdrop_url ? $series->backdrop_url : null);
+                            $backdrop_url_out = $backdrop_url ? $series->backdrop_url : null;
                         @endphp
                         <x-form.input type="url" label="{{ __('admin.backdrop_url') }}" :value="$backdrop_url_out"
                             name="backdrop_url_out" placeholder="{{ __('admin.backdrop_url_placeholder') }}" />
@@ -312,7 +316,6 @@
                 {{ $btn_label ?? __('admin.save') }}
             </button>
         </div>
-
     </div>
 </div>
 {{-- مودال الوسائط --}}
@@ -389,4 +392,186 @@
     </script>
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <script src="{{ asset('js/custom/series.js') }}"></script>
+@endpush
+
+@push('scripts')
+    <script>
+        const form_type_ser = {{ isset($btn_label) ? 'true' : 'false' }};
+
+        function refreshSelectedCategories() {
+            let selectedBox = $("#selected-categories");
+            let selectedContainer = $("#selected-categories .d-flex");
+
+            selectedContainer.empty();
+
+            $("#category-badges label.active").each(function() {
+                selectedContainer.append(`
+            <span class="badge bg-primary px-3 py-2 rounded-pill">
+                ${$(this).text().trim()}
+            </span>
+        `);
+            });
+
+            if ($("#category-badges label.active").length > 0) {
+                selectedBox.removeClass("d-none");
+            } else {
+                selectedBox.addClass("d-none");
+            }
+        }
+
+        // ================================
+        // عند الضغط على التصنيف
+        // ================================
+        $(document).on("click", "#category-badges label", function() {
+            $(this).toggleClass("active");
+
+            let checkbox = $(this).find("input[type='checkbox']");
+            checkbox.prop("checked", $(this).hasClass("active"));
+
+            refreshSelectedCategories();
+        });
+
+        // -----------------------------
+        // TMDB SYNC BUTTON (SERIES)
+        // -----------------------------
+        $("#tmdbSyncBtn").on("click", function() {
+            let id = $("input[name='tmdb_id']").val();
+
+            if (!id) {
+                alert("الرجاء إدخال TMDB ID");
+                return;
+            }
+
+            $.ajax({
+                url: `/dashboard/series/tmdb-sync/${id}`,
+                method: "GET",
+                success: function(res) {
+                    if (!res.status) {
+                        alert(res.message || "حدث خطأ أثناء المزامنة");
+                        return;
+                    }
+
+                    const series = res.data;
+                    // تعبئة بيانات المسلسل
+                    $("input[name='title_ar']").val(series.title_ar);
+                    $("input[name='title_en']").val(series.title_en);
+                    $("textarea[name='description_ar']").val(series.description_ar);
+                    $("textarea[name='description_en']").val(series.description_en);
+                    $("input[name='first_air_date']").val(series.first_air_date);
+                    $("input[name='last_air_date']").val(series.last_air_date);
+                    $("input[name='imdb_rating']").val(series.imdb_rating);
+                    $("input[name='poster_url_out']").val(series.poster_url_out);
+                    $("input[name='backdrop_url_out']").val(series.backdrop_url_out);
+                    $("input[name='backdrop_url']").val(series.backdrop_url_out);
+                    $("input[name='poster_url']").val(series.poster_url_out);
+                    $("input[name='tmdb_id']").val(series.tmdb_id);
+                    $("input[name='view_count']").val(series.view_count);
+                    $("input[name='trailer_url']").val(series.trailer_url);
+                    $("input[name='language']").val(series.language);
+                    $("input[name='series_status']").val(series.series_status);
+                    $("input[name='episodes_count']").val(series.episodes_count);
+                    $("input[name='seasons_count']").val(series.seasons_count);
+                    $("input[name='content_rating']").val(series.content_rating);
+                    $("input[name='country']").val(series.country);
+                    $("input[name='is_featured']").val(series.is_featured);
+                    $("input[name='backdrop_url']").val(series.backdrop_url);
+                    $("input[name='poster_url']").val(series.poster_url);
+
+
+                    // ======= التصنيفات ========
+                    const container = $("#category-badges");
+
+                    const existingCategories = [];
+                    $("#category-badges label").each(function() {
+                        const id = $(this).data("id");
+                        const name = $(this).text().trim();
+                        existingCategories.push({
+                            id,
+                            name
+                        });
+                    });
+
+                    const allCategories = [...existingCategories];
+
+                    // إضافة الجديدة القادمة من TMDB
+                    res.categories.forEach(cat => {
+                        if (!allCategories.some(c => Number(c.id) === Number(cat.id))) {
+                            allCategories.push(cat);
+                        }
+                    });
+
+                    container.empty();
+
+                    const selectedIds = (series.category_ids || []).map(id => Number(id));
+
+                    allCategories.forEach(cat => {
+                        const isActive = selectedIds.includes(Number(cat.id));
+
+                        container.append(`
+                    <label class="px-3 py-1 mb-2 btn btn-outline-primary rounded-pill ${isActive ? "active" : ""}" data-id="${cat.id}">
+                        <input type="checkbox" class="d-none" name="category_ids[]" value="${cat.id}" ${isActive ? "checked" : ""}>
+                        ${cat.name}
+                    </label>
+                `);
+                    });
+
+                    // تحديث المختارة فوق
+                    refreshSelectedCategories();
+
+                    // تحديث المختارة فوق
+                    refreshSelectedCategories();
+
+                    // ----------------------------
+                    // CAST
+                    // ----------------------------
+                    renderCastRows(res.cast);
+
+                    alert("تمت المزامنة بنجاح!");
+                },
+
+                error: function() {
+                    alert("خطأ في الاتصال بالـ API");
+                }
+            });
+        });
+
+        // ----------------------------
+        // Render Cast Rows
+        // ----------------------------
+        function renderCastRows(cast) {
+            let container = $('#cast-rows');
+            container.html('');
+
+            cast.forEach((row, i) => {
+                $.ajax({
+                    url: '/dashboard/series/castRowPartial',
+                    method: 'GET',
+                    data: {
+                        i: i,
+                        row: JSON.stringify(row)
+                    },
+                    success: function(html) {
+                        container.append(html);
+                    }
+                });
+            });
+        }
+
+        $(document).on("click", "#category-badges label", function() {
+            $(this).toggleClass("active");
+
+            let checkbox = $(this).find("input[type='checkbox']");
+            checkbox.prop("checked", $(this).hasClass("active"));
+
+            refreshSelectedCategories();
+        });
+
+        $(document).on('select2:select', '.person-select', function(e) {
+            let data = e.params.data;
+
+            let wrapper = $(this).closest('.cast-row');
+
+            wrapper.find('.person-name-input').val(data.text);
+        });
+    </script>
 @endpush
