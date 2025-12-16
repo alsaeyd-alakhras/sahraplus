@@ -20,9 +20,9 @@ class CheckActiveDevice
         //     ], 400);
         // }
 
-        $user = Auth('web')->id() ?? Auth('sanctum')->id();
         
         if (Auth('web')->check()) {
+            $user = Auth('web')->user()->id;
 
             $device = UserActiveDevice::where('user_id', $user)
                 // ->where('device_id', $deviceId)
@@ -36,6 +36,23 @@ class CheckActiveDevice
                 ], 403);
             }
             // تحديث آخر نشاط تلقائيًا
+            $device->update(['last_activity' => Carbon::now()]);
+        }
+        if (Auth('sanctum')->check()) {
+
+            $user = Auth('sanctum')->user()->id;
+
+            $device = UserActiveDevice::where('user_id', $user)
+                // ->where('device_id', $deviceId)
+                ->where('is_active', true)
+                ->first();
+
+            if (!$device) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Device not registered or inactive'
+                ], 403);
+            }
             $device->update(['last_activity' => Carbon::now()]);
         }
         return $next($request);
