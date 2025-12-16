@@ -21,8 +21,8 @@ class CheckActiveDevice
         // }
 
         $user = Auth('web')->id() ?? Auth('sanctum')->id();
-        
-        if (Auth('web')->check()) {
+
+        if (Auth('web')->check() || Auth('sanctum') ->check()) {
 
             $device = UserActiveDevice::where('user_id', $user)
                 // ->where('device_id', $deviceId)

@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Middleware\LogLastUserActivity;
+use App\Http\Middleware\CheckActiveDevice;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -23,16 +24,19 @@ return Application::configure(basePath: dirname(__DIR__))
             'localeCookieRedirect'  => \Mcamara\LaravelLocalization\Middleware\LocaleCookieRedirect::class,
             'localeViewPath'        => \Mcamara\LaravelLocalization\Middleware\LaravelLocalizationViewPath::class,
             'checkPlanAccess' => \App\Http\Middleware\CheckPlanAccess::class,
+            'CheckActiveDevice' => \App\Http\Middleware\CheckActiveDevice::class,
 
         ]);
 
         // (اختياري) لو حابب تضيف ميدلوير عام للويب/الـ API خليه هون:
         $middleware->web([
+            CheckActiveDevice::class,
             LogLastUserActivity::class,
             // Alkoumi\LaravelArabicNumbers\Http\Middleware\ConvertArabicDigitsToEnlishMiddleware::class
         ]);
 
         $middleware->api([
+            CheckActiveDevice::class,
             LogLastUserActivity::class,
             // \Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class,
             'throttle:api',
