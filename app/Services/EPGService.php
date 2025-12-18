@@ -326,65 +326,102 @@ class EPGService
     }
 
     /**
-     * Get list of all available channels from EPG XML
+     * Fetch EPG XML and cache channels list in database
+     *
+     * @param string $epgUrl EPG source URL
+     * @return array Cached data with channels and metadata
+     */
+    public function fetchAndCacheChannelsList(string $epgUrl): array
+    {
+        try {
+            Log::info('EPGService: Fetching and caching EPG channels list');
+
+            $xmlContent = $this->fetchEPGFromUrl($epgUrl, 'xmltv');
+            $xml = simplexml_load_string($xmlContent);
+
+            if ($xml === false) {
+                throw new \Exception('Invalid XML format');
+            }
+
+            $channels = [];
+
+            foreach ($xml->channel as $channel) {
+                $channelId = (string) $channel['id'];
+
+                // Get display names
+                $displayNames = [];
+                foreach ($channel->{'display-name'} as $name) {
+                    $displayNames[] = (string) $name;
+                }
+
+                // Get icon URL if available
+                $iconUrl = null;
+                if (isset($channel->icon['src'])) {
+                    $iconUrl = (string) $channel->icon['src'];
+                }
+
+                $channels[] = [
+                    'id' => $channelId,
+                    'name' => $displayNames[0] ?? $channelId,
+                    'display_names' => $displayNames,
+                    'icon' => $iconUrl,
+                ];
+            }
+
+            $cacheData = [
+                'channels' => $channels,
+                'updated_at' => now()->toDateTimeString(),
+                'total_channels' => count($channels),
+            ];
+
+            // Save to system_settings table
+            \App\Models\SystemSetting::setValue('epg_channels_cache', json_encode($cacheData));
+
+            Log::info('EPGService: EPG channels list cached successfully', [
+                'total_channels' => count($channels),
+            ]);
+
+            return $cacheData;
+        } catch (\Exception $e) {
+            Log::error('EPGService: Failed to fetch and cache EPG channels', [
+                'error' => $e->getMessage(),
+            ]);
+
+            throw $e;
+        }
+    }
+
+    /**
+     * Get list of all available channels from database cache
      *
      * @return array List of channels with id and display-name
      */
     public function getAvailableChannels(): array
     {
         try {
-            $epgUrl = config('services.epg.url');
-            
-            // Return empty array if no EPG URL configured
-            if (empty($epgUrl)) {
-                Log::warning('EPGService: No EPG URL configured');
+            // Get from system_settings table
+            $cachedJson = \App\Models\SystemSetting::getValue('epg_channels_cache');
+
+            if (empty($cachedJson)) {
+                Log::warning('EPGService: No EPG channels cache found in database');
                 return [];
             }
-            
-            // Try to get from cache first (cache for 24 hours)
-            $cacheKey = 'epg_available_channels';
-            
-            return cache()->remember($cacheKey, 86400, function () use ($epgUrl) {
-                $xmlContent = $this->fetchEPGFromUrl($epgUrl, 'xmltv');
-                $xml = simplexml_load_string($xmlContent);
 
-                if ($xml === false) {
-                    throw new \Exception('Invalid XML format');
-                }
+            $cacheData = json_decode($cachedJson, true);
 
-                $channels = [];
+            if (!$cacheData || !isset($cacheData['channels'])) {
+                Log::warning('EPGService: Invalid EPG channels cache format');
+                return [];
+            }
 
-                foreach ($xml->channel as $channel) {
-                    $channelId = (string) $channel['id'];
-                    
-                    // Get display names
-                    $displayNames = [];
-                    foreach ($channel->{'display-name'} as $name) {
-                        $displayNames[] = (string) $name;
-                    }
-                    
-                    // Get icon URL if available
-                    $iconUrl = null;
-                    if (isset($channel->icon['src'])) {
-                        $iconUrl = (string) $channel->icon['src'];
-                    }
+            Log::info('EPGService: Retrieved available channels from database cache', [
+                'count' => count($cacheData['channels']),
+                'updated_at' => $cacheData['updated_at'] ?? 'unknown',
+            ]);
 
-                    $channels[] = [
-                        'id' => $channelId,
-                        'name' => $displayNames[0] ?? $channelId,
-                        'display_names' => $displayNames,
-                        'icon' => $iconUrl,
-                    ];
-                }
-
-                Log::info('EPGService: Retrieved available channels', [
-                    'count' => count($channels),
-                ]);
-
-                return $channels;
-            });
+            return $cacheData['channels'];
         } catch (\Exception $e) {
-            Log::error('EPGService: Failed to get available channels', [
+            Log::error('EPGService: Failed to get available channels from cache', [
                 'error' => $e->getMessage(),
             ]);
 
@@ -401,13 +438,13 @@ class EPGService
     public function getChannelDetails(string $channelId): ?array
     {
         $channels = $this->getAvailableChannels();
-        
+
         foreach ($channels as $channel) {
             if ($channel['id'] === $channelId) {
                 return $channel;
             }
         }
-        
+
         return null;
     }
 }

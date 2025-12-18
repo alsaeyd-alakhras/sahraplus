@@ -41,7 +41,7 @@ class SyncEPGData implements ShouldQueue
     public function __construct(?string $epgUrl = null)
     {
         // Use default EPG URL (https://epg.pw/xmltv/epg_lite.xml) or custom one
-        $this->epgUrl = $epgUrl ?: 'https://epg.pw/xmltv/epg_lite.xml';
+        $this->epgUrl = $epgUrl ?: config('services.epg.url');
     }
 
     /**
@@ -54,6 +54,13 @@ class SyncEPGData implements ShouldQueue
         ]);
 
         try {
+            // Fetch and cache EPG channels list
+            $channelsCache = $epgService->fetchAndCacheChannelsList($this->epgUrl);
+            
+            Log::info('SyncEPGData: EPG channels cached', [
+                'total_channels' => $channelsCache['total_channels'] ?? 0,
+            ]);
+
             // Update daily schedule using epg_id from channels
             $results = $epgService->updateDailySchedule($this->epgUrl);
 
