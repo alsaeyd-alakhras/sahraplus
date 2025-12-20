@@ -42,6 +42,7 @@ class LiveTvChannelRequest extends FormRequest
             'poster_url_out'    => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif', 'max:5120'],
             'stream_url'        => ['required', 'string', 'max:100'],
             'stream_type'       => ['required', 'in:hls,dash,rtmp'],
+            'epg_id'            => ['nullable', 'string', 'max:255'],
             'language'          => ['nullable', 'string', 'max:10'],
             'country'           => ['nullable', 'string', 'max:4'],
             'sort_order'        => ['nullable', 'integer', 'min:0', 'max:9999'],

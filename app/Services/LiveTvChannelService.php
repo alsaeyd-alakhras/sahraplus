@@ -3,8 +3,10 @@
 namespace App\Services;
 
 use App\Repositories\LiveTvChannelRepository;
+use App\Jobs\SyncChannelEPG;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Yajra\DataTables\Facades\DataTables;
@@ -201,6 +203,11 @@ class LiveTvChannelService
     {
         DB::beginTransaction();
         try {
+            // Set default language if not provided or empty
+            if (empty($data['language'])) {
+                $data['language'] = 'ar';
+            }
+
             // Generate slug
             $nameForSlug = $data['name_en'] ?? $data['name_ar'];
             $data['slug'] = !empty($data['slug']) ? $data['slug'] : $this->uniqueSlug($nameForSlug);
@@ -229,6 +236,18 @@ class LiveTvChannelService
 
             $channel = $this->repo->save($data);
             DB::commit();
+
+            // Queue EPG sync job to run in background
+            if (!empty($channel->epg_id)) {
+                Log::info('LiveTvChannelService: Queuing EPG sync for new channel', [
+                    'channel_id' => $channel->id,
+                    'epg_id' => $channel->epg_id,
+                ]);
+
+                // Dispatch to queue (will run immediately if queue driver is 'sync', otherwise in background)
+                SyncChannelEPG::dispatch($channel->id, $channel->epg_id);
+            }
+
             return $channel;
         } catch (\Throwable $e) {
             DB::rollBack();

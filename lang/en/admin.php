@@ -458,6 +458,8 @@ return [
     'epg_selector_hint' => 'Select a channel from the list to auto-fill English name and EPG ID. Or skip this field and enter data manually.',
     'epg_channel_imported' => 'Channel data imported from EPG successfully. Please add Arabic name, description, and streaming information.',
     'Error_loading_channel_details' => 'Error loading channel details',
+    'epg_programs_synced' => ':count programs synced from EPG',
+    'epg_sync_queued' => 'EPG programs are being synced in the background...',
     'language_placeholder' => 'e.g. ar / en',
     'language_hint' => 'Language (ar for Arabic, en for English, etc.)',
     'description_ar_placeholder' => 'وصف القناة بالعربية',

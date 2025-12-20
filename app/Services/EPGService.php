@@ -24,7 +24,7 @@ class EPGService
         try {
             Log::info('EPGService: Fetching EPG data', ['url' => $url, 'format' => $format]);
 
-            $response = Http::timeout(30)->get($url);
+            $response = Http::timeout(120)->get($url);
 
             if (!$response->successful()) {
                 throw new \Exception("Failed to fetch EPG: HTTP {$response->status()}");
@@ -323,6 +323,80 @@ class EPGService
         ]);
 
         return $deleted;
+    }
+
+    /**
+     * Sync programs for a single channel immediately
+     *
+     * @param LiveTvChannel $channel
+     * @param string $epgUrl EPG source URL
+     * @return array Results with synced count and errors
+     */
+    public function syncSingleChannelPrograms(LiveTvChannel $channel, string $epgUrl = 'https://epg.pw/xmltv/epg_lite.xml'): array
+    {
+        try {
+            // Skip if channel has no epg_id
+            if (empty($channel->epg_id)) {
+                return [
+                    'success' => false,
+                    'message' => 'Channel has no EPG ID',
+                    'synced' => 0,
+                ];
+            }
+
+            Log::info('EPGService: Syncing single channel programs', [
+                'channel_id' => $channel->id,
+                'channel_name' => $channel->name_ar,
+                'epg_id' => $channel->epg_id,
+            ]);
+
+            // Fetch and parse EPG
+            $xmlContent = $this->fetchEPGFromUrl($epgUrl, 'xmltv');
+            $allPrograms = $this->parseXMLTV($xmlContent);
+
+            // Check if EPG data exists for this channel
+            if (!isset($allPrograms[$channel->epg_id])) {
+                Log::warning('EPGService: No EPG data found for channel', [
+                    'channel_id' => $channel->id,
+                    'epg_id' => $channel->epg_id,
+                ]);
+
+                return [
+                    'success' => false,
+                    'message' => 'No EPG data found for this channel',
+                    'synced' => 0,
+                ];
+            }
+
+            // Sync programs
+            $synced = $this->syncChannelPrograms(
+                $channel,
+                $channel->epg_id,
+                $allPrograms[$channel->epg_id]
+            );
+
+            Log::info('EPGService: Single channel sync completed', [
+                'channel_id' => $channel->id,
+                'synced' => $synced,
+            ]);
+
+            return [
+                'success' => true,
+                'message' => "Synced {$synced} programs",
+                'synced' => $synced,
+            ];
+        } catch (\Exception $e) {
+            Log::error('EPGService: Failed to sync single channel', [
+                'channel_id' => $channel->id,
+                'error' => $e->getMessage(),
+            ]);
+
+            return [
+                'success' => false,
+                'message' => $e->getMessage(),
+                'synced' => 0,
+            ];
+        }
     }
 
     /**

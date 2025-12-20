@@ -487,6 +487,8 @@ return [
     'epg_selector_hint' => 'اختر قناة من القائمة لملء الاسم الإنجليزي ومعرف EPG تلقائياً. أو تجاهل هذا الحقل وأدخل البيانات يدوياً.',
     'epg_channel_imported' => 'تم استيراد بيانات القناة من EPG بنجاح. يرجى إضافة الاسم العربي والوصف ومعلومات البث.',
     'Error_loading_channel_details' => 'خطأ في تحميل تفاصيل القناة',
+    'epg_programs_synced' => 'تم تحميل :count برنامج من EPG',
+    'epg_sync_queued' => 'جاري تحميل برامج القناة من EPG في الخلفية...',
     'language_placeholder' => 'ar, en, fr',
     'language_hint' => 'مثال: ar (عربي), en (إنجليزي)',
     'description_ar_placeholder' => 'وصف القناة بالعربية',
