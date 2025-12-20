@@ -25,7 +25,8 @@ class UserSeeder extends Seeder
             'gender' => 'male',
             'country_code' => null,
             'avatar' => null,
-            'last_activity' => now()
+            'last_activity' => now(),
+            'pin_code' => null,
         ]);
 
 
@@ -35,7 +36,6 @@ class UserSeeder extends Seeder
             'avatar_url' => null,
             'is_default' => true,
             'is_child_profile' => false,
-            'pin_code' => null,
             'language' => 'ar',
             'is_active' => true
         ]);
@@ -46,7 +46,6 @@ class UserSeeder extends Seeder
             'avatar_url' => null,
             'is_default' => false,
             'is_child_profile' => true,
-            'pin_code' => 1234,
             'language' => 'ar',
             'is_active' => true
         ]);

@@ -66,6 +66,7 @@ class AuthController extends Controller
             'country_code' => 'nullable|string|max:2',
             'language' => 'nullable|string|max:5',
             'avatar' => 'nullable|image|max:5120',
+            'pin_code' => 'nullable|string|max:6',
         ]);
 
         if ($validator->fails()) {
@@ -104,6 +105,7 @@ class AuthController extends Controller
                 'push_notifications' => $data['push_notifications'] ?? true,
                 'parental_controls' => $data['parental_controls'] ?? false,
                 'last_activity' => now(),
+                'pin_code' => $data['pin_code'] ?? null,
             ]);
 
             // Guest Profile
@@ -112,7 +114,6 @@ class AuthController extends Controller
                 'avatar_url' => null,
                 'is_default' => true,
                 'is_child_profile' => false,
-                'pin_code' => null,
                 'language' => 'ar',
                 'is_active' => true,
             ]);
@@ -123,7 +124,6 @@ class AuthController extends Controller
                 'avatar_url' => null,
                 'is_default' => false,
                 'is_child_profile' => true,
-                'pin_code' => 1234,
                 'language' => 'ar',
                 'is_active' => true,
             ]);

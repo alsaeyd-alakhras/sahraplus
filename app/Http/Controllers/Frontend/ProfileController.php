@@ -18,64 +18,83 @@ class ProfileController extends Controller
         ]);
     }
 
-    public function verifyPin(Request $request, UserProfile $profile)
+    public function verifyPin(Request $request, User $user)
     {
-        // التحقق من أن البروفايل يخص المستخدم الحالي
-        if ($profile->user_id !== Auth::id()) {
-            return response()->json(['message' => 'غير مصرح'], 403);
-        }
-
         $request->validate([
-            'pin_code' => 'nullable|string|max:6',
-            'password' => 'nullable|string',
+            'profile_id' => 'nullable|exists:user_profiles,id',
+            'pin_code' => 'required|string|max:6',
         ]);
 
-        if ($profile->is_child_profile) {
-            // تحقق من PIN
-            if (!$request->has('pin_code')) {
-                return response()->json(['message' => 'يجب إدخال رمز PIN'], 400);
-            }
-            
-            if ($profile->pin_code === $request->pin_code) {
-                return response()->json(['valid' => true, 'message' => 'تم التحقق بنجاح']);
-            }
-            return response()->json(['valid' => false, 'message' => 'رمز PIN غير صحيح'], 403);
+    
+        if ($user->pin_code == $request->pin_code) {
+            return response()->json(['valid' => true, 'message' => 'تم التحقق بنجاح']);
         }
 
-        // للبروفايلات العادية (لو طلبوا التحقق بكلمة سر الـ User)
-        if ($request->has('password')) {
-            if (Hash::check($request->password, Auth::user()->password)) {
-                return response()->json(['valid' => true, 'message' => 'تم التحقق بنجاح']);
-            }
-            return response()->json(['valid' => false, 'message' => 'كلمة المرور غير صحيحة'], 403);
-        }
-
-        return response()->json(['valid' => false, 'message' => 'يجب إدخال كلمة المرور أو رمز PIN'], 400);
+        return response()->json(['valid' => false, 'message' => 'رمز PIN غير صحيح'], 403);
     }
 
-    public function resetPin(Request $request, UserProfile $profile)
+    public function resetPin(Request $request, User $user)
+    {
+        $request->validate([
+            'password' => 'required|string',
+            'profile_id' => 'nullable|exists:user_profiles,id',
+            'new_pin' => 'required|string|max:6',
+        ]);
+
+        // Check Password
+        if(!Hash::check($request->password,$user->password)){
+            return response()->json(['message' => 'كلمة السر غير صحيحة'], 401);
+        }
+
+        $profile = null;
+        if($request->profile_id){
+            $profile = UserProfile::findOrFail($request->profile_id);
+            if ($profile->user_id !== Auth::id() || !$profile->is_child_profile) {
+                return response()->json(['message' => 'غير مسموح'], 403);
+            }
+        }
+
+        $user->update([
+            'pin_code' => $request->new_pin,
+        ]);
+
+        return response()->json([
+            'status' => true,
+            'message' => 'تم تعيين PIN جديد بنجاح',
+            'pin_code' => $request->new_pin
+        ]);
+    }
+
+    public function createPin(Request $request, User $user)
     {
         $request->validate([
             'password' => 'required|string',
             'new_pin' => 'required|string|max:6',
+            'profile_id' => 'nullable|exists:user_profiles,id',
         ]);
 
-        if (
-            $profile->user_id !== Auth::id() ||
-            !$profile->is_child_profile
-        ) {
-            return response()->json(['message' => 'غير مسموح'], 403);
+        // Check Password
+        if(!Hash::check($request->password,$user->password)){
+            return response()->json(['message' => 'كلمة السر غير صحيحة'], 401);
         }
 
-        if (!Hash::check($request->password, Auth::user()->password)) {
-            return response()->json(['message' => 'كلمة المرور غير صحيحة'], 403);
+        $profile = null;
+        if($request->profile_id){
+            $profile = UserProfile::findOrFail($request->profile_id);
+            if ($profile->user_id !== Auth::id() || !$profile->is_child_profile) {
+                return response()->json(['message' => 'غير مسموح'], 403);
+            }
         }
 
-        $profile->update([
+        $user->update([
             'pin_code' => $request->new_pin,
         ]);
 
-        return response()->json(['message' => 'تم تعيين PIN جديد بنجاح']);
+        return response()->json([
+            'status' => true,
+            'message' => 'تم تعيين PIN جديد بنجاح',
+            'pin_code' => $request->new_pin
+        ]);
     }
 
 
@@ -87,17 +106,7 @@ class ProfileController extends Controller
             'avatar_url' => 'nullable|string',
             'language' => 'nullable|string|max:2',
             // 'is_child_profile' => 'nullable|boolean',
-            'pin_code' => 'nullable|string|max:6',
         ]);
-
-        if (
-            config('settings.require_pin_for_children') &&
-            $request->is_child_profile &&
-            empty($request->pin_code)
-        ) {
-            return response()->json(['message' => 'يجب إدخال PIN لملفات الأطفال'], 422);
-        }
-
 
         $user = User::with(['profiles', 'sessions'])->find(Auth::id());
         $profile = $user->profiles()->create([
@@ -106,7 +115,6 @@ class ProfileController extends Controller
             'avatar_url' => $request->avatar_url ?? null,
             'is_default' => false,
             'is_child_profile' => $request->is_child_profile,
-            'pin_code' => $request->pin_code ?? null,
             'language' => $request->language ?? 'ar',
             'is_active' => true
         ]);
@@ -124,11 +132,7 @@ class ProfileController extends Controller
             'avatar_url' => 'nullable|string',
             'language' => 'nullable|string|max:2',
             // 'is_child_profile' => 'nullable|boolean',
-            'pin_code' => 'nullable|string|max:6',
         ]);
-        if (config('settings.require_pin_for_children') && $request->is_child_profile && empty($request->pin_code)) {
-            return response()->json(['message' => 'ملفات الأطفال يجب أن تحتوي على PIN'], 422);
-        }
 
         // منع تعديل الأطفال بدون تحقق
         if ($profile->is_child_profile) {
@@ -151,7 +155,6 @@ class ProfileController extends Controller
             'is_default' => false,
             'is_child_profile' => $request->is_child_profile,
             'language' => $request->language ?? 'ar',
-            'pin_code' => $request->pin_code ?? null,
         ]);
         return response()->json([
             'status' => true,

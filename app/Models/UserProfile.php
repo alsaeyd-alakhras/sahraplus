@@ -21,7 +21,6 @@ class UserProfile extends Model
         'avatar_url',
         'is_default',
         'is_child_profile',
-        'pin_code',
         'language',
         'is_active'
     ];
@@ -88,10 +87,7 @@ class UserProfile extends Model
     }
 
     // Methods
-    public function verifyPin($pin)
-    {
-        return $this->pin_code === $pin;
-    }
+
 
     public function setAsDefault()
     {

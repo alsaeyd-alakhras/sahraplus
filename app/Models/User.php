@@ -2,12 +2,9 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
-
-use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Illuminate\Support\Facades\Hash;
 use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
@@ -20,6 +17,7 @@ class User extends Authenticatable
         'email',
         'phone',
         'password',
+        'pin_code',
         'date_of_birth',
         'gender',
         'country_code',
@@ -30,11 +28,11 @@ class User extends Authenticatable
         'email_notifications',
         'push_notifications',
         'parental_controls',
-        'last_activity'
+        'last_activity',
     ];
 
     protected $hidden = [
-        'password', 'remember_token'
+        'password', 'remember_token',
     ];
 
     protected $casts = [
@@ -47,6 +45,7 @@ class User extends Authenticatable
         'push_notifications' => 'boolean',
         'parental_controls' => 'boolean',
     ];
+
     protected $appends = ['avatar_full_url', 'full_name'];
 
     // العلاقات
@@ -62,7 +61,7 @@ class User extends Authenticatable
 
     public function notifications()
     {
-        return $this->hasMany(Notification::class,'notifiable_id');
+        return $this->hasMany(Notification::class, 'notifiable_id');
     }
 
     public function country()
@@ -71,46 +70,53 @@ class User extends Authenticatable
     }
 
     public function watchlist()
-{
-    return $this->hasMany(Watchlist::class);
-}
+    {
+        return $this->hasMany(Watchlist::class);
+    }
 
-public function watchProgress()
-{
-    return $this->hasMany(WatchProgres::class);
-}
+    public function watchProgress()
+    {
+        return $this->hasMany(WatchProgres::class);
+    }
 
-public function viewingHistory()
-{
-    return $this->hasMany(ViewingHistory::class);
-}
+    public function viewingHistory()
+    {
+        return $this->hasMany(ViewingHistory::class);
+    }
 
-public function ratings()
-{
-    return $this->hasMany(UserRating::class);
-}
+    public function ratings()
+    {
+        return $this->hasMany(UserRating::class);
+    }
 
-public function favorites()
-{
-    return $this->hasMany(Favorite::class);
-}
+    public function favorites()
+    {
+        return $this->hasMany(Favorite::class);
+    }
 
-public function downloads()
-{
-    return $this->hasMany(Download::class);
-}
+    public function downloads()
+    {
+        return $this->hasMany(Download::class);
+    }
 
     // Accessors & Mutators
     public function getFullNameAttribute() // $user->full_name
     {
-        return $this->first_name . ' ' . $this->last_name;
+        return $this->first_name.' '.$this->last_name;
     }
+
     public function getAvatarFullUrlAttribute() // $user->avatar_full_url
     {
         if ($this->avatar_url) {
-            return asset('storage/' . $this->avatar_url);
+            return asset('storage/'.$this->avatar_url);
         }
+
         return asset('assets/img/avatars/1.png');
+    }
+
+    public function verifyPin($pin)
+    {
+        return $this->pin_code === $pin;
     }
 
     // Scopes
@@ -144,13 +150,10 @@ public function downloads()
             ->latest('ends_at');
     }
 
-
-
     public function latestSubscription()
     {
         return $this->hasOne(UserSubscription::class)->latestOfMany();
     }
-
 
     public function currentPlan()
     {
@@ -166,6 +169,7 @@ public function downloads()
             ->where('user_subscriptions.starts_at', '<=', now())
             ->where('user_subscriptions.ends_at', '>=', now());
     }
+
     public function currentContentAccess()
     {
         $plan = $this->currentPlan()->with('contentAccess')->first();

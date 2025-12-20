@@ -79,6 +79,7 @@ class CreateNewUser implements CreatesNewUsers
             'push_notifications' => $input['push_notifications'] ?? true,
             'parental_controls' => $input['parental_controls'] ?? false,
             'last_activity' => now(),
+            'pin_code' => $input['pin_code'] ?? null,
         ]);
 
         // Guest Profile
@@ -87,7 +88,6 @@ class CreateNewUser implements CreatesNewUsers
             'avatar_url' => null,
             'is_default' => true,
             'is_child_profile' => false,
-            'pin_code' => null,
             'language' => 'ar',
             'is_active' => true
         ]);
@@ -98,7 +98,6 @@ class CreateNewUser implements CreatesNewUsers
             'avatar_url' => null,
             'is_default' => false,
             'is_child_profile' => true,
-            'pin_code' => 1234,
             'language' => 'ar',
             'is_active' => true
         ]);

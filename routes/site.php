@@ -97,8 +97,9 @@ Route::group([
         Route::post('/profiles', [ProfileController::class, 'store'])->name('profile.store');
         Route::put('/profiles/{profile}', [ProfileController::class, 'update'])->name('profile.update');
         Route::delete('/profiles/{profile}', [ProfileController::class, 'destroy'])->name('profile.destroy');
-        Route::post('/profiles/{profile}/verify-pin', [ProfileController::class, 'verifyPin'])->name('profile.verify-pin');
-        Route::post('/profiles/{profile}/reset-pin', [ProfileController::class, 'resetPin'])->name('profile.reset-pin');
+        Route::post('/profiles/{user}/verify-pin', [ProfileController::class, 'verifyPin'])->name('profile.verify-pin');
+        Route::post('/profiles/{user}/reset-pin', [ProfileController::class, 'resetPin'])->name('profile.reset-pin');
+        Route::post('/profiles/{user}/create-pin', [ProfileController::class, 'createPin'])->name('profile.create-pin');
 
         // settings ************************
         Route::get('settings', [FrontController::class, 'settings'])->name('settings');
