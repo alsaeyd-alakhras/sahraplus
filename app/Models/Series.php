@@ -2,8 +2,8 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 
 class Series extends Model
@@ -36,18 +36,18 @@ class Series extends Model
         'view_count',
         'tmdb_id',
         'logo_url',
-        'created_by'
+        'created_by',
     ];
 
     protected $casts = [
         'first_air_date' => 'date',
-        'last_air_date'  => 'date',
-        'seasons_count'  => 'integer',
+        'last_air_date' => 'date',
+        'seasons_count' => 'integer',
         'episodes_count' => 'integer',
-        'imdb_rating'    => 'decimal:1',
-        'is_featured'    => 'boolean',
-        'is_kids'        => 'boolean',
-        'view_count'     => 'integer',
+        'imdb_rating' => 'decimal:1',
+        'is_featured' => 'boolean',
+        'is_kids' => 'boolean',
+        'view_count' => 'integer',
     ];
 
     protected $appends = ['poster_full_url', 'backdrop_full_url', 'is_favorite'];
@@ -58,6 +58,7 @@ class Series extends Model
         return $this->belongsToMany(Category::class, 'category_series_pivot', 'series_id', 'category_id')
             ->withTimestamps();
     }
+
     public function getIsFavoriteAttribute()
     {
         return Favorite::where([
@@ -70,7 +71,7 @@ class Series extends Model
     public function people()
     {
         return $this->belongsToMany(Person::class, 'series_cast', 'series_id', 'person_id')
-            ->withPivot(['role_type', 'character_name', 'sort_order','id'])
+            ->withPivot(['role_type', 'character_name', 'sort_order', 'id'])
             ->withTimestamps();
     }
 
@@ -97,15 +98,21 @@ class Series extends Model
         );
     }
 
+    public function totalViewingCount(): int
+    {
+        return $this->episodes()->sum('view_count');
+    }
 
     public function creator()
     {
         return $this->belongsTo(Admin::class, 'created_by');
     }
+
     public function userRatings()
     {
         return $this->morphMany(UserRating::class, 'content');
     }
+
     public function favorites()
     {
         return $this->morphMany(Favorite::class, 'content');
@@ -116,10 +123,12 @@ class Series extends Model
     {
         return $this->userRatings()->approved()->avg('rating');
     }
+
     public function getRatingCount()
     {
         return $this->userRatings()->approved()->count();
     }
+
     public function incrementViewCount()
     {
         $this->increment('view_count');
@@ -130,21 +139,34 @@ class Series extends Model
     {
         return app()->getLocale() === 'ar' ? $this->title_ar : $this->title_en;
     }
+
     public function getDescriptionAttribute()
     {
         return app()->getLocale() === 'ar' ? $this->description_ar : $this->description_en;
     }
+
     public function getPosterFullUrlAttribute()
     {
-        if (Str::startsWith($this->poster_url, ['http', 'https'])) return $this->poster_url;
-        if (empty($this->poster_url)) return null;
-        return asset('storage/' . $this->poster_url);
+        if (Str::startsWith($this->poster_url, ['http', 'https'])) {
+            return $this->poster_url;
+        }
+        if (empty($this->poster_url)) {
+            return null;
+        }
+
+        return asset('storage/'.$this->poster_url);
     }
+
     public function getBackdropFullUrlAttribute()
     {
-        if (Str::startsWith($this->backdrop_url, ['http', 'https'])) return $this->backdrop_url;
-        if (empty($this->backdrop_url)) return null;
-        return asset('storage/' . $this->backdrop_url);
+        if (Str::startsWith($this->backdrop_url, ['http', 'https'])) {
+            return $this->backdrop_url;
+        }
+        if (empty($this->backdrop_url)) {
+            return null;
+        }
+
+        return asset('storage/'.$this->backdrop_url);
     }
 
     // Scopes
@@ -152,6 +174,7 @@ class Series extends Model
     {
         return $query->where('status', 'published');
     }
+
     public function scopeFeatured($query)
     {
         return $query->where('is_featured', true);
@@ -160,13 +183,13 @@ class Series extends Model
     /** مطابق لـ Movie::scopeByCategory */
     public function scopeByCategory($query, $categoryId)
     {
-        return $query->whereHas('categories', fn($q) => $q->where('categories.id', $categoryId));
+        return $query->whereHas('categories', fn ($q) => $q->where('categories.id', $categoryId));
     }
 
     /** تحديث العدادين كما لديك */
     public function updateCounts()
     {
-        $this->seasons_count  = $this->seasons()->count();
+        $this->seasons_count = $this->seasons()->count();
         $this->episodes_count = $this->seasons()->withCount('episodes')->get()->sum('episodes_count');
         $this->save();
     }
@@ -192,4 +215,23 @@ class Series extends Model
         return $this->morphMany(Watchlist::class, 'content');
     }
 
+    public function scopeSelectBasic($q)
+    {
+        return $q->select([
+            'id',
+            'title_ar',
+            'title_en',
+            'description_ar',
+            'description_en',
+            'poster_url',
+            'backdrop_url',
+            'seasons_count',
+            'episodes_count',
+            'imdb_rating',
+            'content_rating',
+            'language',
+            'view_count',
+            'logo_url',
+        ]);
+    }
 }

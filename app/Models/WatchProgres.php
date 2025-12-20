@@ -83,7 +83,7 @@ class WatchProgres extends Model
     // Accessors
     public function getFormattedProgressAttribute()
     {
-        return number_format($this->progress_percentage, 1) . '%';
+        return number_format($this->progress_percentage, 0) . '%';
     }
 
     public function getTimeRemainingAttribute()
@@ -110,5 +110,25 @@ class WatchProgres extends Model
     public function scopeRecent($query)
     {
         return $query->orderBy('last_watched_at', 'desc');
+    }
+
+    public static function continueWatchingMixed(int $profileId, int $limit = 12)
+    {
+        return self::query()
+            ->where('profile_id', $profileId)
+            ->where('progress_percent', '<', 100)
+            ->orderByDesc('updated_at')
+            ->limit($limit)
+            ->get()
+            ->map(function ($row) {
+                return [
+                    'type' => $row->content_type,
+                    'data' => $row->content_type === 'movie'
+                        ? Movie::selectBasic()->find($row->content_id)
+                        : Series::selectBasic()->find($row->content_id),
+                ];
+            })
+            ->filter(fn ($i) => $i['data'])
+            ->values();
     }
 }

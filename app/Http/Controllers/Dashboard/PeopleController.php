@@ -95,7 +95,7 @@ class PeopleController extends Controller
     {
         $term = $request->get('term', '');
 
-        $people = \App\Models\Person::query()
+        $people = Person::query()
             ->when($term, function ($q) use ($term) {
                 $q->where('name_ar', 'like', "%{$term}%")
                 ->orWhere('name_en', 'like', "%{$term}%");

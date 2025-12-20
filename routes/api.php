@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\API\V1\AnalyticsController;
 use App\Http\Controllers\Frontend\ProfileController;
+use App\Http\Controllers\HomeController;
 use Illuminate\Support\Facades\Route;
 
 // ================================
@@ -147,6 +148,9 @@ Route::prefix('v1')->name('api.v1.')->group(function () {
 
     // 🔎 Search & Filter
     Route::get('search', [SearchController::class, 'index'])->name('search');
+
+    // 🏠 Home
+    Route::get('home', [HomeController::class, 'homeApi'])->name('home.api');
 
     // 🏠 Home Banners
     Route::get('home/banners', [HomeBannerController::class, 'index'])->name('home.banners');

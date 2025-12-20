@@ -23,13 +23,13 @@ class PlanAccessController extends Controller
 
         switch ($type) {
             case 'category':
-                $contents = \App\Models\Category::select('id', 'name_ar', 'name_en')->get();
+                $contents = Category::select('id', 'name_ar', 'name_en')->get();
                 break;
             case 'movie':
-                $contents = \App\Models\Movie::select('id', 'title_ar', 'title_en')->get();
+                $contents = Movie::select('id', 'title_ar', 'title_en')->get();
                 break;
             case 'series':
-                $contents = \App\Models\Series::select('id', 'title_ar', 'title_en')->get();
+                $contents = Series::select('id', 'title_ar', 'title_en')->get();
                 break;
             default:
                 $contents = collect();

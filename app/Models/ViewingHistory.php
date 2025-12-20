@@ -2,12 +2,8 @@
 
 namespace App\Models;
 
-
-use App\Models\User;
-use App\Models\UserProfile;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Model;
 
 class ViewingHistory extends Model
 {
@@ -16,7 +12,7 @@ class ViewingHistory extends Model
     protected $fillable = [
         'user_id', 'profile_id', 'content_type', 'content_id',
         'watch_duration_seconds', 'completion_percentage', 'device_type',
-        'quality_watched', 'watched_at'
+        'quality_watched', 'watched_at',
     ];
 
     protected $casts = [
@@ -53,7 +49,7 @@ class ViewingHistory extends Model
             'completion_percentage' => $completionPercentage,
             'device_type' => $deviceType,
             'quality_watched' => $quality,
-            'watched_at' => now()
+            'watched_at' => now(),
         ]);
     }
 
@@ -67,6 +63,7 @@ class ViewingHistory extends Model
         if ($hours > 0) {
             return sprintf('%02d:%02d:%02d', $hours, $minutes, $seconds);
         }
+
         return sprintf('%02d:%02d', $minutes, $seconds);
     }
 
@@ -94,5 +91,69 @@ class ViewingHistory extends Model
     public function scopeThisWeek($query)
     {
         return $query->whereBetween('watched_at', [now()->startOfWeek(), now()->endOfWeek()]);
+    }
+
+    public static function mostViewedMixed(int $limit = 12, bool $isChild = false)
+    {
+        // 1️⃣ المحاولة الأولى: اعتمادًا على ViewingHistory
+        $movies = Movie::selectBasic()
+            ->withCount('viewingHistory')
+            ->when($isChild, callback: fn ($q) => $q->where('is_kids', true))
+            ->orderByDesc('viewing_history_count')
+            ->limit($limit)
+            ->get();
+
+        $series = Series::selectBasic()
+            ->when($isChild, fn ($q) => $q->where('is_kids', true))
+            ->with(['episodes' => function ($q) {
+                $q->select([
+                    'episods.id',
+                    'episods.season_id',
+                    'episods.view_count',
+                ]);
+            }])            
+            ->get()
+            ->map(function ($s) {
+                $s->viewing_history_count = $s->episodes->sum('view_count');
+                return $s;
+            })
+            ->sortByDesc('viewing_history_count')
+            ->take($limit)
+            ->values();
+        
+
+        $merged = $movies
+            ->map(fn ($m) => ['type' => 'movie', 'data' => $m])
+            ->merge(
+                $series->map(fn ($s) => ['type' => 'series', 'data' => $s])
+            )
+            ->sortByDesc(fn ($i) => $i['data']->viewing_history_count)
+            ->values();
+
+        // 2️⃣ إذا في نتائج فعلية من ViewingHistory
+        if ($merged->where('data.viewing_history_count', '>', 0)->count() > 0) {
+            return $merged->take($limit);
+        }
+
+        // 3️⃣ Fallback: الاعتماد على view_count من الجداول نفسها
+        $moviesFallback = Movie::selectBasic()
+            ->when($isChild, fn ($q) => $q->where('is_kids', true))
+            ->orderByDesc('view_count')
+            ->limit($limit)
+            ->get()
+            ->map(fn ($m) => ['type' => 'movie', 'data' => $m]);
+
+        $seriesFallback = Series::selectBasic()
+            ->when($isChild, fn ($q) => $q->where('is_kids', true))
+            ->orderByDesc('view_count')
+            ->limit($limit)
+            ->get()
+            ->map(fn ($s) => ['type' => 'series', 'data' => $s]);
+
+        return $moviesFallback
+            ->merge($seriesFallback)
+            ->sortByDesc(fn ($i) => $i['data']->view_count ?? 0)
+            ->take($limit)
+            ->values();
     }
 }

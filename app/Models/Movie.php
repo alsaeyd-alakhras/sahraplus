@@ -95,6 +95,7 @@ class Movie extends Model
         return $this->morphMany(ViewingHistory::class, 'content');
     }
 
+
     public function userRatings()
     {
         return $this->morphMany(UserRating::class, 'content');
@@ -228,5 +229,24 @@ class Movie extends Model
     public function scopeAdults($query)
     {
         return $query->where('is_kids', false);
+    }
+
+    public function scopeSelectBasic($q)
+    {
+        return $q->select([
+            'id',
+            'title_ar',
+            'title_en',
+            'description_ar',
+            'description_en',
+            'poster_url',
+            'backdrop_url',
+            'release_date',
+            'duration_minutes',
+            'imdb_rating',
+            'content_rating',
+            'language',
+            'logo_url',
+        ]);
     }
 }

@@ -87,4 +87,23 @@ class Watchlist extends Model
     {
         return $query->orderBy('added_at', 'desc');
     }
+
+    public static function mixedForProfile(int $profileId, int $limit = 12)
+    {
+        return self::query()
+            ->where('profile_id', $profileId)
+            ->latest()
+            ->limit($limit)
+            ->get()
+            ->map(function ($row) {
+                return [
+                    'type' => $row->content_type,
+                    'data' => $row->content_type === 'movie'
+                        ? Movie::selectBasic()->find($row->content_id)
+                        : Series::selectBasic()->find($row->content_id),
+                ];
+            })
+            ->filter(fn ($i) => $i['data'])
+            ->values();
+    }
 }
