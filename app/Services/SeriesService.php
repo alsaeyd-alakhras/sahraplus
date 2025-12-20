@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Jobs\SyncSeriesSeasonsJob;
 use App\Models\Category;
 use App\Models\Season;
 use App\Models\Series;
@@ -98,47 +99,20 @@ class SeriesService
             $cast   = $data['cast']   ?? [];
 
             $series = $this->repo->save($data);
-
-            $tmdb = new TMDBService();
-            $data = $tmdb->get("tv/{$series->tmdb_id}");
-
-            if (!empty($data['seasons'])) {
-                foreach ($data['seasons'] as $season) {
-
-                    Season::updateOrCreate(
-                        [
-                            'series_id' => $series->id,
-                            'season_number' => $season['season_number'],
-                        ],
-                        [
-                            'title_ar'       => $season['name'] ?? null,
-                            'title_en'       => $season['name'] ?? null,
-                            'description_ar' => $season['overview'] ?? null,
-                            'description_en' => $season['overview'] ?? null,
-                            'poster_url'     => !empty($season['poster_path'])
-                                ? 'https://image.tmdb.org/t/p/w500' . $season['poster_path']
-                                : null,
-                            'air_date'       => $season['air_date'] ?? null,
-                            'episode_count'  => $season['episode_count'] ?? 0,
-                            'status'         => 'draft',
-                            'tmdb_id'        => $season['id'] ?? null,
-                        ]
-                    );
-                }
-            }
+            // Dispatch Job
+            SyncSeriesSeasonsJob::dispatch($series->id, $series->tmdb_id);
 
             $this->syncCategories($series, $categoryIds ?? []);
             $this->syncCast($series, $cast ?? []);
-
-
             DB::commit();
             return $series;
         } catch (\Throwable $e) {
             DB::rollBack();
             throw $e;
-            return back()->with('danger', $e->getMessage());
+           // return back()->with('danger', $e->getMessage());
         }
     }
+
 
     public function update(array $data, int $id)
     {
@@ -172,7 +146,7 @@ class SeriesService
         } catch (\Throwable $e) {
             DB::rollBack();
             throw $e;
-            return back()->with('error', $e->getMessage());
+           // return back()->with('error', $e->getMessage());
         }
     }
 
