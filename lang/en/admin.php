@@ -586,4 +586,18 @@ return [
     'BannerDeletedSuccessfully' => 'Banner deleted successfully',
     'Yes' => 'Yes',
     'No' => 'No',
+
+    // Home Sections
+    'home_sections' => 'Home Sections',
+    'section_items' => 'Section Items',
+    'platform' => 'Platform',
+    'mobile' => 'Mobile',
+    'web' => 'Web',
+    'both' => 'Both',
+    'is_kids' => 'For Kids',
+    'starts_at' => 'Start Date',
+    'ends_at' => 'End Date',
+    'SectionAddedSuccessfully' => 'Section added successfully',
+    'SectionUpdatedSuccessfully' => 'Section updated successfully',
+    'SectionDeletedSuccessfully' => 'Section deleted successfully',
 ];

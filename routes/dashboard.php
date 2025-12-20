@@ -28,8 +28,8 @@ use App\Http\Controllers\Dashboard\CouponController;
 use App\Http\Controllers\Dashboard\TaxController;
 use App\Http\Controllers\Dashboard\UserSubscriptionController;
 use App\Http\Controllers\Dashboard\PaymentsController;
-use App\Models\Payments;
 use App\Http\Controllers\Dashboard\HomeBannerController;
+use App\Http\Controllers\Dashboard\HomeSectionController;
 use Mcamara\LaravelLocalization\Facades\LaravelLocalization;
 
 Route::group([
@@ -125,6 +125,7 @@ Route::group([
         Route::get('movie-categories-filters/{column}', [CategoryController::class, 'getFilterOptions'])->name('movie-categories.filters');
         Route::get('plan_access/get-contents', [PlanAccessController::class, 'getContents'])->name('plan_access.getContents');
         Route::get('home-banners-filters/{column}', [ HomeBannerController::class, 'getFilterOptions'])->name('home-banners.filters');
+        Route::get('home_sections-filters/{column}', [ HomeSectionController::class, 'getFilterOptions'])->name('home_sections.filters');
         Route::get('series-filters/{column}', [ SeriesController::class, 'getFilterOptions'])->name('series.filters');
 
         Route::resource('seasons', SeasonController::class)->except(['index']);
@@ -154,6 +155,7 @@ Route::group([
             'movie-categories'    => CategoryController::class,
             'series'    => SeriesController::class,
             'home-banners' => HomeBannerController::class,
+            'home_sections' => HomeSectionController::class,
         ]);
         Route::get('series/tmdb-sync/{id}', [SeriesController::class, 'syncSeriesFromTmdb'])->name('series.tmdb.sync');
         //Route::get('episodes/tmdb-sync/{id}', [EpisodeController::class, 'syncEpisodeFromTmdb'])->name('series.tmdb.sync');
@@ -161,6 +163,7 @@ Route::group([
         
         Route::get('countryPrice/countryRowPartial', [SubscriptionPlanController::class, 'countryRowPartial'])->name('countryPrice.countryRowPartial');
         Route::get('planAccess/planAccessRowPartial', [SubscriptionPlanController::class, 'planAccessRowPartial'])->name('planAccess.planAccessRowPartial');
+        Route::get('homeSections/sectionItemRowPartial', [HomeSectionController::class, 'sectionItemRowPartial'])->name('home_sections.sectionItemRowPartial');
     });
 
     Route::get('/countries/{id}/currency', function ($id) {

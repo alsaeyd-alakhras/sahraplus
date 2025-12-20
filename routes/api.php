@@ -44,6 +44,7 @@ use App\Http\Controllers\API\V1\CouponController;
 use App\Http\Controllers\API\V1\MangeDevicesController;
 use App\Http\Controllers\API\V1\PaymentController;
 use App\Http\Controllers\API\V1\HomeBannerController;
+use App\Http\Controllers\API\V1\HomeSectionsController;
 
 /*
 |--------------------------------------------------------------------------
@@ -149,6 +150,10 @@ Route::prefix('v1')->name('api.v1.')->group(function () {
 
     // 🏠 Home Banners
     Route::get('home/banners', [HomeBannerController::class, 'index'])->name('home.banners');
+
+    // 🏠 Home Sections
+    Route::get('home/sections', [HomeSectionsController::class, 'index'])->name('home.sections');
+    Route::get('home/section/{id}', [HomeSectionsController::class, 'show'])->name('home.section.show');
 
 
     // ================================

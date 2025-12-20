@@ -598,4 +598,18 @@ return [
     'BannerDeletedSuccessfully' => 'تم حذف البانر',
     'Yes' => 'نعم',
     'No' => 'لا',
+
+    // Home Sections
+    'home_sections' => 'أقسام الصفحة الرئيسية',
+    'section_items' => 'عناصر القسم',
+    'platform' => 'مكان العرض',
+    'mobile' => 'الجوال',
+    'web' => 'الويب',
+    'both' => 'كلاهما',
+    'is_kids' => 'للأطفال',
+    'starts_at' => 'تاريخ البداية',
+    'ends_at' => 'تاريخ النهاية',
+    'SectionAddedSuccessfully' => 'تم إضافة القسم بنجاح',
+    'SectionUpdatedSuccessfully' => 'تم تعديل القسم بنجاح',
+    'SectionDeletedSuccessfully' => 'تم حذف القسم بنجاح',
 ];

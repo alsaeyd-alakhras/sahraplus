@@ -225,6 +225,15 @@
                 </a>
             </li>
         @endcan
+        @can('view', 'App\\Models\HomeSection')
+            <li
+                class="menu-item {{ request()->is('dashboard/home_sections') || request()->is('dashboard/home_sections/*') ? 'active' : '' }}">
+                <a href="{{ route('dashboard.home_sections.index') }}" class="menu-link">
+                    <i class="ph ph-film-strip me-2"></i>
+                    <div data-i18n="home_sections">{{ __('admin.home_sections') }}</div>
+                </a>
+            </li>
+        @endcan
         @can('view', 'App\\Models\SystemSetting')
             <li
                 class="menu-item {{ request()->is('dashboard/settings') || request()->is('dashboard/settings/*') ? 'active' : '' }}">
