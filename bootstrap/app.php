@@ -2,7 +2,6 @@
 
 use App\Http\Middleware\CheckActiveDevice;
 use App\Http\Middleware\LogLastUserActivity;
-use App\Http\Middleware\CheckActiveDevice;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
