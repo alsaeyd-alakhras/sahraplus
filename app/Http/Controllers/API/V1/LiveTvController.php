@@ -166,6 +166,9 @@ class LiveTvController extends Controller
 
 
             $ipAddress = $request->ip();
+            if ($ipAddress === '127.0.0.1') {
+                $ipAddress = env('FLUSSONIC_DEV_IP');
+            }
 
             // Check if stream_url is already a full URL or just a stream name
             $streamUrl = $channel->stream_url;
