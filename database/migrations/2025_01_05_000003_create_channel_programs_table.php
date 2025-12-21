@@ -19,8 +19,8 @@ return new class extends Migration {
             $table->string('title_en', 200)->nullable();
             $table->text('description_ar')->nullable();
             $table->text('description_en')->nullable();
-            $table->timestamp('start_time');
-            $table->timestamp('end_time');
+            $table->dateTime('start_time');
+            $table->dateTime('end_time');
             $table->integer('duration_minutes');
             $table->string('genre', 50)->nullable();
             $table->boolean('is_live')->default(false);
@@ -40,5 +40,3 @@ return new class extends Migration {
         Schema::dropIfExists('channel_programs');
     }
 };
-
-

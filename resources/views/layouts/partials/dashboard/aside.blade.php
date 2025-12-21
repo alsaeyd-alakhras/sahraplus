@@ -45,6 +45,8 @@
         <li class="menu-header small">
             <span class="menu-header-text" data-i18n="Apps &amp; Pages">{{ __('admin.Media') }}</span>
         </li>
+
+
         @can('view', 'App\\Models\Series')
             <li
                 class="menu-item {{ request()->is('dashboard/series') || request()->is('dashboard/series/*') ? 'active' : '' }}">
@@ -176,6 +178,41 @@
                 </a>
             </li>
         @endcan --}}
+
+        <li class="menu-header small">
+            <span class="menu-header-text" data-i18n="Apps &amp; Pages">البث المباشر</span>
+        </li>
+
+        {{-- Live TV Section --}}
+        @can('view', 'App\\Models\LiveTvCategory')
+            <li
+                class="menu-item {{ request()->is('dashboard/live-tv-categories') || request()->is('dashboard/live-tv-categories/*') ? 'active' : '' }}">
+                <a href="{{ route('dashboard.live-tv-categories.index') }}" class="menu-link">
+                    <i class="ph ph-television me-2"></i>
+                    <div data-i18n="live-tv-categories">{{ __('admin.Live_TV_Categories') }}</div>
+                </a>
+            </li>
+        @endcan
+
+        @can('view', 'App\\Models\LiveTvChannel')
+            <li
+                class="menu-item {{ request()->is('dashboard/live-tv-channels') || request()->is('dashboard/live-tv-channels/*') ? 'active' : '' }}">
+                <a href="{{ route('dashboard.live-tv-channels.index') }}" class="menu-link">
+                    <i class="ph ph-broadcast me-2"></i>
+                    <div data-i18n="live-tv-channels">{{ __('admin.Live_TV_Channels') }}</div>
+                </a>
+            </li>
+        @endcan
+
+        @can('view', 'App\\Models\ChannelProgram')
+            <li
+                class="menu-item {{ request()->is('dashboard/channel-programs') || request()->is('dashboard/channel-programs/*') ? 'active' : '' }}">
+                <a href="{{ route('dashboard.channel-programs.index') }}" class="menu-link">
+                    <i class="ph ph-television me-2"></i>
+                    <div data-i18n="channel-programs">{{ __('admin.Channel_Programs') }}</div>
+                </a>
+            </li>
+        @endcan
 
         <li class="menu-header small">
             <span class="menu-header-text" data-i18n="Apps &amp; Pages">الإعدادات</span>

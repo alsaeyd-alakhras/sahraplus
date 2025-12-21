@@ -30,6 +30,9 @@ use App\Http\Controllers\Dashboard\UserSubscriptionController;
 use App\Http\Controllers\Dashboard\PaymentsController;
 use App\Http\Controllers\Dashboard\HomeBannerController;
 use App\Http\Controllers\Dashboard\HomeSectionController;
+use App\Http\Controllers\Dashboard\LiveTvCategoryController;
+use App\Http\Controllers\Dashboard\LiveTvChannelController;
+use App\Http\Controllers\Dashboard\ChannelProgramController;
 use Mcamara\LaravelLocalization\Facades\LaravelLocalization;
 
 Route::group([
@@ -124,9 +127,17 @@ Route::group([
         Route::get('coupons-filters/{column}', [CouponController::class, 'getFilterOptions'])->name('coupons.filters');
         Route::get('movie-categories-filters/{column}', [CategoryController::class, 'getFilterOptions'])->name('movie-categories.filters');
         Route::get('plan_access/get-contents', [PlanAccessController::class, 'getContents'])->name('plan_access.getContents');
-        Route::get('home-banners-filters/{column}', [ HomeBannerController::class, 'getFilterOptions'])->name('home-banners.filters');
-        Route::get('home_sections-filters/{column}', [ HomeSectionController::class, 'getFilterOptions'])->name('home_sections.filters');
-        Route::get('series-filters/{column}', [ SeriesController::class, 'getFilterOptions'])->name('series.filters');
+        Route::get('home-banners-filters/{column}', [HomeBannerController::class, 'getFilterOptions'])->name('home-banners.filters');
+        Route::get('home_sections-filters/{column}', [HomeSectionController::class, 'getFilterOptions'])->name('home_sections.filters');
+        Route::get('series-filters/{column}', [SeriesController::class, 'getFilterOptions'])->name('series.filters');
+        Route::get('live-tv-categories-filters/{column}', [LiveTvCategoryController::class, 'getFilterOptions'])->name('live-tv-categories.filters');
+        Route::get('live-tv-categories/export', [LiveTvCategoryController::class, 'export'])->name('live-tv-categories.export');
+        Route::get('live-tv-channels-filters/{column}', [LiveTvChannelController::class, 'getFilterOptions'])->name('live-tv-channels.filters');
+        Route::get('live-tv-channels/export', [LiveTvChannelController::class, 'export'])->name('live-tv-channels.export');
+        Route::post('live-tv-channels/test-stream', [LiveTvChannelController::class, 'testStream'])->name('live-tv-channels.test-stream');
+        Route::post('live-tv-channels/epg-channel-details', [LiveTvChannelController::class, 'getEpgChannelDetails'])->name('live-tv-channels.epg-channel-details');
+        Route::get('channel-programs-filters/{column}', [ChannelProgramController::class, 'getFilterOptions'])->name('channel-programs.filters');
+        Route::get('channel-programs/export', [ChannelProgramController::class, 'export'])->name('channel-programs.export');
 
         Route::resource('seasons', SeasonController::class)->except(['index']);
         Route::resource('episodes', EpisodeController::class)->except(['index']);
@@ -156,6 +167,9 @@ Route::group([
             'series'    => SeriesController::class,
             'home-banners' => HomeBannerController::class,
             'home_sections' => HomeSectionController::class,
+            'live-tv-categories' => LiveTvCategoryController::class,
+            'live-tv-channels' => LiveTvChannelController::class,
+            'channel-programs' => ChannelProgramController::class,
         ]);
         Route::get('series/tmdb-sync/{id}', [SeriesController::class, 'syncSeriesFromTmdb'])->name('series.tmdb.sync');
         //Route::get('episodes/tmdb-sync/{id}', [EpisodeController::class, 'syncEpisodeFromTmdb'])->name('series.tmdb.sync');

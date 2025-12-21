@@ -8,7 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Mcamara\LaravelLocalization\Facades\LaravelLocalization;
 
-Route::get('/login',function(){
+Route::get('/login', function () {
     return redirect()->route('login');
 });
 
@@ -26,18 +26,18 @@ Route::group([
         'as' => 'site.',
         // 'middleware' => ['auth'],
     ], function () {
-        Route::get('/',[FrontController::class,'index'])->name('home');
-        Route::get('/home',[FrontController::class,'index'])->name('home');
-        Route::get('/live',[FrontController::class,'live'])->name('live');
-        Route::get('/categories',[FrontController::class,'categories'])->name('categories');
-        Route::get('/categories/{category}',[FrontController::class,'categoryShow'])->name('categories.show');
-        Route::get('/actors',[FrontController::class,'actors'])->name('actors');
-        Route::get('/shorts',[FrontController::class,'shorts'])->name('shorts');
+        Route::get('/', [FrontController::class, 'index'])->name('home');
+        Route::get('/home', [FrontController::class, 'index'])->name('home');
+        Route::get('/live', [FrontController::class, 'live'])->name('live');
+        Route::get('/categories', [FrontController::class, 'categories'])->name('categories');
+        Route::get('/categories/{category}', [FrontController::class, 'categoryShow'])->name('categories.show');
+        Route::get('/actors', [FrontController::class, 'actors'])->name('actors');
+        Route::get('/shorts', [FrontController::class, 'shorts'])->name('shorts');
 
-        Route::get('/cast/{id}',[FrontController::class,'cast'])->name('cast');
+        Route::get('/cast/{id}', [FrontController::class, 'cast'])->name('cast');
 
         // Movie routes
-        Route::get('/movies',[MovieController::class,'index'])->name('movies');
+        Route::get('/movies', [MovieController::class, 'index'])->name('movies');
         Route::prefix('movies')->name('movie.')->group(function () {
 
             // عرض الفيلم
@@ -60,7 +60,7 @@ Route::group([
         });
 
         // Series routes
-        Route::get('/series',[SeriesController::class,'index'])->name('series');
+        Route::get('/series', [SeriesController::class, 'index'])->name('series');
         Route::prefix('series')->name('series.')->group(function () {
 
             // عرض الفيلم
@@ -79,6 +79,9 @@ Route::group([
         'as' => 'site.',
         'middleware' => ['auth:web'],
     ], function () {
+        // Live TV ************************
+        Route::get('/live-tv', [FrontController::class, 'liveTv'])->name('live-tv');
+
         // User Lists (Phase 3) ************************
         Route::get('/watchlist', function () {
             return view('site.watchlist');
@@ -106,5 +109,4 @@ Route::group([
         Route::post('settings/change-password', [FrontController::class, 'changePassword'])->name('change-password');
         Route::post('settings/update-personal-info', [FrontController::class, 'updatePersonalInfo'])->name('update-personal-info');
     });
-
 });

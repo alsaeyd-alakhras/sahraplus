@@ -21,7 +21,10 @@ class LiveTvController extends Controller
             ->ordered()
             ->get();
 
-        return LiveTvCategoryResource::collection($categories);
+        return response()->json([
+            'success' => true,
+            'data' => LiveTvCategoryResource::collection($categories)->resolve(),
+        ]);
     }
 
     /**
@@ -36,7 +39,7 @@ class LiveTvController extends Controller
         $perPage = (int) $request->query('per_page', 20);
 
         $query = LiveTvChannel::with('category')
-            ->active()
+            ->where('is_active', true)
             ->ordered()
             ->when($categoryId, function ($q) use ($categoryId) {
                 $q->where('category_id', $categoryId);
@@ -50,7 +53,16 @@ class LiveTvController extends Controller
 
         $channels = $query->paginate($perPage);
 
-        return LiveTvChannelResource::collection($channels);
+        return response()->json([
+            'success' => true,
+            'data' => LiveTvChannelResource::collection($channels->items())->resolve(),
+            'meta' => [
+                'current_page' => $channels->currentPage(),
+                'last_page' => $channels->lastPage(),
+                'per_page' => $channels->perPage(),
+                'total' => $channels->total(),
+            ],
+        ]);
     }
 
     /**
@@ -63,6 +75,7 @@ class LiveTvController extends Controller
 
         if (! $category) {
             return response()->json([
+                'success' => false,
                 'message' => 'Category not found',
             ], 404);
         }
@@ -74,7 +87,16 @@ class LiveTvController extends Controller
             ->ordered()
             ->paginate($perPage);
 
-        return LiveTvChannelResource::collection($channels);
+        return response()->json([
+            'success' => true,
+            'data' => LiveTvChannelResource::collection($channels->items())->resolve(),
+            'meta' => [
+                'current_page' => $channels->currentPage(),
+                'last_page' => $channels->lastPage(),
+                'per_page' => $channels->perPage(),
+                'total' => $channels->total(),
+            ],
+        ]);
     }
 
     /**
@@ -87,11 +109,15 @@ class LiveTvController extends Controller
 
         if (! $channel) {
             return response()->json([
+                'success' => false,
                 'message' => 'Channel not found',
             ], 404);
         }
 
-        return new LiveTvChannelResource($channel);
+        return response()->json([
+            'success' => true,
+            'data' => (new LiveTvChannelResource($channel))->resolve(),
+        ]);
     }
 
     /**
@@ -104,6 +130,7 @@ class LiveTvController extends Controller
 
         if (! $channel) {
             return response()->json([
+                'success' => false,
                 'message' => 'Channel not found',
             ], 404);
         }
@@ -119,29 +146,71 @@ class LiveTvController extends Controller
 
     /**
      * GET /api/v1/live-tv/channels/{id}/stream
-     * بيانات البث لقناة محددة
+     * بيانات البث لقناة محددة (مع توليد Secure Token من Flussonic)
      */
-    public function stream($id)
+    public function stream(Request $request, $id)
     {
         $channel = LiveTvChannel::find($id);
 
         if (! $channel) {
             return response()->json([
+                'success' => false,
                 'message' => 'Channel not found',
             ], 404);
         }
 
-        return response()->json([
-            'id' => $channel->id,
-            'name_ar' => $channel->name_ar,
-            'name_en' => $channel->name_en,
-            'slug' => $channel->slug,
-            'stream_url' => $channel->stream_url,
-            'stream_type' => $channel->stream_type,
-            'language' => $channel->language,
-            'country' => $channel->country,
-        ]);
+        try {
+            // Get authenticated user if available
+            $user = $request->user();
+            $userId = $user ? $user->id : null;
+
+
+            $ipAddress = $request->ip();
+            if ($ipAddress === '127.0.0.1') {
+                $ipAddress = env('FLUSSONIC_DEV_IP');
+            }
+
+            // Check if stream_url is already a full URL or just a stream name
+            $streamUrl = $channel->stream_url;
+
+            // If it's just a stream name (not a full URL), generate Flussonic URL
+            if (!filter_var($streamUrl, FILTER_VALIDATE_URL)) {
+                $flussonicService = app(\App\Services\FlussonicService::class);
+                $streamData = $flussonicService->generateStreamUrl(
+                    streamName: $channel->stream_url,
+                    userId: $userId,
+                    ipAddress: $ipAddress,
+                    protocol: $channel->stream_type
+                );
+                $streamUrl = $streamData['url'];
+                $expiresAt = $streamData['expires_at'];
+            } else {
+                // Use the full URL as is
+                $expiresAt = time() + 3600; // 1 hour default
+            }
+
+            return response()->json([
+                'success' => true,
+                'data' => [
+                    'id' => $channel->id,
+                    'name_ar' => $channel->name_ar,
+                    'name_en' => $channel->name_en,
+                    'slug' => $channel->slug,
+                    'stream_name' => $channel->stream_url,
+                    'stream_url' => $streamUrl,
+                    'stream_type' => $channel->stream_type,
+                    'expires_at' => $expiresAt,
+                    'expires_at_formatted' => date('Y-m-d H:i:s', $expiresAt),
+                    'language' => $channel->language,
+                    'country' => $channel->country,
+                ],
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to generate stream URL',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
     }
 }
-
-
