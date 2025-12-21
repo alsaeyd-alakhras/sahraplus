@@ -334,7 +334,7 @@ class MoviesController extends Controller
                 'backdrop_url_out' => !empty($data['backdrop_path']) ? 'https://image.tmdb.org/t/p/w780' . $data['backdrop_path'] : null,
                 'backdrop_path' => !empty($data['backdrop_path']) ? 'https://image.tmdb.org/t/p/w780' . $data['backdrop_path'] : null,
                 'tmdb_id' => $id,
-                'view_count' => $data['popularity'] ?? 0,
+                'view_count' =>  0,
                 'intro_skip_time' => 0,
                 'category_ids' => $categoryIds,
                 'logo_url' => !empty($data['belongs_to_collection']['poster_path'])

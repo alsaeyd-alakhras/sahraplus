@@ -117,12 +117,42 @@ class HomeService
         //     return [];
         // }
 
+        $categories = Category::active()
+            ->orderBy('sort_order')
+            ->get(['id', 'name_ar', 'name_en', 'slug']);
+
         return [
             'type' => 'categories',
             'title' => __('Categories'),
-            'items' => Category::active()
-                ->orderBy('sort_order')
-                ->get(['id', 'name_ar', 'name_en', 'slug']),
+            'items' => $categories->map(function ($category) {
+                // جلب الأفلام والمسلسلات لكل كاتيجوري
+                $movies = Movie::selectBasic()
+                    ->whereHas('categories', fn($q) => $q->where('categories.id', $category->id))
+                    ->get()
+                    ->map(fn($movie) => [
+                        'type' => 'movie',
+                        'data' => $movie,
+                    ]);
+
+                $series = Series::selectBasic()
+                    ->whereHas('categories', fn($q) => $q->where('categories.id', $category->id))
+                    ->get()
+                    ->map(fn($series) => [
+                        'type' => 'series',
+                        'data' => $series,
+                    ]);
+
+                // دمج الأفلام والمسلسلات معاً
+                $items = $movies->merge($series)->values();
+
+                return [
+                    'id' => $category->id,
+                    'name_ar' => $category->name_ar,
+                    'name_en' => $category->name_en,
+                    'slug' => $category->slug,
+                    'items' => $items,
+                ];
+            }),
         ];
     }
 

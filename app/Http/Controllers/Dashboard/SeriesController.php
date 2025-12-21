@@ -301,7 +301,7 @@ class SeriesController extends Controller
                 'series_status'   => $data['in_production'] ? 'returning' : 'ended',
 
                 'is_featured'     => false,
-                'view_count'      => $data['popularity'] ?? 0,
+                'view_count'      => 0,
 
                 'tmdb_id'         => $id,
                 'category_ids' => $categoryIds,
