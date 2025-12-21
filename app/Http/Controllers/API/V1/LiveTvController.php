@@ -164,7 +164,7 @@ class LiveTvController extends Controller
             $user = $request->user();
             $userId = $user ? $user->id : null;
 
-            // Get user IP (optional - we'll use 'no_check_ip' by default)
+
             $ipAddress = $request->ip();
 
             // Check if stream_url is already a full URL or just a stream name
@@ -176,7 +176,7 @@ class LiveTvController extends Controller
                 $streamData = $flussonicService->generateStreamUrl(
                     streamName: $channel->stream_url,
                     userId: $userId,
-                    ipAddress: null,
+                    ipAddress: $ipAddress,
                     protocol: $channel->stream_type
                 );
                 $streamUrl = $streamData['url'];
