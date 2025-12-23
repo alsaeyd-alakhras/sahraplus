@@ -68,24 +68,30 @@ class CategoryService
     public function save(array $data)
     {
         DB::beginTransaction();
+
         try {
             $nameForSlug = $data['name_en'] ?: $data['name_ar'];
-            $data['slug'] = $data['slug'] ?: $this->uniqueSlug($nameForSlug);
 
-            if (array_key_exists('image_url_out', $data) && $data['image_url_out'] !== null && $data['image_url_out'] !== '') {
-                $data['image_url'] = $data['image_url_out'];
-            } else {
-                $data['image_url'] = $data['image_url'] ?? null;
+            if (empty($data['slug'])) {
+                $data['slug'] = $this->uniqueSlug($nameForSlug);
             }
 
+            if (!empty($data['image_url_out'])) {
+                $data['image_url'] = $data['image_url_out'];
+            }
+
+            unset($data['image_url_out']);
+
             $cat = $this->repo->save($data);
+
             DB::commit();
             return $cat;
         } catch (\Throwable $e) {
             DB::rollBack();
-            return back()->with('error',$e->getMessage());
+            throw $e; // مهم أثناء التصحيح
         }
     }
+
 
     public function update(array $data, int $id)
     {

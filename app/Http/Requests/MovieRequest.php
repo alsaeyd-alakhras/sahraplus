@@ -60,7 +60,7 @@ class MovieRequest extends FormRequest
 
             // الطاقم
             'cast'           => ['nullable', 'array'],
-            'cast.*.person_id' => ['sometimes', 'distinct', 'exists:people,id'],
+            'cast.*.person_id' => ['sometimes', 'exists:people,id'],
             'cast.*.role_type'           => ['nullable', 'string', 'max:100'],
             'cast.*.character_name' => ['nullable', 'string', 'max:150'],
             'cast.*.sort_order'       => ['nullable', 'integer', 'min:0'],
@@ -69,9 +69,9 @@ class MovieRequest extends FormRequest
             'video_files'                  => ['sometimes', 'array'],
             'video_files.*.video_type'     => ['required', 'in:main,trailer,teaser,clip'],
             'video_files.*.quality'        => ['required', 'in:240p,360p,480p,720p,1080p,4k'],
-            'video_files.*.file'           => $this->isUpdate()
-                ? ['nullable', 'file', 'mimetypes:video/mp4,video/webm,video/quicktime,video/x-matroska']
-                : ['nullable', 'file', 'mimetypes:video/mp4,video/webm,video/quicktime,video/x-matroska'],
+            // 'video_files.*.file'           => $this->isUpdate()
+            //     ? ['nullable', 'file', 'mimetypes:video/mp4,video/webm,video/quicktime,video/x-matroska']
+            //     : ['nullable', 'file', 'mimetypes:video/mp4,video/webm,video/quicktime,video/x-matroska'],
             'video_files.*.file_url'       => $this->isUpdate()
                 ? ['nullable', 'url', 'max:2000']
                 : ['nullable', 'url', 'max:2000', 'required_without:video_files.*.file'],
@@ -80,11 +80,11 @@ class MovieRequest extends FormRequest
 
             // الترجمات
             'subtitles'              => ['nullable', 'array'],
-            'subtitles.*.language'   => ['required', 'string', 'max:10', 'distinct'],
-            'subtitles.*.label'      => ['required', 'string', 'max:100', 'distinct'],
-            'subtitles.*.file'       => $this->isUpdate()
-                ? ['nullable', 'file', 'mimes:srt,vtt']
-                : ['nullable', 'file', 'mimes:srt,vtt'],
+            'subtitles.*.language'   => ['required', 'string', 'max:10'],
+            'subtitles.*.label'      => ['required', 'string', 'max:100'],
+            // 'subtitles.*.file'       => $this->isUpdate()
+            //     ? ['nullable', 'file', 'mimes:srt,vtt']
+            //     : ['nullable', 'file', 'mimes:srt,vtt'],
             'subtitles.*.url'        => $this->isUpdate()
                 ? ['nullable', 'url', 'max:2000']
                 : ['nullable', 'url', 'max:2000', 'required_without:subtitles.*.file'],

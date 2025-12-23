@@ -168,6 +168,7 @@ return [
     'select_one_plan' => 'Select One Plan',
     'content_type' => 'Content Type',
     'select_content' => 'Select Content',
+    'select_categories' => 'Select Categories',
     'loading' => 'Loading...',
     'error_loading' => 'Error loading data',
     'Save' => 'Save',

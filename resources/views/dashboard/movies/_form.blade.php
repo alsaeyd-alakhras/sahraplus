@@ -67,7 +67,7 @@
                     </div>
                     <div class="mb-4 col-md-4">
                         <x-form.input type="number" step="0.1" label="تقييم IMDb (0-10)" :value="$movie->imdb_rating"
-                            name="imdb_rating" placeholder="7.8" min="0" max="10" />
+                            name="imdb_rating" placeholder="7" min="0" max="10" />
                     </div>
 
                     {{-- التصنيف/اللغة/ الدولة --}}
@@ -208,38 +208,31 @@
         <div class="mb-3 border shadow card border-1">
             <div class="pt-4 card-body">
                 <div class="row">
-                    {{-- Categories (movie_category_mapping) --}}
+                    {{-- Categories --}}
                     <div class="col-12">
-                        <label class="form-label fw-bold">{{ __('admin.Movie Category') }}</label>
+                        <label class="form-label fw-bold">
+                            {{ __('admin.Movie Category') }}
+                        </label>
 
-                        {{-- الحاوية للمختارة --}}
-                        <div id="selected-categories" class="mb-2 d-none">
-                            <div class="flex-wrap gap-2 d-flex"></div>
-                            <hr class="mt-2 mb-3">
-                        </div>
-                        {{-- مهم: لو ما في اختيار، هالحقل يرسل قيمة فاضية بدل ما يختفي المفتاح --}}
-                        <input type="hidden" name="category_ids" value="">
-                        {{-- الحاوية للكل --}}
-
-                        <div id="category-badges" class="flex-wrap gap-2 d-flex">
+                        <select name="category_ids[]"    id="category-select" class="form-control select2" multiple
+                            data-placeholder="{{ __('admin.select_categories') }}">
                             @foreach ($allCategories as $category)
-                                <label class="px-3 py-1 mb-2 btn btn-outline-primary rounded-pill"
-                                    data-id="{{ $category->id }}">
-                                    <input type="checkbox" class="d-none" name="category_ids[]"
-                                        value="{{ $category->id }}"
-                                        {{ in_array($category->id, old('category_ids', $movie->categories->pluck('id')->toArray() ?? [])) ? 'checked' : '' }}>
+                                <option value="{{ $category->id }}"
+                                    {{ in_array($category->id, old('category_ids', $movie->categories->pluck('id')->toArray() ?? []))
+                                        ? 'selected'
+                                        : '' }}>
                                     {{ $category->name_ar }}
-                                </label>
+                                </option>
                             @endforeach
-                        </div>
+                        </select>
 
-
-                        <span class="text-muted">{{ __('admin.select_at_least_one_category') }}</span>
+                        <span class="text-muted d-block mt-2">
+                            {{ __('admin.select_at_least_one_category') }}
+                        </span>
                     </div>
                 </div>
             </div>
         </div>
-
 
         <div class="mb-3 border shadow card border-1">
             <div class="pt-4 card-body">
@@ -253,14 +246,7 @@
                             </button>
                         </div>
 
-                        {{-- المختار حالياً --}}
-                        <div id="cast-selected" class="mb-2 d-none">
-                            <div class="flex-wrap gap-2 d-flex"></div>
-                            <hr class="mt-2 mb-3">
-                        </div>
-
-                        {{-- صفوف التحرير --}}
-                        <div id="cast-rows" class="gap-3 d-grid">
+                      <div id="cast-rows" class="gap-3 d-grid">
                             @php
                                 $oldCast = old(
                                     'cast',
@@ -483,39 +469,23 @@
 
 @push('scripts')
     <script>
-        function refreshSelectedCategories() {
-            let selectedBox = $("#selected-categories");
-            let selectedContainer = $("#selected-categories .d-flex");
-
-            selectedContainer.empty();
-
-            $("#category-badges label.active").each(function() {
-                selectedContainer.append(`
-            <span class="badge bg-primary px-3 py-2 rounded-pill">
-                ${$(this).text().trim()}
-            </span>
-        `);
+        $(document).ready(function() {
+            $('.select2').select2({
+                width: '100%',
+                minimumResultsForSearch: 0, // إجبار ظهور البحث
+                placeholder: function() {
+                    return $(this).data('placeholder');
+                }
             });
-
-            if ($("#category-badges label.active").length > 0) {
-                selectedBox.removeClass("d-none");
-            } else {
-                selectedBox.addClass("d-none");
-            }
-        }
-
-        // ================================
-        // عند الضغط على التصنيف
-        // ================================
-        $(document).on("click", "#category-badges label", function() {
-            $(this).toggleClass("active");
-
-            let checkbox = $(this).find("input[type='checkbox']");
-            checkbox.prop("checked", $(this).hasClass("active"));
-
-            refreshSelectedCategories();
         });
 
+        function setImage(url, inputName, imgId, clearBtnId) {
+            if (!url) return;
+
+            $(`input[name='${inputName}']`).val(url);
+            $(`#${imgId}`).attr("src", url).removeClass("d-none");
+            $(`#${clearBtnId}`).removeClass("d-none");
+        }
 
         // ================================
         // زر الـ TMDB SYNC
@@ -546,54 +516,29 @@
                     $("textarea[name='description_en']").val(movie.description_en);
                     $("input[name='release_date']").val(movie.release_date);
                     $("input[name='duration_minutes']").val(movie.duration_minutes);
-                    $("input[name='imdb_rating']").val(movie.imdb_rating);
+                    // $("input[name='imdb_rating']").val(movie.imdb_rating);
+
+                    // بوستر
                     $("input[name='poster_url_out']").val(movie.poster_url_out);
+                    $("input[name='poster_url']").val(movie.poster_url_out);
+                    setImage(movie.poster_url_out, 'poster_url', 'poster_img', 'clearImageBtn1');
                     $("input[name='backdrop_url_out']").val(movie.backdrop_url_out);
+                    setImage(movie.backdrop_url_out, 'backdrop_url', 'backdrop_img', 'clearImageBtn2');
                     $("input[name='tmdb_id']").val(movie.tmdb_id);
-                    $("input[name='view_count']").val(movie.view_count);
+                    // $("input[name='view_count']").val(movie.view_count);
                     $("input[name='logo_url']").val(movie.logo_url);
                     $("input[name='intro_skip_time']").val(movie.intro_skip_time);
 
                     // ======= التصنيفات ========
-
-                    const container = $("#category-badges");
-
-                    const existingCategories = [];
-                    $("#category-badges label").each(function() {
-                        const id = $(this).data("id");
-                        const name = $(this).text().trim();
-                        existingCategories.push({
-                            id,
-                            name
-                        });
-                    });
-
-                    const allCategories = [...existingCategories];
-
-                    // إضافة الجديدة القادمة من TMDB
+                    let select = $('#category-select');
                     res.categories.forEach(cat => {
-                        if (!allCategories.some(c => Number(c.id) === Number(cat.id))) {
-                            allCategories.push(cat);
+                        if ($('#category-select option[value="' + cat.id + '"]').length === 0) {
+                            let newOption = new Option(cat.name, cat.id, false, true);
+                            $('#category-select').append(newOption);
                         }
                     });
-
-                    container.empty();
-
-                    const selectedIds = (movie.category_ids || []).map(id => Number(id));
-
-                    allCategories.forEach(cat => {
-                        const isActive = selectedIds.includes(Number(cat.id));
-
-                        container.append(`
-                    <label class="px-3 py-1 mb-2 btn btn-outline-primary rounded-pill ${isActive ? "active" : ""}" data-id="${cat.id}">
-                        <input type="checkbox" class="d-none" name="category_ids[]" value="${cat.id}" ${isActive ? "checked" : ""}>
-                        ${cat.name}
-                    </label>
-                `);
-                    });
-
-                    // تحديث المختارة فوق
-                    refreshSelectedCategories();
+                    let selectedIds = movie.category_ids.map(id => id.toString());
+                    select.val(selectedIds).trigger('change');
 
                     renderCastRows(res.cast);
 

@@ -22,7 +22,7 @@ class CategoryRequest extends FormRequest
      */
     public function rules(): array
     {
-        $id = $this->route('movie_category')?->id;
+       // $id = $this->route('movie_category')?->id;
         return [
             'name_ar' => ['required','string','max:100'],
             'name_en' => ['required','string','max:100'],

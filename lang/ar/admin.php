@@ -1,6 +1,7 @@
 <?php
 
 return [
+    'select_categories' => 'اختر التصنيفات',
 
     'price_sar' => 'السعر بالريال',
     'price_currency' => 'السعر بالعملة',
