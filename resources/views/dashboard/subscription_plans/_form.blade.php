@@ -1,8 +1,4 @@
 <div class="row">
-    @push('styles')
-        <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
-        <link rel="stylesheet" href="{{ asset('css/custom/media.css') }}">
-    @endpush
     @if ($errors->any())
         <div class="alert alert-danger">
             <ul>
@@ -12,9 +8,6 @@
             </ul>
         </div>
     @endif
-    @php
-        $locale = app()->getLocale();
-    @endphp
     @php
         $oldCountryPrice = old('countryPrices', isset($sub) ? ($countryPrices ?? null) : []);
         $oldPlanAccess = old('planAccess', isset($sub) ? ($planContentAccess ?? []) : []);
@@ -229,8 +222,6 @@
         </div>
     </div>
 </div>
-
-@include('layouts.partials.dashboard.mediamodel')
 
 @push('scripts')
     <script>

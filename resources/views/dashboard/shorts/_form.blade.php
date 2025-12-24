@@ -1,7 +1,3 @@
-@push('styles')
-    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
-    <link rel="stylesheet" href="{{ asset('css/custom/media.css') }}">
-@endpush
 @if ($errors->any())
     <div class="alert alert-danger">
         <ul>
@@ -58,12 +54,12 @@
                         <div class="d-flex justify-content-between align-items-center">
                             <button type="button" data-bs-toggle="modal" data-bs-target="#mediaModal"
                                 data-clear-btn="#clearImageBtn1" data-img="#poster_img" data-mode="single"
-                                data-input="#imageInput" class="mt-3 btn btn-primary openMediaModal">
+                                data-input="#imageInput" data-out-input="#poster_path_out" class="mt-3 btn btn-primary openMediaModal">
                                {{__('admin.click_to_upload')}}
                             </button>
                             <button type="button"
                                 class="clear-btn mt-3 btn btn-danger {{ !empty($short->poster_path) ? '' : 'd-none' }}"
-                                id="clearImageBtn1" data-img="#poster_img" data-input="#imageInput">
+                                id="clearImageBtn1" data-img="#poster_img" data-input="#imageInput" data-out-input="#poster_path_out">
                                 <i class="fas fa-trash"></i>
                             </button>
                         </div>
@@ -286,15 +282,7 @@
         const form_type = "{{ isset($btn_label) }}";
         const videoRowPartial = "{{ route('dashboard.shorts.videoRowPartial') }}";
 
-        // media
-        const urlIndex = "{{ route('dashboard.media.index') }}";
-        const urlStore = "{{ route('dashboard.media.store') }}";
-        const urlDelete = "{{ route('dashboard.media.destroy', ':id') }}";
-        const _token = "{{ csrf_token() }}";
-        const urlAssetPath = "{{ config('app.asset_url') }}";
     </script>
-    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-    <script src="{{ asset('js/custom/mediaPage.js') }}"></script>
     <script src="{{ asset('js/custom/shorts.js') }}"></script>
 
 

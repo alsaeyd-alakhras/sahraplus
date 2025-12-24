@@ -1,6 +1,5 @@
 <div class="row">
     @push('styles')
-        <link rel="stylesheet" href="{{ asset('css/custom/media.css') }}">
         <style>
             /* Tags Input Styles - متوافق مع Bootstrap */
             .tags-container {
@@ -214,12 +213,12 @@
                         <div class="d-flex justify-content-between align-items-center">
                             <button type="button" data-bs-toggle="modal" data-bs-target="#mediaModal"
                                 data-clear-btn="#clearImageBtn1" data-img="#poster_img" data-mode="single"
-                                data-input="#imageInput" class="mt-3 btn btn-primary openMediaModal">
+                                data-input="#imageInput" data-out-input="#photo_url_out" class="mt-3 btn btn-primary openMediaModal">
                                 {{ __('admin.choose_from_media') }}
                             </button>
                             <button type="button"
                                 class="clear-btn mt-3 btn btn-danger {{ !empty($person->photo_url) ? '' : 'd-none' }}"
-                                id="clearImageBtn1" data-img="#poster_img" data-input="#imageInput">
+                                id="clearImageBtn1" data-img="#poster_img" data-input="#imageInput" data-out-input="#photo_url_out">
                                 <i class="fas fa-trash"></i>
                             </button>
                         </div>
@@ -240,67 +239,9 @@
         </div>
     </div>
 </div>
-{{-- مودال الوسائط --}}
-<div class="modal fade" id="mediaModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="mb-6 text-2xl font-bold modal-title">📁 {{ __('admin.media_library') }}</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" id="closeMediaModal">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            <div class="p-4 modal-body">
-                <form id="uploadForm" enctype="multipart/form-data" class="mb-3">
-                    <input type="hidden" name="_token" value="{{ csrf_token() }}">
-                    <input type="file" name="image" id="imageInputMedia" class="mb-2 form-control">
-                    <button type="button" id="uploadFormBtn"
-                        class="btn btn-primary">{{ __('admin.upload_image') }}</button>
-                </form>
-                <div id="mediaGrid" class="masonry">
-                    {{-- الصور ستُملأ تلقائيًا عبر jQuery --}}
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-primary" id="selectMediaBtn">{{ __('admin.select') }}</button>
-            </div>
-        </div>
-    </div>
-</div>
-<div class="modal fade" id="confirmDeleteModal" tabindex="-1" role="dialog"
-    aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">{{ __('admin.confirm_delete') }}</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" id="closeDeleteModal">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            <div class="modal-body">
-                {{ __('admin.confirm_delete_message') }}
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
-                    id="closeDeleteModal">{{ __('admin.cancel') }}</button>
-                <button type="button" class="btn btn-danger"
-                    id="confirmDeleteBtn">{{ __('admin.delete') }}</button>
-            </div>
-        </div>
-    </div>
-</div>
-
+@include('layouts.partials.dashboard.mediamodel')
 
 @push('scripts')
-    <script>
-        const urlIndex = "{{ route('dashboard.media.index') }}";
-        const urlStore = "{{ route('dashboard.media.store') }}";
-        const urlDelete = "{{ route('dashboard.media.destroy', ':id') }}";
-        const _token = "{{ csrf_token() }}";
-        const urlAssetPath = "{{ config('app.asset_url') }}";
-    </script>
-    <script src="{{ asset('js/custom/mediaPage.js') }}"></script>
-
     <script>
         // نظام Tags متعدد - يمكن استخدامه مع أي حقل
         function initTagsInput(fieldId) {

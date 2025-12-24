@@ -3,10 +3,4 @@
         @csrf
         @include('dashboard.movies._form')
     </form>
-
-    @push('scripts')
-        <script>
-            var form_type = "create";
-        </script>
-    @endpush
 </x-dashboard-layout>

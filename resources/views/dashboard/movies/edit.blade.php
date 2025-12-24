@@ -4,9 +4,4 @@
         @method('put')
         @include("dashboard.movies._form")
     </form>
-        @push('scripts')
-        <script>
-            var form_type = "edit";
-        </script>
-    @endpush
 </x-dashboard-layout>

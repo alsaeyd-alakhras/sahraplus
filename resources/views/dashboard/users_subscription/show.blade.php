@@ -6,7 +6,6 @@
     @push('styles')
         <!-- Page CSS -->
         <link rel="stylesheet" href="{{ asset('assets/vendor/css/pages/page-profile.css') }}" />
-        <link rel="stylesheet" href="{{ asset('css/custom/media.css') }}">
     @endpush
     <!-- Header -->
     <div class="row">
@@ -23,7 +22,7 @@
                                 </h4>
                                 <p class="text-muted">{{ @$sub->user->email }}</p>
                                 <h5 class="text-muted">{{ @$sub->plan->name_ar }}</h5>
-                                <p class="text-muted">{{ @$sub->plan->description_ar .'  / '.@$sub->plan->price  }}</p>
+                                <p class="text-muted">{{ @$sub->plan->description_ar . '  / ' . @$sub->plan->price  }}</p>
                             </div>
 
                         </div>
@@ -39,8 +38,7 @@
         <div class="col-xl-8 col-lg-7 col-md-7">
             <div class="card">
                 <div class="card-body">
-                    <small
-                        class="mb-3 card-text text-uppercase text-muted small">{{ __('admin.details') }}</small>
+                    <small class="mb-3 card-text text-uppercase text-muted small">{{ __('admin.details') }}</small>
                     <ul class="py-1 list-unstyled">
                         <li class="mb-3 d-flex align-items-center">
                             <i class="ti ti-movie ti-lg"></i>
@@ -129,15 +127,4 @@
         </div>
 
     </div>
-
-    @push('scripts')
-        <script>
-            const urlIndex = "{{ route('dashboard.media.index') }}";
-            const urlStore = "{{ route('dashboard.media.store') }}";
-            const urlDelete = "{{ route('dashboard.media.destroy', ':id') }}";
-            const _token = "{{ csrf_token() }}";
-            const urlAssetPath = "{{ config('app.asset_url') }}";
-        </script>
-        <script src="{{ asset('js/custom/mediaPage.js') }}"></script>
-    @endpush
 </x-dashboard-layout>

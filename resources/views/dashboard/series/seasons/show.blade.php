@@ -6,7 +6,6 @@
     @push('styles')
         <!-- Page CSS -->
         <link rel="stylesheet" href="{{ asset('assets/vendor/css/pages/page-profile.css') }}" />
-        <link rel="stylesheet" href="{{ asset('css/custom/media.css') }}">
     @endpush
     <!-- Header -->
     <div class="row">
@@ -237,13 +236,13 @@
                                 <div class="d-flex justify-content-between align-items-center">
                                     <button type="button" data-bs-toggle="modal" data-bs-target="#mediaModal"
                                         data-clear-btn="#clearPosterBtn" data-img="#poster_img" data-mode="single"
-                                        data-model-next="#seasonModal" data-input="#posterInput"
+                                        data-model-next="#seasonModal" data-input="#posterInput" data-out-input="#poster_url_out"
                                         class="mt-3 btn btn-primary openMediaModal">
                                         {{ __('admin.poster_img_choose') }}
                                     </button>
                                     <button type="button" id="clearPosterBtn"
                                         class="mt-3 clear-btn btn btn-danger d-none" data-img="#poster_img"
-                                        data-input="#posterInput">
+                                        data-input="#posterInput" data-out-input="#poster_url_out">
                                         <i class="fas fa-trash"></i>
                                     </button>
                                 </div>
@@ -268,53 +267,7 @@
             </div>
         </div>
     </div>
-    {{-- مودال الوسائط --}}
-    <div class="modal fade" id="mediaModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-lg modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="mb-6 text-2xl font-bold modal-title">📁 مكتبة الوسائط</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" id="closeMediaModal">
-                        <i class="fas fa-times"></i>
-                    </button>
-                </div>
-                <div class="p-4 modal-body">
-                    <form id="uploadForm" enctype="multipart/form-data" class="mb-3">
-                        <input type="hidden" name="_token" value="{{ csrf_token() }}">
-                        <input type="file" name="image" id="imageInputMedia" class="mb-2 form-control">
-                        <button type="button" id="uploadFormBtn" class="btn btn-primary">رفع صورة</button>
-                    </form>
-                    <div id="mediaGrid" class="masonry">
-                        {{-- الصور ستُملأ تلقائيًا عبر jQuery --}}
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-primary" id="selectMediaBtn">اختيار</button>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="modal fade" id="confirmDeleteModal" tabindex="-1" role="dialog"
-        aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">تأكيد الحذف</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" id="closeDeleteModal">
-                        <i class="fas fa-times"></i>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    هل أنت متأكد من حذف هذه الصورة؟
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
-                        id="closeDeleteModal">إلغاء</button>
-                    <button type="button" class="btn btn-danger" id="confirmDeleteBtn">نعم، حذف</button>
-                </div>
-            </div>
-        </div>
-    </div>
+    @include('layouts.partials.dashboard.mediamodel')
 
     @push('scripts')
         <!-- Page JS -->
@@ -387,16 +340,5 @@
                 });
             });
         </script>
-    @endpush
-
-    @push('scripts')
-        <script>
-            const urlIndex = "{{ route('dashboard.media.index') }}";
-            const urlStore = "{{ route('dashboard.media.store') }}";
-            const urlDelete = "{{ route('dashboard.media.destroy', ':id') }}";
-            const _token = "{{ csrf_token() }}";
-            const urlAssetPath = "{{ config('app.asset_url') }}";
-        </script>
-        <script src="{{ asset('js/custom/mediaPage.js') }}"></script>
     @endpush
 </x-dashboard-layout>

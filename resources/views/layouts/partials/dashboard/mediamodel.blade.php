@@ -1,3 +1,6 @@
+@push('styles')
+<link rel="stylesheet" href="{{ asset('css/custom/media.css') }}">
+@endpush
 {{-- مودال الوسائط --}}
 <div class="modal fade" id="mediaModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-centered">
@@ -41,9 +44,9 @@
             <div class="modal-footer">
 
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
-                    id="closeDeleteModal">إلغاء</button>
+                    id="closeDeleteModal">{{ __('admin.Cancel') }}</button>
 
-                <button type="button" class="btn btn-danger" id="confirmDeleteBtn">{{ __('admin.Save') }}</button>
+                <button type="button" class="btn btn-danger" id="confirmDeleteBtn">{{ __('admin.Sure Delete') }}</button>
             </div>
         </div>
     </div>

@@ -26,8 +26,8 @@ return [
     'failed'            => 'فشل الدفع',
     'refunded'          => 'مسترجع',
     'canceled'          => 'ملغي',
-
-
+    'Sure Delete' => 'نعم، حذف',
+    'select' => 'اختر',
     'gateway_response'        => 'استجابة بوابة الدفع',
     'gateway_transaction_id'  => 'معرّف معاملة بوابة الدفع',
     'gateway'                 => 'بوابة الدفع',

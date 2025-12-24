@@ -1,9 +1,4 @@
 <div class="row">
-    @push('styles')
-        <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
-        <link rel="stylesheet" href="{{ asset('css/custom/media.css') }}">
-        <link rel="stylesheet" href="{{ asset('css/custom/movies.css') }}">
-    @endpush
     @if ($errors->any())
         <div class="alert alert-danger">
             <ul>
@@ -13,10 +8,6 @@
             </ul>
         </div>
     @endif
-    @php
-        $locale = app()->getLocale();
-    @endphp
-
     <div class="col-md-12">
 
         <div class="mb-3 border shadow card border-1">
@@ -33,11 +24,11 @@
                     </div>
                     <div class="mb-4 col-md-4">
 
-                        <x-form.selectkey required label="{{ __('admin.tax_type') }}" name="tax_type" :selected="$tax->tax_type ?? 'percentage'"
-                            :options="[
-                                'fixed' => __('admin.fixed'),
-                                'percentage' => __('admin.percentage'),
-                            ]" />
+                        <x-form.selectkey required label="{{ __('admin.tax_type') }}" name="tax_type"
+                            :selected="$tax->tax_type ?? 'percentage'" :options="[
+        'fixed' => __('admin.fixed'),
+        'percentage' => __('admin.percentage'),
+    ]" />
                     </div>
 
                     <div class="mb-4 col-md-6">
@@ -66,13 +57,14 @@
                     </div>
 
                     <div class="mb-4 col-md-6">
-                        <x-form.input type="date" label="{{ __('admin.effective_from') }}" :value="$tax->effective_from ? $tax->effective_from->format('Y-m-d') : ''"
-                            name="effective_from" placeholder="{{ __('admin.effective_from') }}" />
+                        <x-form.input type="date" label="{{ __('admin.effective_from') }}" :value="$tax->effective_from ? $tax->effective_from->format('Y-m-d') : ''" name="effective_from"
+                            placeholder="{{ __('admin.effective_from') }}" />
                     </div>
 
                     <div class="mb-4 col-md-6">
                         <x-form.input type="date" label="{{ __('admin.effective_until') }}" name="effective_until"
-                            :value="$tax->effective_until ? $tax->effective_until->format('Y-m-d') : ''" placeholder="{{ __('admin.effective_until') }}" />
+                            :value="$tax->effective_until ? $tax->effective_until->format('Y-m-d') : ''"
+                            placeholder="{{ __('admin.effective_until') }}" />
                     </div>
 
 
@@ -97,8 +89,8 @@
                         <label class="form-label d-block">{{ __('admin.is_active') }}</label>
                         <div class="form-check form-switch">
                             <input type="hidden" name="is_active" value="0">
-                            <input class="form-check-input" type="checkbox" id="is_active" name="is_active"
-                                value="1" @checked(old('is_active', $tax->is_active))>
+                            <input class="form-check-input" type="checkbox" id="is_active" name="is_active" value="1"
+                                @checked(old('is_active', $tax->is_active))>
                         </div>
                     </div>
                 </div>
@@ -113,38 +105,4 @@
             </div>
         </div>
     </div>
-
-    <div class="modal fade" id="confirmDeleteModal" tabindex="-1" role="dialog"
-        aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">{{ __('admin.Delete Confirmation') }}</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" id="closeDeleteModal">
-                        <i class="fas fa-times"></i>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    {{ __('admin.Are you sure?') }}
-                </div>
-                <div class="modal-footer">
-
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
-                        id="closeDeleteModal">إلغاء</button>
-
-                    <button type="button" class="btn btn-danger"
-                        id="confirmDeleteBtn">{{ __('admin.Save') }}</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-
-    @push('scripts')
-        <script>
-            const _token = "{{ csrf_token() }}";
-            const urlAssetPath = "{{ config('app.asset_url') }}";
-        </script>
-        <script src="{{ asset('js/custom/mediaPage.js') }}"></script>
-        <script src="{{ asset('js/custom/plans.js') }}"></script>
-    @endpush
+</div>
