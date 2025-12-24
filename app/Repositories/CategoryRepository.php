@@ -9,7 +9,9 @@ class CategoryRepository
 {
     public function __construct(protected Category $category) {}
 
-    public function getQuery(): Builder { return $this->category->query(); }
+    public function getQuery(): Builder
+    {
+        return $this->category->query()->latest(); }
 
     public function getById(int $id): ?Category { return $this->category->find($id); }
 

@@ -50,7 +50,7 @@
                             :options="$statusOptions" />
                     </div>
 
-                        <div class="col-md-4">
+                    <div class="col-md-4">
                         <x-form.selectkey label="{{ __('admin.series_status') }}" name="series_status"
                             :selected="$series->series_status ?? 'returning'" :options="$seriesStatusOptions" />
                     </div>
@@ -88,7 +88,7 @@
                     <div class="mb-4 col-md-4">
                         <x-form.input type="number" step="0.1" min="0" max="10"
                             label="{{ __('admin.imdb_rating') }}" :value="$series->imdb_rating" name="imdb_rating"
-                            placeholder="7.5" />
+                            placeholder="7" />
                     </div>
                     <div class="col-md-4">
                         <x-form.input type="number" min="0" label="{{ __('admin.seasons_count') }}"
@@ -112,29 +112,27 @@
         <div class="mb-3 border shadow card border-1">
             <div class="pt-4 card-body">
                 <div class="row">
+                    {{-- Categories --}}
                     <div class="col-12">
-                        <label class="form-label fw-bold">{{ __('admin.Movie Category') }}</label>
+                        <label class="form-label fw-bold">
+                            {{ __('admin.series Category') }}
+                        </label>
 
-                        <div id="selected-categories" class="mb-2 d-none">
-                            <div class="flex-wrap gap-2 d-flex"></div>
-                            <hr class="mt-2 mb-3">
-                        </div>
-
-                        <input type="hidden" name="category_ids" value="">
-
-                        <div id="category-badges" class="flex-wrap gap-2 d-flex">
+                        <select name="category_ids[]" id="category-select" class="form-control select2" multiple
+                            data-placeholder="{{ __('admin.select_categories') }}">
                             @foreach ($allCategories as $category)
-                                <label class="px-3 py-1 mb-2 btn btn-outline-primary rounded-pill"
-                                    data-id="{{ $category->id }}">
-                                    <input type="checkbox" class="d-none" name="category_ids[]"
-                                        value="{{ $category->id }}"
-                                        {{ in_array($category->id, old('category_ids', $series->categories->pluck('id')->toArray() ?? [])) ? 'checked' : '' }}>
+                                <option value="{{ $category->id }}"
+                                    {{ in_array($category->id, old('category_ids', $series->categories->pluck('id')->toArray() ?? []))
+                                        ? 'selected'
+                                        : '' }}>
                                     {{ $category->name_ar }}
-                                </label>
+                                </option>
                             @endforeach
-                        </div>
+                        </select>
 
-                        <span class="text-muted">{{ __('admin.select_at_least_one_category') }}</span>
+                        <span class="text-muted d-block mt-2">
+                            {{ __('admin.select_at_least_one_category') }}
+                        </span>
                     </div>
                 </div>
             </div>
@@ -149,11 +147,6 @@
                             <label class="fw-semibold">{{ __('admin.Cast') }}</label>
                             <button type="button" id="add-cast-row" class="btn btn-dark btn-sm">+
                                 {{ __('admin.Create') }}</button>
-                        </div>
-
-                        <div id="cast-selected" class="mb-2 d-none">
-                            <div class="flex-wrap gap-2 d-flex"></div>
-                            <hr class="mt-2 mb-3">
                         </div>
 
                         <div id="cast-rows" class="gap-3 d-grid">
@@ -398,39 +391,23 @@
     <script>
         const form_type_ser = {{ isset($btn_label) ? 'true' : 'false' }};
 
-        function refreshSelectedCategories() {
-            let selectedBox = $("#selected-categories");
-            let selectedContainer = $("#selected-categories .d-flex");
-
-            selectedContainer.empty();
-
-            $("#category-badges label.active").each(function() {
-                selectedContainer.append(`
-            <span class="badge bg-primary px-3 py-2 rounded-pill">
-                ${$(this).text().trim()}
-            </span>
-        `);
+        $(document).ready(function() {
+            $('.select2').select2({
+                width: '100%',
+                minimumResultsForSearch: 0, // إجبار ظهور البحث
+                placeholder: function() {
+                    return $(this).data('placeholder');
+                }
             });
-
-            if ($("#category-badges label.active").length > 0) {
-                selectedBox.removeClass("d-none");
-            } else {
-                selectedBox.addClass("d-none");
-            }
-        }
-
-        // ================================
-        // عند الضغط على التصنيف
-        // ================================
-        $(document).on("click", "#category-badges label", function() {
-            $(this).toggleClass("active");
-
-            let checkbox = $(this).find("input[type='checkbox']");
-            checkbox.prop("checked", $(this).hasClass("active"));
-
-            refreshSelectedCategories();
         });
 
+        function setImage(url, inputName, imgId, clearBtnId) {
+            if (!url) return;
+
+            $(`input[name='${inputName}']`).val(url);
+            $(`#${imgId}`).attr("src", url).removeClass("d-none");
+            $(`#${clearBtnId}`).removeClass("d-none");
+        }
         // -----------------------------
         // TMDB SYNC BUTTON (SERIES)
         // -----------------------------
@@ -459,67 +436,34 @@
                     $("textarea[name='description_en']").val(series.description_en);
                     $("input[name='first_air_date']").val(series.first_air_date);
                     $("input[name='last_air_date']").val(series.last_air_date);
-                    $("input[name='imdb_rating']").val(series.imdb_rating);
+
                     $("input[name='poster_url_out']").val(series.poster_url_out);
+                    $("input[name='poster_url']").val(series.poster_url_out);
+                    setImage(series.poster_url_out, 'poster_url', 'poster_img', 'clearImageBtn1');
+
                     $("input[name='backdrop_url_out']").val(series.backdrop_url_out);
                     $("input[name='backdrop_url']").val(series.backdrop_url_out);
-                    $("input[name='poster_url']").val(series.poster_url_out);
+                    setImage(series.backdrop_url_out, 'backdrop_url', 'backdrop_img', 'clearImageBtn2');
+
                     $("input[name='tmdb_id']").val(series.tmdb_id);
-                    $("input[name='view_count']").val(series.view_count);
                     $("input[name='trailer_url']").val(series.trailer_url);
                     $("input[name='language']").val(series.language);
                     $("input[name='series_status']").val(series.series_status);
                     $("input[name='episodes_count']").val(series.episodes_count);
                     $("input[name='seasons_count']").val(series.seasons_count);
-                    $("input[name='content_rating']").val(series.content_rating);
                     $("input[name='country']").val(series.country);
-                    $("input[name='is_featured']").val(series.is_featured);
-                    $("input[name='backdrop_url']").val(series.backdrop_url);
-                    $("input[name='poster_url']").val(series.poster_url);
 
 
                     // ======= التصنيفات ========
-                    const container = $("#category-badges");
-
-                    const existingCategories = [];
-                    $("#category-badges label").each(function() {
-                        const id = $(this).data("id");
-                        const name = $(this).text().trim();
-                        existingCategories.push({
-                            id,
-                            name
-                        });
-                    });
-
-                    const allCategories = [...existingCategories];
-
-                    // إضافة الجديدة القادمة من TMDB
+                    let select = $('#category-select');
                     res.categories.forEach(cat => {
-                        if (!allCategories.some(c => Number(c.id) === Number(cat.id))) {
-                            allCategories.push(cat);
+                        if ($('#category-select option[value="' + cat.id + '"]').length === 0) {
+                            let newOption = new Option(cat.name, cat.id, false, true);
+                            $('#category-select').append(newOption);
                         }
                     });
-
-                    container.empty();
-
-                    const selectedIds = (series.category_ids || []).map(id => Number(id));
-
-                    allCategories.forEach(cat => {
-                        const isActive = selectedIds.includes(Number(cat.id));
-
-                        container.append(`
-                    <label class="px-3 py-1 mb-2 btn btn-outline-primary rounded-pill ${isActive ? "active" : ""}" data-id="${cat.id}">
-                        <input type="checkbox" class="d-none" name="category_ids[]" value="${cat.id}" ${isActive ? "checked" : ""}>
-                        ${cat.name}
-                    </label>
-                `);
-                    });
-
-                    // تحديث المختارة فوق
-                    refreshSelectedCategories();
-
-                    // تحديث المختارة فوق
-                    refreshSelectedCategories();
+                    let selectedIds = series.category_ids.map(id => id.toString());
+                    select.val(selectedIds).trigger('change');
 
                     // ----------------------------
                     // CAST

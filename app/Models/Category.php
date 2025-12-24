@@ -9,10 +9,6 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 class Category extends Model
 {
     use HasFactory;
-
-    // اسم الجدول صراحة (احتياطيًا)
-    protected $table = 'categories';
-
     /**
      * الحقول المسموح تعبئتها جماعيًا
      */
@@ -97,24 +93,24 @@ class Category extends Model
     /**
      * إنشاء slug تلقائيًا إذا لم يتم تمريره
      */
-    protected static function booted(): void
-    {
-        static::saving(function (Category $category) {
-            if (empty($category->slug)) {
-                // حاول من الإنجليزية، وإلا استخدم العربية
-                $base = $category->name_en ?: $category->name_ar;
-                // slug بسيط؛ في حالة العربية سيُحافظ على النص وقد تضيف/تخصص منطقًا آخر لاحقًا
-                $slug = Str::slug($base, '-');
+    // protected static function booted(): void
+    // {
+    //     static::saving(function (Category $category) {
+    //         if (empty($category->slug)) {
+    //             // حاول من الإنجليزية، وإلا استخدم العربية
+    //             $base = $category->name_en ?: $category->name_ar;
+    //             // slug بسيط؛ في حالة العربية سيُحافظ على النص وقد تضيف/تخصص منطقًا آخر لاحقًا
+    //             $slug = Str::slug($base, '-');
 
-                // في حال كان الاسم عربي بالكامل وقد ينتج slug فارغ، استخدم نسخة مبسطة
-                if ($slug === '' && !empty($base)) {
-                    $slug = trim(preg_replace('/\s+/u', '-', $base), '-');
-                }
+    //             // في حال كان الاسم عربي بالكامل وقد ينتج slug فارغ، استخدم نسخة مبسطة
+    //             if ($slug === '' && !empty($base)) {
+    //                 $slug = trim(preg_replace('/\s+/u', '-', $base), '-');
+    //             }
 
-                $category->slug = $slug;
-            }
-        });
-    }
+    //             $category->slug = $slug;
+    //         }
+    //     });
+    // }
 
     // Accessor
     public function getImageFullUrlAttribute()

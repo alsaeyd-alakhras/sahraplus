@@ -33,7 +33,8 @@ class CategoryController extends Controller
 
     public function store(CategoryRequest $request)
     {
-        $this->authorize('create', Category::class);
+        //return $request;
+       $this->authorize('create', Category::class);
         $this->service->save($request->validated());
         return redirect()->route('dashboard.movie-categories.index')->with('success','تم إضافة تصنيف');
     }

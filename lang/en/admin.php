@@ -156,6 +156,7 @@ return [
     'sub_plan' => 'Sub Plan',
     'select_one_plan' => 'Select One Plan',
     'select_content' => 'Select Content',
+    'select_categories' => 'Select Categories',
     'loading' => 'Loading...',
     'error_loading' => 'Error loading data',
     'Save' => 'Save',

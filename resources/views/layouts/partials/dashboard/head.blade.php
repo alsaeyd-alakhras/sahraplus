@@ -15,6 +15,7 @@
 
     <!-- Favicon -->
     <link rel="icon" type="image/x-icon" href="{{ asset('imgs/icon.png') }}" />
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">

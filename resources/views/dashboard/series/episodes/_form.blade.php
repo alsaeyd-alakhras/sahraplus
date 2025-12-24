@@ -406,7 +406,6 @@
                     $("input[name='episode_number']").val(ep.episode_number);
                     $("input[name='tmdb_id']").val(ep.tmdb_id);
                     $("input[name='duration_minutes']").val(ep.duration_minutes);
-                    $("input[name='imdb_rating']").val(ep.imdb_rating);
                     $("input[name='intro_skip_time']").val(ep.intro_skip_time);
                     $("input[name='status']").val(ep.status);
                     $("input[name='thumbnail_url_out']").val(ep.thumbnail_url);
