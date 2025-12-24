@@ -30,16 +30,14 @@ return Application::configure(basePath: dirname(__DIR__))
 
         // (اختياري) لو حابب تضيف ميدلوير عام للويب/الـ API خليه هون:
         $middleware->web([
-            CheckActiveDevice::class,
+            // CheckActiveDevice::class,
             LogLastUserActivity::class,
-            // CheckActiveDevice::class
             // Alkoumi\LaravelArabicNumbers\Http\Middleware\ConvertArabicDigitsToEnlishMiddleware::class
         ]);
 
         $middleware->api([
-            CheckActiveDevice::class,
-            LogLastUserActivity::class,
             // CheckActiveDevice::class,
+            LogLastUserActivity::class,
             // \Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class,
             'throttle:api',
             \Illuminate\Routing\Middleware\SubstituteBindings::class,

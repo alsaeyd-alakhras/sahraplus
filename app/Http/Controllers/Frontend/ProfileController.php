@@ -36,15 +36,15 @@ class ProfileController extends Controller
     public function resetPin(Request $request, User $user)
     {
         $request->validate([
-            'password' => 'required|string',
+            // 'password' => 'required|string',
             'profile_id' => 'nullable|exists:user_profiles,id',
             'new_pin' => 'required|string|max:6',
         ]);
 
-        // Check Password
-        if(!Hash::check($request->password,$user->password)){
-            return response()->json(['message' => 'كلمة السر غير صحيحة'], 401);
-        }
+        // // Check Password
+        // if(!Hash::check($request->password,$user->password)){
+        //     return response()->json(['message' => 'كلمة السر غير صحيحة'], 401);
+        // }
 
         $profile = null;
         if($request->profile_id){
@@ -68,15 +68,15 @@ class ProfileController extends Controller
     public function createPin(Request $request, User $user)
     {
         $request->validate([
-            'password' => 'required|string',
+            // 'password' => 'required|string',
             'new_pin' => 'required|string|max:6',
             'profile_id' => 'nullable|exists:user_profiles,id',
         ]);
 
-        // Check Password
-        if(!Hash::check($request->password,$user->password)){
-            return response()->json(['message' => 'كلمة السر غير صحيحة'], 401);
-        }
+        // // Check Password
+        // if(!Hash::check($request->password,$user->password)){
+        //     return response()->json(['message' => 'كلمة السر غير صحيحة'], 401);
+        // }
 
         $profile = null;
         if($request->profile_id){
