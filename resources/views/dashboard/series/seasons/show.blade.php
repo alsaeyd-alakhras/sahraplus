@@ -198,7 +198,7 @@
 
                             <div class="mb-4 col-md-6">
                                 <x-form.input label="{{ __('admin.title_ar') }}" name="title_ar"
-                                    placeholder="عنوان الموسم بالعربية" />
+                                    placeholder="{{ __('admin.season_title_ar_placeholder') }}" />
                             </div>
 
                             <div class="mb-4 col-md-6">
@@ -208,7 +208,7 @@
 
                             <div class="mb-4 col-md-6">
                                 <x-form.textarea label="{{ __('admin.description_ar') }}" name="description_ar"
-                                    rows="2" placeholder="وصف الموسم بالعربية..." />
+                                    rows="2" placeholder="{{ __('admin.season_description_ar_placeholder') }}" />
                             </div>
 
                             <div class="mb-4 col-md-6">

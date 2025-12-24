@@ -55,7 +55,7 @@
                             $image_url_out = ($image_url ? $movie_category->image_url : null);
                         @endphp
                         <x-form.input type="url" label="{{ __('admin.Photo') }}" :value="$image_url_out" name="image_url_out"
-                            placeholder="أو اختر من الوسائط" />
+                            placeholder="{{ __('admin.choose_from_media') }}" />
 
                         <input type="text" id="imageInput" name="image_url"
                             value="{{ old('image_url', $movie_category->image_url) }}" class="d-none form-control">
@@ -87,7 +87,7 @@
                         <div class="form-check form-switch">
                             <input type="hidden" name="is_kids" value="0">
                             <input class="form-check-input" type="checkbox" name="is_kids" value="1" @checked(old('is_kids', $movie_category->is_kids))>
-                            <label class="form-check-label">محتوى للأطفال</label>
+                            <label class="form-check-label">{{ __('admin.KidsContent') }}</label>
                         </div>
                     </div>
                 </div>

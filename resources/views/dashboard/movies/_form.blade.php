@@ -20,12 +20,12 @@
                     {{-- العناوين --}}
 
                     <div class="col-md-6">
-                        <x-form.input label="عنوان الفيلم (عربي)" :value="$movie->title_ar" name="title_ar"
-                            placeholder="مثال: الطريق إلى القدس" required autofocus />
+                        <x-form.input label="{{ __('admin.movie_title_ar') }}" :value="$movie->title_ar" name="title_ar"
+                            placeholder="{{ __('admin.movie_title_ar_example') }}" required autofocus />
                     </div>
                     <div class="col-md-6">
-                        <x-form.input label="عنوان الفيلم (إنجليزي)" :value="$movie->title_en" name="title_en"
-                            placeholder="Movie Title (EN)" />
+                        <x-form.input label="{{ __('admin.movie_title_en') }}" :value="$movie->title_en" name="title_en"
+                            placeholder="{{ __('admin.title_en_placeholder') }}" />
 
                     </div>
                 </div>
@@ -37,12 +37,12 @@
 
                     {{-- الأوصاف --}}
                     <div class="col-md-6">
-                        <x-form.textarea label="الوصف (عربي)" name="description_ar" rows="2" :value="$movie->description_ar"
-                            placeholder="نبذة عن الفيلم..." />
+                        <x-form.textarea label="{{ __('admin.description_ar') }}" name="description_ar" rows="2" :value="$movie->description_ar"
+                            placeholder="{{ __('admin.movie_description_placeholder') }}" />
                     </div>
                     <div class="col-md-6">
-                        <x-form.textarea label="الوصف (En)" name="description_en" rows="2" :value="$movie->description_en"
-                            placeholder="نبذة عن الفيلم. .." />
+                        <x-form.textarea label="{{ __('admin.description_en') }}" name="description_en" rows="2" :value="$movie->description_en"
+                            placeholder="{{ __('admin.movie_description_placeholder') }}" />
                     </div>
                 </div>
             </div>
@@ -54,51 +54,51 @@
                     {{-- تاريخ/مدة/تقييم --}}
                     <div class="mb-4 col-md-4">
 
-                        <x-form.input type="date" label="تاريخ الإصدار" :value="$movie->release_date?->format('Y-m-d')" name="release_date" />
+                        <x-form.input type="date" label="{{ __('admin.release_date') }}" :value="$movie->release_date?->format('Y-m-d')" name="release_date" />
                     </div>
                     <div class="mb-4 col-md-4">
-                        <x-form.input type="number" label="المدة بالدقائق" :value="$movie->duration_minutes" name="duration_minutes"
+                        <x-form.input type="number" label="{{ __('admin.duration_minutes') }}" :value="$movie->duration_minutes" name="duration_minutes"
                             placeholder="120" min="0" />
 
                     </div>
                     <div class="mb-4 col-md-4">
-                        <x-form.input type="number" step="any" label="تقييم IMDb (0-10)" :value="$movie->imdb_rating"
+                        <x-form.input type="number" step="any" label="{{ __('admin.imdb_rating_label') }}" :value="$movie->imdb_rating"
                             name="imdb_rating" placeholder="7" min="0" max="10" />
                     </div>
 
                     {{-- التصنيف/اللغة/ الدولة --}}
                     <div class="mb-4 col-md-4">
 
-                        <x-form.selectkey label="التصنيف العمري" name="content_rating" :selected="$movie->content_rating ?? 'G'"
+                        <x-form.selectkey label="{{ __('admin.content_rating_label') }}" name="content_rating" :selected="$movie->content_rating ?? 'G'"
                             :options="$contentRatingOptions" />
                     </div>
                     <div class="mb-4 col-md-4">
-                        <x-form.selectkey label="اللغة" name="language" :selected="$movie->language ?? 'ar'" :options="$languageOptions" />
+                        <x-form.selectkey label="{{ __('admin.language_label') }}" name="language" :selected="$movie->language ?? 'ar'" :options="$languageOptions" />
                     </div>
                     <div class="mb-4 col-md-4">
-                        <x-form.selectkey label="بلد الإنتاج" name="country" :selected="$movie->country" :options="$countries" />
+                        <x-form.selectkey label="{{ __('admin.production_country') }}" name="country" :selected="$movie->country" :options="$countries" />
                     </div>
 
                     {{-- الحالة --}}
                     <div class="mb-4 col-md-6">
-                        <x-form.selectkey label="حالة النشر" name="status" required :selected="$movie->status ?? 'draft'"
+                        <x-form.selectkey label="{{ __('admin.publish_status') }}" name="status" required :selected="$movie->status ?? 'draft'"
                             :options="$statusOptions" />
                     </div>
 
                     {{-- مميز --}}
                     <div class="mb-4 col-md-6">
-                        <label class="form-label d-block">خيارات العرض</label>
+                        <label class="form-label d-block">{{ __('admin.display_options') }}</label>
                         <div class="form-check form-switch mb-2">
                             <input type="hidden" name="is_featured" value="0">
                             <input class="form-check-input" type="checkbox" id="is_featured" name="is_featured"
                                 value="1" @checked(old('is_featured', $movie->is_featured))>
-                            <label class="form-check-label" for="is_featured">عرض كفيلم مميز</label>
+                            <label class="form-check-label" for="is_featured">{{ __('admin.show_as_featured') }}</label>
                         </div>
                         <div class="form-check form-switch">
                             <input type="hidden" name="is_kids" value="0">
                             <input class="form-check-input" type="checkbox" id="is_kids" name="is_kids"
                                 value="1" @checked(old('is_kids', $movie->is_kids))>
-                            <label class="form-check-label" for="is_kids">محتوى للأطفال</label>
+                            <label class="form-check-label" for="is_kids">{{ __('admin.KidsContent') }}</label>
                         </div>
 
 
@@ -107,13 +107,13 @@
 
 
                     <div class="mb-4 col-md-4">
-                        <x-form.input type="number" label="وقت تخطي المقدمة " :value="$movie->intro_skip_time" name="intro_skip_time"
+                        <x-form.input type="number" label="{{ __('admin.intro_skip_time') }}" :value="$movie->intro_skip_time" name="intro_skip_time"
                             min="0" />
 
                     </div>
 
                     <div class="col-md-6">
-                        <x-form.input label="Logo Url" :value="$movie->logo_url" name="logo_url" required
+                        <x-form.input label="{{ __('admin.logo_url_label') }}" :value="$movie->logo_url" name="logo_url" required
                             placeholder="https://example.com" />
                     </div>
 
@@ -132,8 +132,8 @@
                             $poster_url = Str::startsWith($movie->poster_url, ['http', 'https']);
                             $poster_url_out = $poster_url ? $movie->poster_url : null;
                         @endphp
-                        <x-form.input type="url" label="رابط البوستر" :value="$poster_url_out" name="poster_url_out"
-                            placeholder="أو اختر من الوسائط" />
+                        <x-form.input type="url" label="{{ __('admin.poster_url_label') }}" :value="$poster_url_out" name="poster_url_out"
+                            placeholder="{{ __('admin.choose_from_media') }}" />
 
                         <input type="text" id="imageInput" name="poster_url"
                             value="{{ old('poster_url', $movie->poster_url) }}" class="d-none form-control">
@@ -141,7 +141,7 @@
                             <button type="button" data-bs-toggle="modal" data-bs-target="#mediaModal"
                                 data-clear-btn="#clearImageBtn1" data-img="#poster_img" data-mode="single"
                                 data-input="#imageInput" data-out-input="#poster_url_out" class="mt-3 btn btn-primary openMediaModal">
-                                اختر من الوسائط
+                                {{ __('admin.choose_from_media') }}
                             </button>
                             <button type="button"
                                 class="clear-btn mt-3 btn btn-danger {{ !empty($movie->poster_url) ? '' : 'd-none' }}"
@@ -162,8 +162,8 @@
                             $backdrop_url = Str::startsWith($movie->backdrop_url, ['http', 'https']);
                             $backdrop_url_out = $backdrop_url ? $movie->backdrop_url : null;
                         @endphp
-                        <x-form.input type="url" label="رابط الخلفية" :value="$backdrop_url_out" name="backdrop_url_out"
-                            placeholder="أو اختر من الوسائط" />
+                        <x-form.input type="url" label="{{ __('admin.backdrop_url_label') }}" :value="$backdrop_url_out" name="backdrop_url_out"
+                            placeholder="{{ __('admin.choose_from_media') }}" />
 
                         <input type="text" id="imageInput2" name="backdrop_url"
                             value="{{ old('backdrop_url', $movie->backdrop_url) }}" class="d-none form-control">
@@ -171,7 +171,7 @@
                             <button type="button" data-bs-toggle="modal" data-bs-target="#mediaModal"
                                 data-clear-btn="#clearImageBtn2" data-img="#backdrop_img" data-mode="single"
                                 data-input="#imageInput2" data-out-input="#backdrop_url_out" class="mt-3 btn btn-primary openMediaModal">
-                                اختر من الوسائط
+                                {{ __('admin.choose_from_media') }}
                             </button>
                             <button type="button"
                                 class="clear-btn mt-3 btn btn-danger {{ !empty($movie->backdrop_url) ? '' : 'd-none' }}"
@@ -184,7 +184,7 @@
                                 class="{{ !empty($movie->backdrop_url) ? '' : 'd-none' }}" style="max-height:100px">
                         </div>
                         <div class="mb-4 col-md-6">
-                            <x-form.input type="number" min="0" label="عدد المشاهدات" :value="$movie->view_count ?? 0"
+                            <x-form.input type="number" min="0" label="{{ __('admin.view_count') }}" :value="$movie->view_count ?? 0"
                                 name="view_count" placeholder="0" readonly />
                         </div>
                     </div>
@@ -198,11 +198,11 @@
                 <div class="row">
                     <div class="mb-4 col-md-6">
                         <x-form.input type="number" min="0" label="TMDB ID" :value="$movie->tmdb_id"
-                            name="tmdb_id" placeholder="مثال: 550" />
+                            name="tmdb_id" placeholder="{{ __('admin.example') }}: 550" />
 
                     </div>
                     <div class="mb-4 col-md-6">
-                        <button type="button" id="tmdbSyncBtn" class="btn btn-primary">مزامنة من TMDB</button>
+                        <button type="button" id="tmdbSyncBtn" class="btn btn-primary">{{ __('admin.sync_from_tmdb') }}</button>
                     </div>
                 </div>
             </div>

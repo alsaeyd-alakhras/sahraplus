@@ -93,7 +93,7 @@
                 <div class="row ">
 
                     <div class="mb-4 col-md-4">
-                        <x-form.input type="number" label="وقت تخطي المقدمة " :value="$episode->intro_skip_time" name="intro_skip_time"
+                        <x-form.input type="number" label="{{ __('admin.intro_skip_time') }}" :value="$episode->intro_skip_time" name="intro_skip_time"
                             min="0" />
 
                     </div>
@@ -113,10 +113,10 @@
                 <div class="div row">
                     <div class="col-md-6">
                         <x-form.input type="number" min="0" label="{{ __('admin.tmdb_id') }}"
-                            :value="$episode->tmdb_id" name="tmdb_id" placeholder="مثال: 1412" />
+                            :value="$episode->tmdb_id" name="tmdb_id" placeholder="{{ __('admin.example') }}: 1412" />
                     </div>
                     <div class="col-md-6 mb-4 ">
-                        <button type="button" id="tmdbSyncBtn" class="btn btn-primary">مزامنة من TMDB</button>
+                        <button type="button" id="tmdbSyncBtn" class="btn btn-primary">{{ __('admin.sync_from_tmdb') }}</button>
                     </div>
                 </div>
             </div>

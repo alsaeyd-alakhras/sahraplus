@@ -100,8 +100,8 @@
                     <div class="mb-4 col-md-4">
                         <label class="form-label"> {{__('admin.order')}} </label>
                         <select class="form-control" name="aspect_ratio">
-                            <option value="vertical" @selected(old('aspect_ratio', $short->aspect_ratio) == 'vertical')>عمودي</option>
-                            <option value="horizontal" @selected(old('aspect_ratio', $short->aspect_ratio) == 'horizontal')>أفقي</option>
+                            <option value="vertical" @selected(old('aspect_ratio', $short->aspect_ratio) == 'vertical')>{{ __('admin.vertical') }}</option>
+                            <option value="horizontal" @selected(old('aspect_ratio', $short->aspect_ratio) == 'horizontal')>{{ __('admin.horizontal') }}</option>
                         </select>
                     </div>
                     <div class="mb-4 col-md-4">

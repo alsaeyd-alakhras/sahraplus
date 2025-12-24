@@ -227,7 +227,7 @@
                 <div class="div row">
                     <div class="col-md-6">
                         <x-form.input type="number" min="0" label="{{ __('admin.tmdb_id') }}"
-                            :value="$series->tmdb_id" name="tmdb_id" placeholder="مثال: 1412" />
+                            :value="$series->tmdb_id" name="tmdb_id" placeholder="{{ __('admin.example') }}: 1412" />
                     </div>
                     <div class="col-md-6">
                         <button type="button" id="tmdbSyncBtn" class="btn btn-primary">مزامنة من TMDB</button>

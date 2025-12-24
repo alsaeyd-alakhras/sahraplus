@@ -121,7 +121,7 @@
                 <div class="row">
                     <div class="mb-4 col-md-6">
                         <x-form.input label="{{ __('admin.Name_ar') }}" :value="$person->name_ar" name="name_ar"
-                            placeholder="محمد..." required autofocus />
+                            placeholder="{{ __('admin.name_placeholder_ar') }}" required autofocus />
                     </div>
                     <div class="mb-4 col-md-6">
                         <x-form.input label="{{ __('admin.Name_en') }}" :value="$person->name_en" name="name_en"
@@ -129,7 +129,7 @@
                     </div>
                     <div class="col-md-6">
                         <x-form.textarea label="{{ __('admin.Bio_ar') }}" name="bio_ar" rows="2"
-                            :value="$person->bio_ar" placeholder="السيرة الذاتية بالعربية..." />
+                            :value="$person->bio_ar" placeholder="{{ __('admin.bio_ar_placeholder') }}" />
                     </div>
                     <div class="col-md-6">
                         <x-form.textarea label="{{ __('admin.Bio_en') }}" name="bio_en" rows="2"
@@ -166,7 +166,7 @@
 
                     <div class="mb-4 col-md-4">
                         <x-form.input type="number" min="0" label="TMDB ID" :value="$person->tmdb_id" name="tmdb_id"
-                            placeholder="مثال: 550" />
+                            placeholder="{{ __('admin.example') }}: 550" />
                     </div>
 
                     {{-- ✅ حالة النشاط --}}
@@ -192,7 +192,7 @@
                             <div class="tags-container" id="known_for_container">
                                 <div class="tags-wrapper" id="known_for_wrapper"></div>
                                 <input type="text" class="tag-input" id="known_for_input"
-                                    placeholder="ابحث أو أضف مهنة جديدة...">
+                                    placeholder="{{ __('admin.add_new_job') }}">
                                 <div class="placeholder" id="known_for_placeholder">ابحث أو أضف مهنة جديدة...</div>
                             </div>
                             <div class="suggestions-list" id="known_for_suggestions"></div>

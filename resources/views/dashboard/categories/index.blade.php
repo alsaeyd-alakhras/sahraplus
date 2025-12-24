@@ -40,7 +40,7 @@
 
         <div class="mx-2 nav-item">
             <button class="p-2 border-0 btn btn-outline-danger rounded-pill me-n1 waves-effect waves-light d-none"
-                    type="button" id="filterBtnClear" title="إزالة التصفية">
+                    type="button" id="filterBtnClear" title="{{ __('admin.remove_filter') }}">
                 <i class="fa-solid fa-eraser fe-16"></i>
             </button>
         </div>
@@ -86,7 +86,7 @@
                                                     <div class="dropdown-menu enhanced-filter-menu filterDropdownMenu" aria-labelledby="{{ $index }}_filter">
                                                         <div class="mb-3 d-flex justify-content-between align-items-center">
                                                             <input type="search" class="form-control search-checkbox"
-                                                                   placeholder="ابحث..." data-index="{{ $loop->index + 1 }}">
+                                                                   placeholder="{{ __('admin.search') }}..." data-index="{{ $loop->index + 1 }}">
                                                             <button class="enhanced-apply-btn ms-2 filter-apply-btn-checkbox"
                                                                     data-target="{{ $loop->index + 1 }}" data-field="{{ $index }}">
                                                                 <i class="fas fa-check"></i>
@@ -125,8 +125,8 @@
                 <p class="delete-sub-text"> {{ __('admin.You will not be able to revert this!') }}</p>
             </div>
             <div class="modal-footer justify-content-center">
-                <button type="button" class="btn btn-cancel" data-bs-dismiss="modal"><i class="fas fa-times me-2"></i>إلغاء</button>
-                <button type="button" class="text-white btn btn-confirm-delete" id="confirmDeleteBtn"><i class="fas fa-trash me-2"></i>حذف نهائي</button>
+                <button type="button" class="btn btn-cancel" data-bs-dismiss="modal"><i class="fas fa-times me-2"></i>{{ __('admin.Cancel') }}</button>
+                <button type="button" class="text-white btn btn-confirm-delete" id="confirmDeleteBtn"><i class="fas fa-trash me-2"></i>{{ __('admin.Final_Delete') }}</button>
             </div>
         </div></div>
     </div>
@@ -163,6 +163,13 @@
             const abilityEdit   = "{{ Auth::guard('admin')->user()->can('update', 'App\\Models\\Category') }}";
             const abilityDelete = "{{ Auth::guard('admin')->user()->can('delete', 'App\\Models\\Category') }}";
 
+            // translations
+            const transEdit = "{{ __('admin.edit_action') }}";
+            const transDelete = "{{ __('admin.delete_action') }}";
+            const transSearch = "{{ __('admin.search') }}";
+            const transCancel = "{{ __('admin.Cancel') }}";
+            const transFinalDelete = "{{ __('admin.Final_Delete') }}";
+
             // أسماء الحقول للفلترة في الهيدر
             const fields = ['#','name_ar','name_en','sort_order','is_active'];
 
@@ -181,10 +188,10 @@
                     let linkedit = ``;
                     let linkdelete = ``;
                     if (abilityEdit) {
-                        linkedit = `<a href="${urlEdit.replace(':id', data)}" class="action-btn btn-edit" title="تعديل"><i class="fas fa-edit"></i></a>`;
+                        linkedit = `<a href="${urlEdit.replace(':id', data)}" class="action-btn btn-edit" title="${transEdit}"><i class="fas fa-edit"></i></a>`;
                     }
                     if (abilityDelete) {
-                        linkdelete = `<button class="action-btn btn-delete delete_row" data-id="${data}" title="حذف"><i class="fas fa-trash"></i></button>`;
+                        linkdelete = `<button class="action-btn btn-delete delete_row" data-id="${data}" title="${transDelete}"><i class="fas fa-trash"></i></button>`;
                     }
 
                     return `<div class="d-flex align-items-center justify-content-evenly">
