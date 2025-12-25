@@ -313,7 +313,7 @@
             <i class="fas fa-trash"></i>
           </button>`;
                         }
-                        return `<div class="d-flex align-items-center justify-content-evenly">
+                        return `<div class="d-flex align-items-center justify-content-evenly gap-2">
                 ${linkedit}${linkdelete}
               </div>`;
                     }

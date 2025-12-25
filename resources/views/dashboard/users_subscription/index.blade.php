@@ -246,7 +246,7 @@
                             linkshow =
                                 `<a href="${urlShow.replace(':id',  row.id)}" class="action-btn btn-show" title="عرض"><i class="fas fa-eye"></i></a>`;
                         }
-                        return `<div class="d-flex align-items-center justify-content-evenly">
+                        return `<div class="d-flex align-items-center justify-content-evenly gap-2">
                                     ${linkshow}
                                 </div>`;
                     }

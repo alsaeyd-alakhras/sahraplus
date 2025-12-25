@@ -315,7 +315,7 @@
                         }
 
                         // 6. **إرجاع جميع الأزرار المتاحة**
-                        return `<div class="d-flex align-items-center justify-content-evenly">
+                        return `<div class="d-flex align-items-center justify-content-evenly gap-2">
                                     ${linkshow}
                                     ${linkdelete}
                                 </div>`;
