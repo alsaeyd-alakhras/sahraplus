@@ -36,7 +36,7 @@ $(document).ready(function () {
             data.forEach((item) => {
                 html += `
                     <div class="overflow-hidden masonry-item position-relative">
-                        <img src="/storage/${item.file_path}" class="img-fluid media-image">
+                        <img src="${urlAssetPath}storage/${item.file_path}" class="img-fluid media-image">
                         <div class="top-0 p-2 media-actions position-absolute" style="display: none;">
                             <button class="border btn btn-sm btn-light rounded-circle edit-btn" data-id="${item.id}" data-name="${item.name}" title="تعديل">
                                 <i class="fas fa-pen text-secondary"></i>

@@ -138,6 +138,7 @@
             const urlDelete = "{{ route('dashboard.media.destroy', ':id') }}";
             const urlEdit = "{{ route('dashboard.media.update', ':id') }}";
             const _token = "{{ csrf_token() }}";
+            const urlAssetPath = "{{ config('app.asset_url') }}";
         </script>
         <script src="{{ asset('js/custom/media.js') }}"></script>
     @endpush
