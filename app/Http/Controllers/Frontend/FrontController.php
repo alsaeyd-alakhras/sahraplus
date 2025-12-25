@@ -269,6 +269,9 @@ class FrontController extends Controller
                     ->where('vh.watched_at', '>=', now()->subDays(30));
             });
         }
+        if (request()->has('short_id')) {
+            $shortsQuery->where('id', request()->short_id);
+        }
         $shorts = $shortsQuery->orderByDesc('id')->limit(10)->get();
         return view('site.shorts', compact('shorts'));
     }

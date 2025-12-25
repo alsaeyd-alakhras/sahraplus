@@ -12,6 +12,9 @@
             </ul>
         </div>
     @endif
+    @php
+        $name = 'name_' . app()->getLocale();
+    @endphp
 
     <div class="col-md-12">
         <div class="mb-3 border shadow card border-1">
@@ -225,7 +228,7 @@
                                     {{ in_array($category->id, old('category_ids', $movie->categories->pluck('id')->toArray() ?? []))
                                         ? 'selected'
                                         : '' }}>
-                                    {{ $category->name_ar }}
+                                    {{ $category->$name }}
                                 </option>
                             @endforeach
                         </select>

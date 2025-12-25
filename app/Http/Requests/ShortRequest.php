@@ -28,12 +28,11 @@ class ShortRequest extends FormRequest
     return [
         'title'        => ['required', 'string', 'max:200'],
         'description'  => ['nullable', 'string'],
-        'share_url'    => ['nullable', 'url', 'max:191'],
         'aspect_ratio' => ['required', Rule::in(['vertical', 'horizontal'])],
         'status'       => ['required', Rule::in(['active', 'inactive'])],
         'is_featured'  => ['sometimes', 'boolean'],
         'is_kids'      => ['sometimes', 'boolean'],
-        'video_basic_url'=> ['required'],
+        'video_basic_url'=> ['nullable','url'],
 
         // إجبار وجود الفيديو
         'video_path'   => ['required_without:video_files', 'string', 'max:2000'],
@@ -48,7 +47,7 @@ class ShortRequest extends FormRequest
         'poster_path'     => ['nullable', 'string', 'max:191'],
 
         // ملفات الفيديو المرفقة (اختياري إذا عندك UI لها)
-        'video_files'                  => ['sometimes', 'array'],
+        'video_files'                  => ['required', 'array'],
         'video_files.*.video_type'     => ['required', 'in:main,trailer,teaser,clip'],
         'video_files.*.quality'        => ['required', 'in:240p,360p,480p,720p,1080p,4k'],
         'video_files.*.file'           => $isUpdate
@@ -66,7 +65,7 @@ class ShortRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'video_files.*.file_url.required_without' => __('admin.validation_url_or_file'),
+            'video_path.required_without' => __('admin.validation_url_or_file'),
         ];
     }
 }

@@ -1,3 +1,6 @@
+@push('styles')
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+@endpush
 @if ($errors->any())
     <div class="alert alert-danger">
         <ul>
@@ -7,6 +10,9 @@
         </ul>
     </div>
 @endif
+@php
+    $name = 'name_' . app()->getLocale();
+@endphp
 <div class="row">
     <div class="col-md-12">
         <div class="mb-3 border shadow card border-1">
@@ -18,14 +24,14 @@
                         <input type="text" name="title" class="form-control" required
                             value="{{ old('title', $short->title) }}">
                     </div>
-                    <div class="mb-4 col-md-6">
+                    {{-- <div class="mb-4 col-md-6">
                         <label class="form-label">{{__('admin.share_url')}} </label>
                         <input type="url" name="share_url" class="form-control"
                             value="{{ old('share_url', $short->share_url) }}">
-                    </div>
+                    </div> --}}
                     <div class="mb-4 col-md-6">
                         <label class="form-label">{{__('admin.video_basic_url')}}</label>
-                        <input type="text" name="video_basic_url" class="form-control" required
+                        <input type="url" name="video_basic_url" class="form-control"
                             value="{{ old('video_basic_url', $short->video_basic_url) }}">
                     </div>
                 </div>
@@ -133,33 +139,27 @@
         <div class="mb-3 border shadow card border-1">
             <div class="pt-4 card-body">
                 <div class="row">
-                    {{-- Categories (movie_category_mapping) --}}
+                    {{-- Categories --}}
                     <div class="col-12">
-                        <label class="form-label fw-bold">{{ __('admin.Movie Category') }}</label>
+                        <label class="form-label fw-bold">
+                            {{ __('admin.Movie Category') }}
+                        </label>
 
-                        {{-- الحاوية للمختارة --}}
-                        <div id="selected-categories" class="mb-2 d-none">
-                            <div class="flex-wrap gap-2 d-flex"></div>
-                            <hr class="mt-2 mb-3">
-                        </div>
-                        {{-- مهم: لو ما في اختيار، هالحقل يرسل قيمة فاضية بدل ما يختفي المفتاح --}}
-                        <input type="hidden" name="category_ids" value="">
-                        {{-- الحاوية للكل --}}
-
-                        <div id="category-badges" class="flex-wrap gap-2 d-flex">
+                        <select name="category_ids[]"    id="category-select" class="form-control select2" multiple
+                            data-placeholder="{{ __('admin.select_categories') }}">
                             @foreach ($allCategories as $category)
-                                <label class="px-3 py-1 mb-2 btn btn-outline-primary rounded-pill"
-                                    data-id="{{ $category->id }}">
-                                    <input type="checkbox" class="d-none" name="category_ids[]"
-                                        value="{{ $category->id }}"
-                                        {{ in_array($category->id, old('category_ids', $short->categories->pluck('id')->toArray() ?? [])) ? 'checked' : '' }}>
-                                    {{ $category->name_ar }}
-                                </label>
+                                <option value="{{ $category->id }}"
+                                    {{ in_array($category->id, old('category_ids', $short->categories->pluck('id')->toArray() ?? []))
+                                        ? 'selected'
+                                        : '' }}>
+                                    {{ $category->$name }}
+                                </option>
                             @endforeach
-                        </div>
+                        </select>
 
-
-                        <span class="text-muted">{{ __('admin.select_at_least_one_category') }}</span>
+                        <span class="text-muted d-block mt-2">
+                            {{ __('admin.select_at_least_one_category') }}
+                        </span>
                     </div>
                 </div>
             </div>
@@ -171,8 +171,8 @@
                     <div class="col-12">
                         <div class="mb-2 d-flex justify-content-between align-items-center">
                             <label class="fw-semibold">{{ __('admin.video_files') }}</label>
-                            <button type="button" id="add-video-row" class="btn btn-dark btn-sm">+
-                                {{ __('admin.add') }}</button>
+                            {{-- <button type="button" id="add-video-row" class="btn btn-dark btn-sm">+
+                                {{ __('admin.add') }}</button> --}}
                         </div>
 
                         <div id="video-rows" class="gap-3 d-grid">
@@ -195,7 +195,7 @@
                                 );
                             @endphp
 
-                            @if (empty($oldVideos) && !isset($btn_label))
+                            @if (empty($oldVideos))
                                 @include('dashboard.shorts.partials._video_row', ['i' => 0, 'row' => []])
                             @else
                                 @foreach ($oldVideos as $i => $row)
@@ -221,60 +221,9 @@
             </div>
         </div>
     </div>
-
 </div>
 
-{{-- مودال الوسائط --}}
-<div class="modal fade" id="mediaModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="mb-6 text-2xl font-bold modal-title">{{ __('admin.media') }} </h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" id="closeMediaModal">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            <div class="p-4 modal-body">
-                <form id="uploadForm" enctype="multipart/form-data" class="mb-3">
-                    <input type="hidden" name="_token" value="{{ csrf_token() }}">
-                    <input type="file" name="image" id="imageInputMedia" class="mb-2 form-control">
-                    <button type="button" id="uploadFormBtn"
-                        class="btn btn-primary">{{ __('admin.upload') }}</button>
-                </form>
-                <div id="mediaGrid" class="masonry">
-                    {{-- الصور ستُملأ تلقائيًا عبر jQuery --}}
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-primary" id="selectMediaBtn">{{ __('admin.select') }}</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div class="modal fade" id="confirmDeleteModal" tabindex="-1" role="dialog"
-    aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">{{ __('admin.Delete Confirmation') }}</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" id="closeDeleteModal">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            <div class="modal-body">
-                {{ __('admin.Are you sure?') }}
-            </div>
-            <div class="modal-footer">
-
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
-                    id="closeDeleteModal">إلغاء</button>
-
-                <button type="button" class="btn btn-danger" id="confirmDeleteBtn">نعم، حذف</button>
-            </div>
-        </div>
-    </div>
-</div>
+@include('layouts.partials.dashboard.mediamodel')
 
 @push('scripts')
     <script>
@@ -283,7 +232,18 @@
         const videoRowPartial = "{{ route('dashboard.shorts.videoRowPartial') }}";
 
     </script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <script src="{{ asset('js/custom/shorts.js') }}"></script>
-
+    <script>
+                $(document).ready(function() {
+            $('.select2').select2({
+                width: '100%',
+                minimumResultsForSearch: 0, // إجبار ظهور البحث
+                placeholder: function() {
+                    return $(this).data('placeholder');
+                }
+            });
+        });
+    </script>
 
 @endpush
